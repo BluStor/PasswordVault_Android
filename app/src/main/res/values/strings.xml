@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PasswordVault</string>
+    <string name="error_empty">Cannot be empty</string>
+    <string name="error_match">Passwords do not match</string>
+    <string name="imageview_icon_content_description">Icon</string>
+    <string name="textview_empty">Empty</string>
+    <string name="textview_name">Name</string>
+</resources>
