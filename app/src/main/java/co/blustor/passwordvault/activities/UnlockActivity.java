@@ -6,11 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.nanotasks.BackgroundWork;
 import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
@@ -44,8 +43,8 @@ public class UnlockActivity extends AppCompatActivity {
 
         final EditText passwordTextView = (EditText)findViewById(R.id.edittext_password);
 
-        Button unlockButton = (Button)findViewById(R.id.button_unlock);
-        unlockButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton floatingActionButton = (FloatingActionButton)findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Editable editable = passwordTextView.getText();

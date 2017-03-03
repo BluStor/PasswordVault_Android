@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.UnlockActivity">
+        <activity android:name=".activities.UnlockActivity" android:windowSoftInputMode="stateVisible|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,7 +17,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.GroupActivity" />
-
+        <activity android:name=".activities.InitializeActivity" android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".activities.EditGroupActivity" android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".activities.EditEntryActivity" android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".activities.AddGroupActivity" android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".activities.AddEntryActivity" android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".activities.CloseActivity" />
         <receiver
             android:name=".receivers.AppBroadcastReceiver"
             android:exported="false">
@@ -25,17 +30,9 @@
                 <action android:name="co.blustor.passwordvault.lock_database" />
             </intent-filter>
         </receiver>
-
         <service
             android:name=".services.NotificationService"
             android:exported="false" />
-
-        <activity android:name=".activities.InitializeActivity" android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.EditGroupActivity" android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.EditEntryActivity" android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.AddGroupActivity" android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.AddEntryActivity" android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.CloseActivity" />
     </application>
 
 </manifest>

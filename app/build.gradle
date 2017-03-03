@@ -21,18 +21,17 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.1'
     compile 'com.android.support:design:25.2.0'
     compile 'com.basgeekball:awesome-validation:2.0'
     compile 'com.fabiendevos:nanotasks:1.1.0'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.google.guava:guava:20.0'
-    compile ('de.slackspace:openkeepass:0.6.0') {
+    compile('de.slackspace:openkeepass:0.6.0') {
         exclude module: 'stax'
         exclude module: 'stax-api'
         exclude module: 'xpp3'
     }
-
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })

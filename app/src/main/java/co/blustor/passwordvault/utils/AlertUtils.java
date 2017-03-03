@@ -8,7 +8,7 @@ public class AlertUtils {
     private static String TAG = "AlertUtils";
 
     public static void showError(Context context, String message) {
-        showMessage(context, "Error", message);
+        showMessage(context, null, message);
     }
 
     public static void showMessage(Context context, String title, String message) {

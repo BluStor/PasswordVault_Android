@@ -74,8 +74,6 @@ public class EditGroupActivity extends LockingActivity {
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Warning")
                 .setMessage("Close without saving?")
                 .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                     @Override

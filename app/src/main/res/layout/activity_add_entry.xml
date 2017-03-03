@@ -11,17 +11,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/imageview_vault"
-                android:src="@drawable/vault"
-                android:adjustViewBounds="true"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <include layout="@layout/inc_entry"/>
-        </LinearLayout>
+        <include layout="@layout/inc_entry"/>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>

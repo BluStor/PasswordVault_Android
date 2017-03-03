@@ -9,8 +9,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.activities.CloseActivity;
+import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.constants.Notifications;
 import co.blustor.passwordvault.constants.Intents;
 import co.blustor.passwordvault.database.Vault;

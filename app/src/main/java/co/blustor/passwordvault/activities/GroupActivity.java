@@ -86,7 +86,7 @@ public class GroupActivity extends LockingActivity {
         groupFloatingActionButton.setLabelText("Group");
         groupFloatingActionButton.setColorNormalResId(R.color.colorPrimaryDark);
         groupFloatingActionButton.setColorPressedResId(R.color.colorPrimaryDark);
-        groupFloatingActionButton.setImageResource(R.drawable.fab_add);
+        groupFloatingActionButton.setImageResource(R.drawable.group_white);
         groupFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,7 +102,7 @@ public class GroupActivity extends LockingActivity {
         entryFloatingActionButton.setLabelText("Entry");
         entryFloatingActionButton.setColorNormalResId(R.color.colorPrimaryDark);
         entryFloatingActionButton.setColorPressedResId(R.color.colorPrimaryDark);
-        entryFloatingActionButton.setImageResource(R.drawable.fab_add);
+        entryFloatingActionButton.setImageResource(R.drawable.entry_white);
         entryFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
