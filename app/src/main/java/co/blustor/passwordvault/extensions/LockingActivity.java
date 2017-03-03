@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 
 import co.blustor.passwordvault.constants.Intents;
+import co.blustor.passwordvault.database.Vault;
 
 public class LockingActivity extends AppCompatActivity {
     private BroadcastReceiver lockBroadcastReceiver = new BroadcastReceiver() {
@@ -21,10 +22,21 @@ public class LockingActivity extends AppCompatActivity {
     };
 
     @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
     protected void onResume() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intents.LOCK_DATABASE);
         registerReceiver(lockBroadcastReceiver, intentFilter);
+
+        Vault vault = Vault.getInstance(this);
+        if (!vault.isUnlocked()) {
+            finish();
+        }
+
         super.onResume();
     }
 
