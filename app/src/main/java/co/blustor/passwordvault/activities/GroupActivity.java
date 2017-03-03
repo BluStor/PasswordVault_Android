@@ -35,7 +35,7 @@ public class GroupActivity extends LockingActivity {
     private VaultGroup mGroup = null;
     private GroupEntryAdapter mGroupEntryAdapter = null;
     private TextView mEmptyTextView = null;
-    private ArrayList<String> mPath = new ArrayList<>();
+    private final ArrayList<String> mPath = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,8 +180,8 @@ public class GroupActivity extends LockingActivity {
 
     private class GroupEntryAdapter extends RecyclerView.Adapter<GroupEntryAdapter.GroupEntryViewHolder> {
 
-        private List<VaultGroup> mGroups = new ArrayList<>();
-        private List<VaultEntry> mEntries = new ArrayList<>();
+        private final List<VaultGroup> mGroups = new ArrayList<>();
+        private final List<VaultEntry> mEntries = new ArrayList<>();
 
         GroupEntryAdapter() {
             updateData();
@@ -234,8 +234,8 @@ public class GroupActivity extends LockingActivity {
 
         class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-            ImageView iconImageView;
-            TextView titleTextView;
+            final ImageView iconImageView;
+            final TextView titleTextView;
 
             GroupEntryViewHolder(View itemView) {
                 super(itemView);

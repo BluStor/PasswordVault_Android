@@ -1,6 +1,5 @@
 package co.blustor.passwordvault.extensions;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +10,7 @@ import co.blustor.passwordvault.constants.Intents;
 import co.blustor.passwordvault.database.Vault;
 
 public class LockingActivity extends AppCompatActivity {
-    private BroadcastReceiver lockBroadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver lockBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -20,11 +19,6 @@ public class LockingActivity extends AppCompatActivity {
             }
         }
     };
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     @Override
     protected void onResume() {

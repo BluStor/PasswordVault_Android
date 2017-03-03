@@ -2,9 +2,7 @@ package co.blustor.passwordvault.activities;
 
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -13,7 +11,6 @@ import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 
 import java.util.UUID;
-import java.util.concurrent.locks.Lock;
 
 import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
@@ -28,7 +25,7 @@ public class EditEntryActivity extends LockingActivity {
 
     private VaultEntry mEntry = null;
 
-    private AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
+    private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private EditText mTitleEditText = null;
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
@@ -100,7 +97,7 @@ public class EditEntryActivity extends LockingActivity {
                 .show();
     }
 
-    public void load() {
+    private void load() {
         setTitle("Edit entry");
 
         mTitleEditText.setText(mEntry.getTitle());
@@ -109,7 +106,7 @@ public class EditEntryActivity extends LockingActivity {
         mUriEditText.setText(mEntry.getUri());
     }
 
-    public Boolean save() {
+    private Boolean save() {
         if (mAwesomeValidation.validate()) {
             mEntry.setTitle(mTitleEditText.getText().toString());
             mEntry.setUsername(mUsernameEditText.getText().toString());

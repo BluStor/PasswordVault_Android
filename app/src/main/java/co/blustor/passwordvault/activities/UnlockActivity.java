@@ -54,7 +54,7 @@ public class UnlockActivity extends AppCompatActivity {
         });
     }
 
-    public void openVault(final String password) {
+    private void openVault(final String password) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Opening ...");
         progressDialog.setIndeterminate(true);

@@ -23,7 +23,7 @@ public class Vault {
     private static final String TAG = "Vault";
 
     private static Vault instance = null;
-    private File mFile;
+    private final File mFile;
     private VaultGroup mRoot = null;
 
     public static Vault getInstance(Context context) {

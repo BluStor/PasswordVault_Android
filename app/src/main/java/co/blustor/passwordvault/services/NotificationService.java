@@ -18,7 +18,7 @@ import co.blustor.passwordvault.database.Vault;
 import static android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC;
 
 public class NotificationService extends Service {
-    protected static final String TAG = "NotificationService";
+    private static final String TAG = "NotificationService";
 
     @Nullable
     @Override
@@ -42,13 +42,7 @@ public class NotificationService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        super.onTaskRemoved(rootIntent);
-
-    }
-
-    public PendingIntent getSwitchToAppPendingIntent() {
+    private PendingIntent getSwitchToAppPendingIntent() {
         Intent intent = new Intent(this, CloseActivity.class);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -56,11 +50,11 @@ public class NotificationService extends Service {
         return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public PendingIntent getLockDatabaseIntent() {
+    private PendingIntent getLockDatabaseIntent() {
         return PendingIntent.getBroadcast(this, 0, new Intent(Intents.LOCK_DATABASE), PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    public Notification getUnlockedNotification() {
+    private Notification getUnlockedNotification() {
         return new NotificationCompat.Builder(this)
                 .setOngoing(true)
                 .setVisibility(VISIBILITY_PUBLIC)

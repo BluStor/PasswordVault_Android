@@ -5,7 +5,7 @@ import java.util.UUID;
 public class VaultEntry {
     private static final String TAG = "VaultEntry";
 
-    private UUID mUUID;
+    private final UUID mUUID;
     private String mTitle;
     private String mUsername;
     private String mPassword;

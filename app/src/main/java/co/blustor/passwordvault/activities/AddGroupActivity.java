@@ -2,7 +2,6 @@ package co.blustor.passwordvault.activities;
 
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,8 +24,8 @@ public class AddGroupActivity extends LockingActivity {
 
     private VaultGroup mGroup;
 
-    AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
-    EditText mNameEditText = null;
+    private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
+    private EditText mNameEditText = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +86,7 @@ public class AddGroupActivity extends LockingActivity {
                 .show();
     }
 
-    public Boolean save() {
+    private Boolean save() {
         if (mAwesomeValidation.validate()) {
             VaultGroup group = new VaultGroup(
                     mGroup.getUUID(),

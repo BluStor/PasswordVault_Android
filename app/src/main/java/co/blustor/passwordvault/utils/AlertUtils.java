@@ -11,7 +11,7 @@ public class AlertUtils {
         showMessage(context, null, message);
     }
 
-    public static void showMessage(Context context, String title, String message) {
+    private static void showMessage(Context context, String title, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setMessage(message)
                 .setPositiveButton("Okay", new DialogInterface.OnClickListener() {

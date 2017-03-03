@@ -24,6 +24,9 @@
             android:id="@+id/textview_title"
             android:gravity="center_vertical"
             android:paddingLeft="10dp"
+            android:paddingStart="10dp"
+            android:paddingRight="10dp"
+            android:paddingEnd="10dp"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="85"/>

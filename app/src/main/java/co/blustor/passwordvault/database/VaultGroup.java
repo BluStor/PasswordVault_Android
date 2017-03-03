@@ -12,14 +12,14 @@ import java.util.UUID;
 public class VaultGroup {
     private static String TAG = "VaultGroup";
 
-    private UUID mParentUUID;
-    private UUID mUUID;
+    private final UUID mParentUUID;
+    private final UUID mUUID;
     private String mName;
 
-    private List<VaultGroup> mGroups = new ArrayList<>();
-    private List<VaultEntry> mEntries = new ArrayList<>();
+    private final List<VaultGroup> mGroups = new ArrayList<>();
+    private final List<VaultEntry> mEntries = new ArrayList<>();
 
-    static TreeTraverser<VaultGroup> traverser = new TreeTraverser<VaultGroup>() {
+    static final TreeTraverser<VaultGroup> traverser = new TreeTraverser<VaultGroup>() {
         @Override
         public Iterable<VaultGroup> children(@NonNull VaultGroup root) {
             return root.getGroups();
