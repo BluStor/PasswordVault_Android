@@ -26,9 +26,10 @@ import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
+import co.blustor.passwordvault.extensions.LockingActivity;
 import co.blustor.passwordvault.services.NotificationService;
 
-public class GroupActivity extends AppCompatActivity {
+public class GroupActivity extends LockingActivity {
     private static final String TAG = "GroupActivity";
 
     private VaultGroup mGroup = null;

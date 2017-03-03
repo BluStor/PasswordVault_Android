@@ -18,18 +18,11 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (action != null) {
             if (action.equals(Intents.LOCK_DATABASE)) {
-                Log.d(TAG, "Lock database");
                 Vault vault = Vault.getInstance(context);
                 vault.lock();
 
-                Intent unlockActivity = new Intent(context, UnlockActivity.class);
-                unlockActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Removes other Activities from stack
-                context.startActivity(unlockActivity);
-
-                // TODO: The above opens the app.  This is not ideal.
-
                 Intent ongoingNotificationService = new Intent(context, NotificationService.class);
-                context.startService(ongoingNotificationService);
+                context.stopService(ongoingNotificationService);
             }
         }
     }

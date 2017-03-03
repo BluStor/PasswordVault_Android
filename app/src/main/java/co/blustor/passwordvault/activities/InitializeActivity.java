@@ -1,5 +1,6 @@
 package co.blustor.passwordvault.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +17,7 @@ import co.blustor.passwordvault.utils.AlertUtils;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class InitializeActivity extends AppCompatActivity {
+public class InitializeActivity extends Activity {
     private static final String TAG = "InitializeActivity";
 
     @Override

@@ -5,10 +5,10 @@ import java.util.List;
 import de.slackspace.openkeepass.domain.Entry;
 import de.slackspace.openkeepass.domain.Group;
 
-public class Importer {
+class Importer {
     private static final String TAG = "Importer";
 
-    public static VaultGroup addKeePass(Group keePassGroup, VaultGroup rootGroup) {
+    static VaultGroup addKeePass(Group keePassGroup, VaultGroup rootGroup) {
         List<Group> keePassGroups = keePassGroup.getGroups();
         for (Group group : keePassGroups) {
             VaultGroup newGroup = new VaultGroup(keePassGroup.getUuid(), group.getUuid(), group.getName());

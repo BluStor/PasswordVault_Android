@@ -16,10 +16,11 @@ import java.util.UUID;
 import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultGroup;
+import co.blustor.passwordvault.extensions.LockingActivity;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class EditGroupActivity extends AppCompatActivity {
+public class EditGroupActivity extends LockingActivity {
     private static final String TAG = "EditGroupActivity";
 
     private VaultGroup mGroup = null;

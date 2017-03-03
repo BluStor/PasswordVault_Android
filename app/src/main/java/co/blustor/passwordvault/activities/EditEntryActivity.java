@@ -13,15 +13,17 @@ import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
 
 import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
+import co.blustor.passwordvault.extensions.LockingActivity;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class EditEntryActivity extends AppCompatActivity {
+public class EditEntryActivity extends LockingActivity {
     private static final String TAG = "EditEntryActivity";
 
     private VaultEntry mEntry = null;

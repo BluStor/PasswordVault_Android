@@ -1,5 +1,6 @@
 package co.blustor.passwordvault.activities;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,10 +18,11 @@ import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
+import co.blustor.passwordvault.extensions.LockingActivity;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class AddEntryActivity extends AppCompatActivity {
+public class AddEntryActivity extends LockingActivity {
     private static final String TAG = "AddEntryActivity";
 
     private VaultGroup mGroup;
