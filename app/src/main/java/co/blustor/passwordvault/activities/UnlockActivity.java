@@ -15,6 +15,7 @@ import com.nanotasks.BackgroundWork;
 import com.nanotasks.Completion;
 import com.nanotasks.Tasks;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import co.blustor.passwordvault.R;
@@ -77,6 +78,7 @@ public class UnlockActivity extends AppCompatActivity {
 
                 Intent groupActivity = new Intent(context, GroupActivity.class);
                 groupActivity.putExtra("uuid", result);
+                groupActivity.putStringArrayListExtra("path", new ArrayList<String>());
                 startActivity(groupActivity);
 
                 Intent notificationService = new Intent(context, NotificationService.class);

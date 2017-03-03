@@ -2,7 +2,6 @@ package co.blustor.passwordvault.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.common.base.Joiner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,15 +35,40 @@ public class GroupActivity extends LockingActivity {
     private VaultGroup mGroup = null;
     private GroupEntryAdapter mGroupEntryAdapter = null;
     private TextView mEmptyTextView = null;
+    private ArrayList<String> mPath = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group);
 
+        // Load
+
+        Intent intent = getIntent();
+        UUID uuid = (UUID)intent.getSerializableExtra("uuid");
+
+        try {
+            Vault vault = Vault.getInstance(this);
+            mGroup = vault.getGroupByUUID(uuid);
+        } catch (Vault.GroupNotFoundException e) {
+            finish();
+        }
+
+        mPath.addAll(intent.getStringArrayListExtra("path"));
+        mPath.add(mGroup.getName());
+
         // Views
 
         mEmptyTextView = (TextView)findViewById(R.id.textview_empty);
+
+        TextView pathTextView = (TextView)findViewById(R.id.textview_path);
+        List<String> displayPath = getDisplayPath();
+        if (displayPath.size() > 0) {
+            String path = "in " + Joiner.on("/").join(getDisplayPath());
+            pathTextView.setText(path);
+        } else {
+            pathTextView.setVisibility(View.GONE);
+        }
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_groupsentries);
         recyclerView.setHasFixedSize(true);
@@ -66,7 +91,7 @@ public class GroupActivity extends LockingActivity {
             @Override
             public void onClick(View v) {
                 fam.close(false);
-                Intent addGroupActivity = new Intent(GroupActivity.this, AddGroupActivity.class);
+                Intent addGroupActivity = new Intent(v.getContext(), AddGroupActivity.class);
                 addGroupActivity.putExtra("uuid", mGroup.getUUID());
                 startActivity(addGroupActivity);
             }
@@ -82,7 +107,7 @@ public class GroupActivity extends LockingActivity {
             @Override
             public void onClick(View v) {
                 fam.close(false);
-                Intent addEntryActivity = new Intent(GroupActivity.this, AddEntryActivity.class);
+                Intent addEntryActivity = new Intent(v.getContext(), AddEntryActivity.class);
                 addEntryActivity.putExtra("uuid", mGroup.getUUID());
                 startActivity(addEntryActivity);
             }
@@ -90,17 +115,6 @@ public class GroupActivity extends LockingActivity {
 
         fam.addMenuButton(groupFloatingActionButton);
         fam.addMenuButton(entryFloatingActionButton);
-
-        // Load
-
-        UUID uuid = (UUID)getIntent().getSerializableExtra("uuid");
-
-        try {
-            Vault vault = Vault.getInstance(this);
-            mGroup = vault.getGroupByUUID(uuid);
-        } catch (Vault.GroupNotFoundException e) {
-            finish();
-        }
     }
 
     @Override
@@ -116,6 +130,7 @@ public class GroupActivity extends LockingActivity {
             Log.d(TAG, "Edit selected");
             Intent editGroupActivity = new Intent(this, EditGroupActivity.class);
             editGroupActivity.putExtra("uuid", mGroup.getUUID());
+            editGroupActivity.putStringArrayListExtra("path", mPath);
 
             startActivity(editGroupActivity);
         } else if (id == R.id.action_delete) {
@@ -153,6 +168,14 @@ public class GroupActivity extends LockingActivity {
         mGroupEntryAdapter.updateData();
         mGroupEntryAdapter.notifyDataSetChanged();
         super.onResume();
+    }
+
+    private List<String> getDisplayPath() {
+        if (mPath.size() > 1) {
+            return mPath.subList(0, mPath.size() - 1);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     private class GroupEntryAdapter extends RecyclerView.Adapter<GroupEntryAdapter.GroupEntryViewHolder> {
@@ -230,14 +253,15 @@ public class GroupActivity extends LockingActivity {
                 if (position < mGroups.size()) {
                     VaultGroup group = mGroups.get(position);
 
-                    Intent groupActivity = new Intent(GroupActivity.this, GroupActivity.class);
+                    Intent groupActivity = new Intent(v.getContext(), GroupActivity.class);
                     groupActivity.putExtra("uuid", group.getUUID());
+                    groupActivity.putExtra("path", mPath);
 
                     startActivity(groupActivity);
                 } else {
                     VaultEntry entry = mEntries.get(position - mGroups.size());
 
-                    Intent editEntryActivity = new Intent(GroupActivity.this, EditEntryActivity.class);
+                    Intent editEntryActivity = new Intent(v.getContext(), EditEntryActivity.class);
                     editEntryActivity.putExtra("groupUUID", mGroup.getUUID());
                     editEntryActivity.putExtra("uuid", entry.getUUID());
 
@@ -251,7 +275,7 @@ public class GroupActivity extends LockingActivity {
                 if (position < mGroups.size()) {
                     VaultGroup group = mGroups.get(position);
 
-                    Intent editGroupActivity = new Intent(GroupActivity.this, EditGroupActivity.class);
+                    Intent editGroupActivity = new Intent(v.getContext(), EditGroupActivity.class);
                     editGroupActivity.putExtra("uuid", group.getUUID());
 
                     startActivity(editGroupActivity);
