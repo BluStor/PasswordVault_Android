@@ -135,7 +135,7 @@ public class GroupActivity extends LockingActivity {
             startActivity(editGroupActivity);
         } else if (id == R.id.action_delete) {
             if (mGroup.getParentUUID() == null) {
-                Toast.makeText(this, "Cannot delete root group.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Cannot delete root group_orange.", Toast.LENGTH_SHORT).show();
             } else {
                 try {
                     Vault vault = Vault.getInstance(this);
@@ -196,12 +196,12 @@ public class GroupActivity extends LockingActivity {
         @Override
         public void onBindViewHolder(GroupEntryAdapter.GroupEntryViewHolder holder, int position) {
             if (position < mGroups.size()) {
-                holder.iconImageView.setImageResource(R.drawable.group);
+                holder.iconImageView.setImageResource(R.drawable.group_orange);
 
                 VaultGroup group = mGroups.get(position);
                 holder.titleTextView.setText(group.getName());
             } else {
-                holder.iconImageView.setImageResource(R.drawable.entry);
+                holder.iconImageView.setImageResource(R.drawable.entry_gray);
 
                 VaultEntry entry = mEntries.get(position - mGroups.size());
                 holder.titleTextView.setText(entry.getTitle());
