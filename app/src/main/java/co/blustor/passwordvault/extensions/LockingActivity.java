@@ -21,11 +21,16 @@ public class LockingActivity extends AppCompatActivity {
     };
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
+    protected void onResume() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intents.LOCK_DATABASE);
         registerReceiver(lockBroadcastReceiver, intentFilter);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(lockBroadcastReceiver);
+        super.onPause();
     }
 }
