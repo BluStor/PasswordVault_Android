@@ -1,7 +1,10 @@
 package co.blustor.passwordvault.activities;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -232,7 +235,7 @@ public class GroupActivity extends LockingActivity {
             }
         }
 
-        class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+        class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
             final ImageView iconImageView;
             final TextView titleTextView;
@@ -241,7 +244,6 @@ public class GroupActivity extends LockingActivity {
                 super(itemView);
 
                 itemView.setOnClickListener(this);
-                itemView.setOnLongClickListener(this);
 
                 iconImageView = (ImageView)itemView.findViewById(R.id.imageview_icon);
                 titleTextView = (TextView)itemView.findViewById(R.id.textview_title);
@@ -265,23 +267,9 @@ public class GroupActivity extends LockingActivity {
                     editEntryActivity.putExtra("groupUUID", mGroup.getUUID());
                     editEntryActivity.putExtra("uuid", entry.getUUID());
 
-                    startActivity(editEntryActivity);
+                    ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(GroupActivity.this, iconImageView, "entry");
+                    startActivity(editEntryActivity, activityOptions.toBundle());
                 }
-            }
-
-            @Override
-            public boolean onLongClick(View v) {
-                int position = getAdapterPosition();
-                if (position < mGroups.size()) {
-                    VaultGroup group = mGroups.get(position);
-
-                    Intent editGroupActivity = new Intent(v.getContext(), EditGroupActivity.class);
-                    editGroupActivity.putExtra("uuid", group.getUUID());
-
-                    startActivity(editGroupActivity);
-                }
-
-                return true;
             }
         }
     }

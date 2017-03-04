@@ -60,7 +60,7 @@ public class EditEntryActivity extends LockingActivity {
             load();
         } catch (Vault.GroupNotFoundException | VaultGroup.EntryNotFoundException e) {
             e.printStackTrace();
-            finish();
+            supportFinishAfterTransition();
         }
     }
 
@@ -75,7 +75,7 @@ public class EditEntryActivity extends LockingActivity {
         int id = item.getItemId();
         if (id == R.id.action_save) {
             if (save()) {
-                finish();
+                supportFinishAfterTransition();
             }
         }
 
@@ -89,7 +89,7 @@ public class EditEntryActivity extends LockingActivity {
                 .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        finish();
+                        supportFinishAfterTransition();
                     }
 
                 })
