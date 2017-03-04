@@ -29,7 +29,7 @@ public class AddEntryActivity extends LockingActivity {
     private EditText mTitleEditText = null;
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
-    private EditText mUriEditText = null;
+    private EditText mUrlEditText = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ public class AddEntryActivity extends LockingActivity {
         mTitleEditText = (EditText)findViewById(R.id.edittext_title);
         mUsernameEditText = (EditText)findViewById(R.id.edittext_username);
         mPasswordEditText = (EditText)findViewById(R.id.edittext_password);
-        mUriEditText = (EditText)findViewById(R.id.edittext_uri);
+        mUrlEditText = (EditText)findViewById(R.id.edittext_url);
 
         // Load
 
@@ -102,7 +102,7 @@ public class AddEntryActivity extends LockingActivity {
                     mUsernameEditText.getText().toString(),
                     mPasswordEditText.getText().toString()
             );
-            entry.setUri(mUriEditText.getText().toString());
+            entry.setUrl(mUrlEditText.getText().toString());
             mGroup.add(entry);
             return true;
         } else {

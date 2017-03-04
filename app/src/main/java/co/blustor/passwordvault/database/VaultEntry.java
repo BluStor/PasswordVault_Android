@@ -9,7 +9,7 @@ public class VaultEntry {
     private String mTitle;
     private String mUsername;
     private String mPassword;
-    private String mUri = "";
+    private String mUrl = "";
 
     public VaultEntry(UUID uuid, String title, String username, String password) {
         mUUID = uuid;
@@ -46,11 +46,11 @@ public class VaultEntry {
         mPassword = password;
     }
 
-    public String getUri() {
-        return mUri;
+    public String getUrl() {
+        return mUrl;
     }
 
-    public void setUri(String uri) {
-        mUri = uri;
+    public void setUrl(String url) {
+        mUrl = url;
     }
 }
