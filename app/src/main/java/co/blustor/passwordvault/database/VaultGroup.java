@@ -5,9 +5,13 @@ import android.support.annotation.NonNull;
 import com.google.common.collect.TreeTraverser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+
+import co.blustor.passwordvault.comparators.VaultEntryComparator;
+import co.blustor.passwordvault.comparators.VaultGroupComparator;
 
 public class VaultGroup {
     private static String TAG = "VaultGroup";
@@ -36,6 +40,7 @@ public class VaultGroup {
 
     public void add(VaultEntry entry) {
         mEntries.add(entry);
+        Collections.sort(mEntries, new VaultEntryComparator());
     }
 
     public List<VaultEntry> getEntries() {
@@ -56,6 +61,7 @@ public class VaultGroup {
 
     public void add(VaultGroup group) {
         mGroups.add(group);
+        Collections.sort(mGroups, new VaultGroupComparator());
     }
 
     public List<VaultGroup> getGroups() {
