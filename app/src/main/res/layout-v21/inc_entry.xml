@@ -15,7 +15,7 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/edittext_title"
             android:hint="Title"
             android:inputType="textCapWords"
@@ -27,7 +27,7 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/edittext_username"
             android:hint="Username"
             android:inputType="text"
@@ -39,7 +39,7 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/edittext_password"
             android:hint="Password"
             android:inputType="textPassword"
@@ -51,7 +51,7 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/edittext_url"
             android:hint="URL"
             android:inputType="textUri"
