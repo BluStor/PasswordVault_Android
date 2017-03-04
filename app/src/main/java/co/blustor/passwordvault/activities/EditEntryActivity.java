@@ -3,6 +3,7 @@ package co.blustor.passwordvault.activities;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -66,7 +67,7 @@ public class EditEntryActivity extends LockingActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_save, menu);
+        getMenuInflater().inflate(R.menu.menu_edit_entry, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -76,6 +77,12 @@ public class EditEntryActivity extends LockingActivity {
         if (id == R.id.action_save) {
             if (save()) {
                 supportFinishAfterTransition();
+            }
+        } else if (id == R.id.action_unmask) {
+            if (mPasswordEditText.getTransformationMethod() instanceof PasswordTransformationMethod) {
+                mPasswordEditText.setTransformationMethod(null);
+            } else {
+                mPasswordEditText.setTransformationMethod(new PasswordTransformationMethod());
             }
         }
 
