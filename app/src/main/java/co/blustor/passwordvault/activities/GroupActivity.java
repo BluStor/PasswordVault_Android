@@ -116,12 +116,7 @@ public class GroupActivity extends LockingActivity {
 
         fam.addMenuButton(groupFloatingActionButton);
         fam.addMenuButton(entryFloatingActionButton);
-        fam.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fam.close(true);
-            }
-        });
+        fam.setClosedOnTouchOutside(true);
     }
 
     @Override
