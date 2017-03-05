@@ -1,5 +1,6 @@
 package co.blustor.passwordvault.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
@@ -24,6 +26,7 @@ import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 public class EditEntryActivity extends LockingActivity {
     private static final String TAG = "EditEntryActivity";
 
+    private VaultGroup mGroup = null;
     private VaultEntry mEntry = null;
 
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
@@ -55,8 +58,9 @@ public class EditEntryActivity extends LockingActivity {
 
         try {
             Vault vault = Vault.getInstance(this);
-            VaultGroup group = vault.getGroupByUUID(groupUUID);
-            mEntry = group.getEntry(uuid);
+
+            mGroup = vault.getGroupByUUID(groupUUID);
+            mEntry = mGroup.getEntry(uuid);
             load();
         } catch (Vault.GroupNotFoundException | VaultGroup.EntryNotFoundException e) {
             e.printStackTrace();
@@ -73,15 +77,18 @@ public class EditEntryActivity extends LockingActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_save) {
-            if (save()) {
-                supportFinishAfterTransition();
-            }
-        } else if (id == R.id.action_unmask) {
+
+        if (id == R.id.action_unmask) {
             if (mPasswordEditText.getTransformationMethod() instanceof PasswordTransformationMethod) {
                 mPasswordEditText.setTransformationMethod(null);
             } else {
                 mPasswordEditText.setTransformationMethod(new PasswordTransformationMethod());
+            }
+        } else if (id == R.id.action_delete) {
+            delete();
+        } else if (id == R.id.action_save) {
+            if (save()) {
+                supportFinishAfterTransition();
             }
         }
 
@@ -110,6 +117,29 @@ public class EditEntryActivity extends LockingActivity {
         mUsernameEditText.setText(mEntry.getUsername());
         mPasswordEditText.setText(mEntry.getPassword());
         mUrlEditText.setText(mEntry.getUrl());
+    }
+
+    private void delete() {
+        final Context context = this;
+
+        new AlertDialog.Builder(this)
+                .setMessage("Are you sure you want to delete this entry?")
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mGroup.removeEntry(mEntry.getUUID());
+
+                        Toast.makeText(context, "Entry deleted.", Toast.LENGTH_SHORT).show();
+
+                        finish();
+                    }
+                }).show();
     }
 
     private Boolean save() {

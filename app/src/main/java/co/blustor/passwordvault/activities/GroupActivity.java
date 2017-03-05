@@ -1,8 +1,11 @@
 package co.blustor.passwordvault.activities;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -136,19 +139,34 @@ public class GroupActivity extends LockingActivity {
 
             startActivity(editGroupActivity);
         } else if (id == R.id.action_delete) {
+            final Context context = this;
+
             if (mGroup.getParentUUID() == null) {
-                Toast.makeText(this, "Cannot delete root group_orange.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Cannot delete root group.", Toast.LENGTH_SHORT).show();
             } else {
-                try {
-                    Vault vault = Vault.getInstance(this);
-                    vault.getGroupByUUID(mGroup.getParentUUID()).removeGroup(mGroup.getUUID());
+                new AlertDialog.Builder(this)
+                        .setMessage("Are you sure you want to delete this group?")
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                try {
+                                    Vault vault = Vault.getInstance(getParent());
+                                    vault.getGroupByUUID(mGroup.getParentUUID()).removeGroup(mGroup.getUUID());
 
-                    Toast.makeText(this, "Group deleted.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, "Group deleted.", Toast.LENGTH_SHORT).show();
 
-                    finish();
-                } catch (Vault.GroupNotFoundException e) {
-                    e.printStackTrace();
-                }
+                                    finish();
+                                } catch (Vault.GroupNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).show();
             }
         }
 
@@ -167,9 +185,9 @@ public class GroupActivity extends LockingActivity {
 
     @Override
     protected void onResume() {
-        mGroupEntryAdapter.updateData();
-        mGroupEntryAdapter.notifyDataSetChanged();
         super.onResume();
+
+        mGroupEntryAdapter.updateData();
     }
 
     private List<String> getDisplayPath() {

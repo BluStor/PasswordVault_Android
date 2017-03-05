@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import co.blustor.passwordvault.comparators.VaultEntryComparator;
 import co.blustor.passwordvault.comparators.VaultGroupComparator;
@@ -55,6 +56,15 @@ public class VaultGroup {
         }
 
         throw new EntryNotFoundException();
+    }
+
+    public void removeEntry(final UUID uuid) {
+        Iterator<VaultEntry> i = mEntries.iterator();
+        while (i.hasNext()) {
+            if (i.next().getUUID().equals(uuid)) {
+                i.remove();
+            }
+        }
     }
 
     // Groups

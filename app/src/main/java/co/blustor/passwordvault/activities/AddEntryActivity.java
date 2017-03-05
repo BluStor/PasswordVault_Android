@@ -38,7 +38,7 @@ public class AddEntryActivity extends LockingActivity {
 
         // Validation
 
-        mAwesomeValidation.addValidation(this, R.id.edittext_name, RegexTemplate.NOT_EMPTY, R.string.error_empty);
+        mAwesomeValidation.addValidation(this, R.id.edittext_title, RegexTemplate.NOT_EMPTY, R.string.error_empty);
 
         // Views
 
