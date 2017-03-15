@@ -2,9 +2,8 @@ package co.blustor.passwordvault.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
-import android.text.method.PasswordTransformationMethod;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -25,11 +24,9 @@ import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class EditEntryActivity extends LockingActivity {
     private static final String TAG = "EditEntryActivity";
-
+    private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup = null;
     private VaultEntry mEntry = null;
-
-    private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private EditText mTitleEditText = null;
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
@@ -46,15 +43,15 @@ public class EditEntryActivity extends LockingActivity {
 
         // Views
 
-        mTitleEditText = (EditText)findViewById(R.id.edittext_title);
-        mUsernameEditText = (EditText)findViewById(R.id.edittext_username);
-        mPasswordEditText = (EditText)findViewById(R.id.edittext_password);
-        mUrlEditText = (EditText)findViewById(R.id.edittext_url);
+        mTitleEditText = (EditText) findViewById(R.id.edittext_title);
+        mUsernameEditText = (EditText) findViewById(R.id.edittext_username);
+        mPasswordEditText = (EditText) findViewById(R.id.edittext_password);
+        mUrlEditText = (EditText) findViewById(R.id.edittext_url);
 
         // Load
 
-        UUID groupUUID = (UUID)getIntent().getSerializableExtra("groupUUID");
-        UUID uuid = (UUID)getIntent().getSerializableExtra("uuid");
+        UUID groupUUID = (UUID) getIntent().getSerializableExtra("groupUUID");
+        UUID uuid = (UUID) getIntent().getSerializableExtra("uuid");
 
         try {
             Vault vault = Vault.getInstance(this);
@@ -78,13 +75,7 @@ public class EditEntryActivity extends LockingActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_unmask) {
-            if (mPasswordEditText.getTransformationMethod() instanceof PasswordTransformationMethod) {
-                mPasswordEditText.setTransformationMethod(null);
-            } else {
-                mPasswordEditText.setTransformationMethod(new PasswordTransformationMethod());
-            }
-        } else if (id == R.id.action_delete) {
+        if (id == R.id.action_delete) {
             delete();
         } else if (id == R.id.action_save) {
             if (save()) {

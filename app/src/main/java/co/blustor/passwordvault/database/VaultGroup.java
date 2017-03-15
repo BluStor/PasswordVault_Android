@@ -9,27 +9,23 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 import co.blustor.passwordvault.comparators.VaultEntryComparator;
 import co.blustor.passwordvault.comparators.VaultGroupComparator;
 
 public class VaultGroup {
-    private static String TAG = "VaultGroup";
-
-    private final UUID mParentUUID;
-    private final UUID mUUID;
-    private String mName;
-
-    private final List<VaultGroup> mGroups = new ArrayList<>();
-    private final List<VaultEntry> mEntries = new ArrayList<>();
-
     static final TreeTraverser<VaultGroup> traverser = new TreeTraverser<VaultGroup>() {
         @Override
         public Iterable<VaultGroup> children(@NonNull VaultGroup root) {
             return root.getGroups();
         }
     };
+    private static String TAG = "VaultGroup";
+    private final UUID mParentUUID;
+    private final UUID mUUID;
+    private final List<VaultGroup> mGroups = new ArrayList<>();
+    private final List<VaultEntry> mEntries = new ArrayList<>();
+    private String mName;
 
     public VaultGroup(UUID parentUUID, UUID uuid, String name) {
         mParentUUID = parentUUID;
@@ -105,5 +101,6 @@ public class VaultGroup {
         mName = name;
     }
 
-    public static class EntryNotFoundException extends Exception {}
+    public static class EntryNotFoundException extends Exception {
+    }
 }

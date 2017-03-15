@@ -33,7 +33,7 @@ public class InitializeActivity extends Activity {
 
         // Views
 
-        final EditText passwordEditText = (EditText)findViewById(R.id.edittext_password);
+        final EditText passwordEditText = (EditText) findViewById(R.id.edittext_password);
 
         Button createButton = (Button) findViewById(R.id.button_create);
         createButton.setOnClickListener(new View.OnClickListener() {

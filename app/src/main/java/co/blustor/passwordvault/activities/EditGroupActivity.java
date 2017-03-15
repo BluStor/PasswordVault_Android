@@ -1,8 +1,8 @@
 package co.blustor.passwordvault.activities;
 
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -21,10 +21,8 @@ import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class EditGroupActivity extends LockingActivity {
     private static final String TAG = "EditGroupActivity";
-
-    private VaultGroup mGroup = null;
-
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
+    private VaultGroup mGroup = null;
     private EditText mNameEditText = null;
 
     @Override
@@ -38,11 +36,11 @@ public class EditGroupActivity extends LockingActivity {
 
         // Views
 
-        mNameEditText = (EditText)findViewById(R.id.edittext_name);
+        mNameEditText = (EditText) findViewById(R.id.edittext_name);
 
         // Load
 
-        UUID uuid = (UUID)getIntent().getSerializableExtra("uuid");
+        UUID uuid = (UUID) getIntent().getSerializableExtra("uuid");
 
         try {
             Vault vault = Vault.getInstance(this);

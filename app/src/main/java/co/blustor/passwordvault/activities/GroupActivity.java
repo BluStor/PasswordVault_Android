@@ -35,11 +35,10 @@ import co.blustor.passwordvault.services.NotificationService;
 
 public class GroupActivity extends LockingActivity {
     private static final String TAG = "GroupActivity";
-
+    private final ArrayList<String> mPath = new ArrayList<>();
     private VaultGroup mGroup = null;
     private GroupEntryAdapter mGroupEntryAdapter = null;
     private TextView mEmptyTextView = null;
-    private final ArrayList<String> mPath = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +48,7 @@ public class GroupActivity extends LockingActivity {
         // Load
 
         Intent intent = getIntent();
-        UUID uuid = (UUID)intent.getSerializableExtra("uuid");
+        UUID uuid = (UUID) intent.getSerializableExtra("uuid");
 
         try {
             Vault vault = Vault.getInstance(this);
@@ -63,9 +62,9 @@ public class GroupActivity extends LockingActivity {
 
         // Views
 
-        mEmptyTextView = (TextView)findViewById(R.id.textview_empty);
+        mEmptyTextView = (TextView) findViewById(R.id.textview_empty);
 
-        TextView pathTextView = (TextView)findViewById(R.id.textview_path);
+        TextView pathTextView = (TextView) findViewById(R.id.textview_path);
         List<String> displayPath = getDisplayPath();
         if (displayPath.size() > 0) {
             String path = "in " + Joiner.on("/").join(getDisplayPath());
@@ -83,7 +82,7 @@ public class GroupActivity extends LockingActivity {
         mGroupEntryAdapter = new GroupEntryAdapter();
         recyclerView.setAdapter(mGroupEntryAdapter);
 
-        final FloatingActionMenu fam = (FloatingActionMenu)findViewById(R.id.fam);
+        final FloatingActionMenu fam = (FloatingActionMenu) findViewById(R.id.fam);
 
         FloatingActionButton groupFloatingActionButton = new FloatingActionButton(this);
         groupFloatingActionButton.setButtonSize(FloatingActionButton.SIZE_MINI);
@@ -262,8 +261,8 @@ public class GroupActivity extends LockingActivity {
 
                 itemView.setOnClickListener(this);
 
-                iconImageView = (ImageView)itemView.findViewById(R.id.imageview_icon);
-                titleTextView = (TextView)itemView.findViewById(R.id.textview_title);
+                iconImageView = (ImageView) itemView.findViewById(R.id.imageview_icon);
+                titleTextView = (TextView) itemView.findViewById(R.id.textview_title);
             }
 
             @Override

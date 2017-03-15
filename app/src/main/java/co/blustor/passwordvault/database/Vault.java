@@ -26,13 +26,6 @@ public class Vault {
     private final File mFile;
     private VaultGroup mRoot = null;
 
-    public static Vault getInstance(Context context) {
-        if (instance == null) {
-            instance = new Vault(context);
-        }
-        return instance;
-    }
-
     private Vault(Context context) {
         File path = context.getFilesDir();
         mFile = new File(path, "passwords.kdbx");
@@ -52,6 +45,13 @@ public class Vault {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static Vault getInstance(Context context) {
+        if (instance == null) {
+            instance = new Vault(context);
+        }
+        return instance;
     }
 
     public Boolean exists() {
@@ -123,7 +123,12 @@ public class Vault {
         }
     }
 
-    public static class NotFoundException extends Exception {}
-    public static class PasswordInvalidException extends Exception {}
-    public static class GroupNotFoundException extends Exception {}
+    public static class NotFoundException extends Exception {
+    }
+
+    public static class PasswordInvalidException extends Exception {
+    }
+
+    public static class GroupNotFoundException extends Exception {
+    }
 }

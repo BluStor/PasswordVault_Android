@@ -1,8 +1,8 @@
 package co.blustor.passwordvault.activities;
 
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -22,10 +22,8 @@ import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class AddEntryActivity extends LockingActivity {
     private static final String TAG = "AddEntryActivity";
-
-    private VaultGroup mGroup;
-
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
+    private VaultGroup mGroup;
     private EditText mTitleEditText = null;
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
@@ -43,14 +41,14 @@ public class AddEntryActivity extends LockingActivity {
         // Views
 
         setTitle("Add entry");
-        mTitleEditText = (EditText)findViewById(R.id.edittext_title);
-        mUsernameEditText = (EditText)findViewById(R.id.edittext_username);
-        mPasswordEditText = (EditText)findViewById(R.id.edittext_password);
-        mUrlEditText = (EditText)findViewById(R.id.edittext_url);
+        mTitleEditText = (EditText) findViewById(R.id.edittext_title);
+        mUsernameEditText = (EditText) findViewById(R.id.edittext_username);
+        mPasswordEditText = (EditText) findViewById(R.id.edittext_password);
+        mUrlEditText = (EditText) findViewById(R.id.edittext_url);
 
         // Load
 
-        UUID uuid = (UUID)getIntent().getSerializableExtra("uuid");
+        UUID uuid = (UUID) getIntent().getSerializableExtra("uuid");
 
         try {
             Vault vault = Vault.getInstance(this);
