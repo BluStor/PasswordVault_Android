@@ -29,7 +29,7 @@ public class NotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
-        Vault vault = Vault.getInstance(this);
+        Vault vault = Vault.getInstance();
 
         if (vault.isUnlocked()) {
             stopForeground(true);
@@ -62,7 +62,7 @@ public class NotificationService extends Service {
                 .setContentText("Database is unlocked.")
                 .setContentIntent(getSwitchToAppPendingIntent())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .addAction(R.drawable.ic_action_lock, "Lock database", getLockDatabaseIntent())
+                .addAction(R.drawable.lock_black, "Lock database", getLockDatabaseIntent())
                 .build();
     }
 }

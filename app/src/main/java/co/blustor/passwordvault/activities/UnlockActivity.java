@@ -1,28 +1,24 @@
 package co.blustor.passwordvault.activities;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.github.clans.fab.FloatingActionButton;
-import com.nanotasks.BackgroundWork;
-import com.nanotasks.Completion;
-import com.nanotasks.Tasks;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
 import co.blustor.passwordvault.R;
-import co.blustor.passwordvault.database.Vault;
-import co.blustor.passwordvault.services.NotificationService;
-import co.blustor.passwordvault.utils.AlertUtils;
+import co.blustor.passwordvault.sync.SyncDialogFragment;
+import co.blustor.passwordvault.sync.SyncManager;
 
-public class UnlockActivity extends AppCompatActivity {
+public class UnlockActivity extends AppCompatActivity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "UnlockActivity";
 
     @Override
@@ -30,18 +26,18 @@ public class UnlockActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock);
 
-        // Initialize if keePassDatabase does not exist
-
-        Vault vault = Vault.getInstance(this);
-        if (!vault.exists()) {
-            Intent initializeActivity = new Intent(this, InitializeActivity.class);
-            startActivity(initializeActivity);
-            finish();
-        }
-
         // Views
 
         final EditText passwordTextView = (EditText) findViewById(R.id.edittext_password);
+
+        Button newButton = (Button) findViewById(R.id.button_new);
+        newButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent initializeActivity = new Intent(v.getContext(), InitializeActivity.class);
+                startActivity(initializeActivity);
+            }
+        });
 
         FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -54,43 +50,22 @@ public class UnlockActivity extends AppCompatActivity {
         });
     }
 
-    private void openVault(final String password) {
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Opening ...");
-        progressDialog.setIndeterminate(true);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
+    void openVault(final String password) {
+        SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
 
-        final Context context = this;
+        Bundle args = new Bundle();
+        args.putSerializable("type", SyncManager.SyncType.READ);
+        args.putSerializable("password", password);
 
-        Tasks.executeInBackground(this, new BackgroundWork<UUID>() {
-            @Override
-            public UUID doInBackground() throws Exception {
-                Vault vault = Vault.getInstance(context);
-                vault.unlock(password);
-                return vault.getRoot().getUUID();
-            }
-        }, new Completion<UUID>() {
-            @Override
-            public void onSuccess(Context context, UUID result) {
-                progressDialog.cancel();
+        syncDialogFragment.setArguments(args);
+        syncDialogFragment.show(getFragmentManager(), "dialog");
+    }
 
-                Intent groupActivity = new Intent(context, GroupActivity.class);
-                groupActivity.putExtra("uuid", result);
-                groupActivity.putStringArrayListExtra("path", new ArrayList<String>());
-                startActivity(groupActivity);
-
-                Intent notificationService = new Intent(context, NotificationService.class);
-                startService(notificationService);
-            }
-
-            @Override
-            public void onError(Context context, Exception e) {
-                progressDialog.cancel();
-                if (e.getClass() == Vault.PasswordInvalidException.class) {
-                    AlertUtils.showError(context, "Your password was invalid.");
-                }
-            }
-        });
+    @Override
+    public void syncComplete(UUID uuid) {
+        Intent groupActivity = new Intent(UnlockActivity.this, GroupActivity.class);
+        groupActivity.putExtra("uuid", uuid);
+        groupActivity.putExtra("path", new ArrayList<String>());
+        startActivity(groupActivity);
     }
 }

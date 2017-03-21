@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ImageView
-        android:src="@drawable/entry_gray"
+        android:src="@drawable/vaultentry_gray"
         android:transitionName="entry"
         android:minHeight="100dp"
         android:layout_width="match_parent"

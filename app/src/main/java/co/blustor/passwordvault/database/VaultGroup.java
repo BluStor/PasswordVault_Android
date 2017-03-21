@@ -40,6 +40,10 @@ public class VaultGroup {
         Collections.sort(mEntries, new VaultEntryComparator());
     }
 
+    public void addEntries(List<VaultEntry> entries) {
+        mEntries.addAll(entries);
+    }
+
     public List<VaultEntry> getEntries() {
         return mEntries;
     }
@@ -68,6 +72,10 @@ public class VaultGroup {
     public void add(VaultGroup group) {
         mGroups.add(group);
         Collections.sort(mGroups, new VaultGroupComparator());
+    }
+
+    public void addGroups(List<VaultGroup> groups) {
+        mGroups.addAll(groups);
     }
 
     public List<VaultGroup> getGroups() {

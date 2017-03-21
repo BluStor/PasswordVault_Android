@@ -16,10 +16,12 @@ import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.extensions.LockingActivity;
+import co.blustor.passwordvault.sync.SyncDialogFragment;
+import co.blustor.passwordvault.sync.SyncManager;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class AddGroupActivity extends LockingActivity {
+public class AddGroupActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "AddGroupActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup;
@@ -44,7 +46,7 @@ public class AddGroupActivity extends LockingActivity {
         UUID uuid = (UUID) getIntent().getSerializableExtra("uuid");
 
         try {
-            Vault vault = Vault.getInstance(this);
+            Vault vault = Vault.getInstance();
             mGroup = vault.getGroupByUUID(uuid);
         } catch (Vault.GroupNotFoundException e) {
             e.printStackTrace();
@@ -62,9 +64,7 @@ public class AddGroupActivity extends LockingActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_save) {
-            if (save()) {
-                finish();
-            }
+            save();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -84,7 +84,7 @@ public class AddGroupActivity extends LockingActivity {
                 .show();
     }
 
-    private Boolean save() {
+    private void save() {
         if (mAwesomeValidation.validate()) {
             VaultGroup group = new VaultGroup(
                     mGroup.getUUID(),
@@ -92,9 +92,22 @@ public class AddGroupActivity extends LockingActivity {
                     mNameEditText.getText().toString()
             );
             mGroup.add(group);
-            return true;
-        } else {
-            return false;
+
+            Vault vault = Vault.getInstance();
+
+            SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
+
+            Bundle args = new Bundle();
+            args.putSerializable("type", SyncManager.SyncType.WRITE);
+            args.putSerializable("password", vault.getPassword());
+
+            syncDialogFragment.setArguments(args);
+            syncDialogFragment.show(getFragmentManager(), "dialog");
         }
+    }
+
+    @Override
+    public void syncComplete(UUID uuid) {
+        finish();
     }
 }

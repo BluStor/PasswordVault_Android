@@ -3,60 +3,70 @@ package co.blustor.passwordvault.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
+import com.github.clans.fab.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
-import co.blustor.passwordvault.utils.AlertUtils;
+import co.blustor.passwordvault.sync.SyncDialogFragment;
+import co.blustor.passwordvault.sync.SyncManager;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class InitializeActivity extends Activity {
+public class InitializeActivity extends Activity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "InitializeActivity";
+    private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_initialize);
 
         // Validation
 
-        final AwesomeValidation awesomeValidation = new AwesomeValidation(BASIC);
-        awesomeValidation.addValidation(this, R.id.edittext_password, RegexTemplate.NOT_EMPTY, R.string.error_empty);
-        awesomeValidation.addValidation(this, R.id.edittext_password_repeat, RegexTemplate.NOT_EMPTY, R.string.error_empty);
-        awesomeValidation.addValidation(this, R.id.edittext_password, R.id.edittext_password_repeat, R.string.error_match);
+        mAwesomeValidation.addValidation(this, R.id.edittext_password, RegexTemplate.NOT_EMPTY, R.string.error_empty);
+        mAwesomeValidation.addValidation(this, R.id.edittext_password, R.id.edittext_password_repeat, R.string.error_match);
 
         // Views
 
-        final EditText passwordEditText = (EditText) findViewById(R.id.edittext_password);
+        final EditText passwordTextView = (EditText) findViewById(R.id.edittext_password);
 
-        Button createButton = (Button) findViewById(R.id.button_create);
-        createButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                if (awesomeValidation.validate()) {
-                    createDatabase(passwordEditText.getText().toString());
+            public void onClick(final View v) {
+                if (mAwesomeValidation.validate()) {
+                    Vault vault = Vault.getInstance();
+                    vault.create();
+
+                    SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
+
+                    Bundle args = new Bundle();
+                    args.putSerializable("type", SyncManager.SyncType.WRITE);
+                    args.putSerializable("password", passwordTextView.getText().toString());
+
+                    syncDialogFragment.setArguments(args);
+                    syncDialogFragment.show(getFragmentManager(), "dialog");
                 }
             }
         });
     }
 
-    private void createDatabase(String password) {
-        try {
-            Vault vault = Vault.getInstance(this);
-            vault.create();
-            vault.save(password);
+    @Override
+    public void syncComplete(UUID uuid) {
+        Intent groupActivity = new Intent(InitializeActivity.this, GroupActivity.class);
+        groupActivity.putExtra("uuid", uuid);
+        groupActivity.putExtra("path", new ArrayList<String>());
+        startActivity(groupActivity);
 
-            Intent unlockActivity = new Intent(this, UnlockActivity.class);
-            startActivity(unlockActivity);
-            finish();
-        } catch (Vault.NotFoundException e) {
-            AlertUtils.showError(this, "Unable to create databse.");
-        }
+        finish();
     }
 }

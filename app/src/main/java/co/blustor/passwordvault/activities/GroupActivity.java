@@ -32,8 +32,11 @@ import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.extensions.LockingActivity;
 import co.blustor.passwordvault.services.NotificationService;
+import co.blustor.passwordvault.sync.SyncDialogFragment;
+import co.blustor.passwordvault.sync.SyncManager;
+import co.blustor.passwordvault.utils.AlertUtils;
 
-public class GroupActivity extends LockingActivity {
+public class GroupActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "GroupActivity";
     private final ArrayList<String> mPath = new ArrayList<>();
     private VaultGroup mGroup = null;
@@ -45,20 +48,30 @@ public class GroupActivity extends LockingActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group);
 
-        // Load
+        // Load group
 
         Intent intent = getIntent();
         UUID uuid = (UUID) intent.getSerializableExtra("uuid");
+        ArrayList<String> paths = intent.getStringArrayListExtra("path");
 
         try {
-            Vault vault = Vault.getInstance(this);
+            Vault vault = Vault.getInstance();
             mGroup = vault.getGroupByUUID(uuid);
         } catch (Vault.GroupNotFoundException e) {
+            Log.d(TAG, "Group " + uuid + " was not found");
             finish();
+            return;
         }
 
-        mPath.addAll(intent.getStringArrayListExtra("path"));
+        mPath.addAll(paths);
         mPath.add(mGroup.getName());
+
+        // Start notification service if necessary
+
+        if (mGroup.getParentUUID() == null) {
+            Intent notificationService = new Intent(this, NotificationService.class);
+            startService(notificationService);
+        }
 
         // Views
 
@@ -89,7 +102,7 @@ public class GroupActivity extends LockingActivity {
         groupFloatingActionButton.setLabelText("Group");
         groupFloatingActionButton.setColorNormalResId(R.color.colorPrimaryDark);
         groupFloatingActionButton.setColorPressedResId(R.color.colorPrimaryDark);
-        groupFloatingActionButton.setImageResource(R.drawable.group_white);
+        groupFloatingActionButton.setImageResource(R.drawable.vaultgroup_white);
         groupFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,7 +118,7 @@ public class GroupActivity extends LockingActivity {
         entryFloatingActionButton.setLabelText("Entry");
         entryFloatingActionButton.setColorNormalResId(R.color.colorPrimaryDark);
         entryFloatingActionButton.setColorPressedResId(R.color.colorPrimaryDark);
-        entryFloatingActionButton.setImageResource(R.drawable.entry_white);
+        entryFloatingActionButton.setImageResource(R.drawable.vaultentry_white);
         entryFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,12 +168,10 @@ public class GroupActivity extends LockingActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 try {
-                                    Vault vault = Vault.getInstance(getParent());
+                                    Vault vault = Vault.getInstance();
                                     vault.getGroupByUUID(mGroup.getParentUUID()).removeGroup(mGroup.getUUID());
 
-                                    Toast.makeText(context, "Group deleted.", Toast.LENGTH_SHORT).show();
-
-                                    finish();
+                                    save();
                                 } catch (Vault.GroupNotFoundException e) {
                                     e.printStackTrace();
                                 }
@@ -215,12 +226,12 @@ public class GroupActivity extends LockingActivity {
         @Override
         public void onBindViewHolder(GroupEntryAdapter.GroupEntryViewHolder holder, int position) {
             if (position < mGroups.size()) {
-                holder.iconImageView.setImageResource(R.drawable.group_orange);
+                holder.iconImageView.setImageResource(R.drawable.vaultgroup_orange);
 
                 VaultGroup group = mGroups.get(position);
                 holder.titleTextView.setText(group.getName());
             } else {
-                holder.iconImageView.setImageResource(R.drawable.entry_gray);
+                holder.iconImageView.setImageResource(R.drawable.vaultentry_gray);
 
                 VaultEntry entry = mEntries.get(position - mGroups.size());
                 holder.titleTextView.setText(entry.getTitle());
@@ -288,5 +299,23 @@ public class GroupActivity extends LockingActivity {
                 }
             }
         }
+    }
+
+    public void save() {
+        Vault vault = Vault.getInstance();
+
+        SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
+
+        Bundle args = new Bundle();
+        args.putSerializable("type", SyncManager.SyncType.WRITE);
+        args.putSerializable("password", vault.getPassword());
+
+        syncDialogFragment.setArguments(args);
+        syncDialogFragment.show(getFragmentManager(), "dialog");
+    }
+
+    @Override
+    public void syncComplete(UUID uuid) {
+        finish();
     }
 }

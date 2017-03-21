@@ -26,7 +26,7 @@ public class LockingActivity extends AppCompatActivity {
         intentFilter.addAction(Intents.LOCK_DATABASE);
         registerReceiver(lockBroadcastReceiver, intentFilter);
 
-        Vault vault = Vault.getInstance(this);
+        Vault vault = Vault.getInstance();
         if (!vault.isUnlocked()) {
             finish();
         }

@@ -1,16 +1,10 @@
 package co.blustor.passwordvault.database;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -23,39 +17,14 @@ public class Vault {
     private static final String TAG = "Vault";
 
     private static Vault instance = null;
-    private final File mFile;
+    private String mPassword = "";
     private VaultGroup mRoot = null;
 
-    private Vault(Context context) {
-        File path = context.getFilesDir();
-        mFile = new File(path, "passwords.kdbx");
-
-        if (!mFile.exists()) {
-            try {
-                InputStream fileInputStream = context.getAssets().open("passwords.kdbx");
-
-                FileOutputStream fileOutputStream = new FileOutputStream(mFile);
-
-                byte[] buffer = new byte[1024];
-                int read;
-                while ((read = fileInputStream.read(buffer)) != -1) {
-                    fileOutputStream.write(buffer, 0, read);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static Vault getInstance(Context context) {
+    public static Vault getInstance() {
         if (instance == null) {
-            instance = new Vault(context);
+            instance = new Vault();
         }
         return instance;
-    }
-
-    public Boolean exists() {
-        return mFile.exists();
     }
 
     public Boolean isUnlocked() {
@@ -68,45 +37,15 @@ public class Vault {
 
     public void create() {
         mRoot = new VaultGroup(null, UUID.randomUUID(), "Passwords");
-    }
-
-    public void unlock(String password) throws NotFoundException, PasswordInvalidException {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(mFile);
-            KeePassFile database = KeePassDatabase.getInstance(fileInputStream).openDatabase(password);
-
-            Group keePassRoot = database.getRoot().getGroups().get(0);
-            mRoot = Importer.addKeePass(keePassRoot, new VaultGroup(null, keePassRoot.getUuid(), keePassRoot.getName()));
-        } catch (FileNotFoundException e) {
-            throw new NotFoundException();
-        } catch (KeePassDatabaseUnreadableException e) {
-            throw new PasswordInvalidException();
-        }
-    }
-
-    public void save(String password) throws NotFoundException {
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(mFile);
-        } catch (FileNotFoundException e) {
-            throw new NotFoundException();
-        }
-    }
-
-    public VaultGroup getRoot() throws GroupNotFoundException {
-        if (mRoot == null) {
-            throw new GroupNotFoundException();
-        } else {
-            return mRoot;
-        }
+        Log.d(TAG, "Created new vault with root group " + mRoot.getUUID());
     }
 
     public VaultGroup getGroupByUUID(final UUID uuid) throws GroupNotFoundException {
+        Log.d(TAG, "Get group: " + uuid);
         VaultGroup root = getRoot();
 
         if (root.getUUID().equals(uuid)) {
             return mRoot;
-        } else {
-            Log.d("Vault", "Root UUID is " + root.getUUID() + root.getUUID());
         }
 
         Optional<VaultGroup> match = VaultGroup.traverser.preOrderTraversal(root).firstMatch(new Predicate<VaultGroup>() {
@@ -123,12 +62,25 @@ public class Vault {
         }
     }
 
-    public static class NotFoundException extends Exception {
+    public VaultGroup getRoot() throws GroupNotFoundException {
+        if (mRoot == null) {
+            throw new GroupNotFoundException();
+        } else {
+            return mRoot;
+        }
     }
 
-    public static class PasswordInvalidException extends Exception {
+    public void setRoot(VaultGroup group) {
+        mRoot = group;
     }
 
-    public static class GroupNotFoundException extends Exception {
+    public void setPassword(String password) {
+        mPassword = password;
     }
+
+    public String getPassword() {
+        return mPassword;
+    }
+
+    public static class GroupNotFoundException extends Exception {}
 }

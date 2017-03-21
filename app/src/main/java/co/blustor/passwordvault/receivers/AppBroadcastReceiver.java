@@ -16,7 +16,7 @@ public class AppBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (action != null) {
             if (action.equals(Intents.LOCK_DATABASE)) {
-                Vault vault = Vault.getInstance(context);
+                Vault vault = Vault.getInstance();
                 vault.lock();
 
                 Intent ongoingNotificationService = new Intent(context, NotificationService.class);

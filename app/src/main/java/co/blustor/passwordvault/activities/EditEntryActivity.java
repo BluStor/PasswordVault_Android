@@ -19,10 +19,12 @@ import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.extensions.LockingActivity;
+import co.blustor.passwordvault.sync.SyncDialogFragment;
+import co.blustor.passwordvault.sync.SyncManager;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class EditEntryActivity extends LockingActivity {
+public class EditEntryActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "EditEntryActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup = null;
@@ -54,7 +56,7 @@ public class EditEntryActivity extends LockingActivity {
         UUID uuid = (UUID) getIntent().getSerializableExtra("uuid");
 
         try {
-            Vault vault = Vault.getInstance(this);
+            Vault vault = Vault.getInstance();
 
             mGroup = vault.getGroupByUUID(groupUUID);
             mEntry = mGroup.getEntry(uuid);
@@ -78,9 +80,7 @@ public class EditEntryActivity extends LockingActivity {
         if (id == R.id.action_delete) {
             delete();
         } else if (id == R.id.action_save) {
-            if (save()) {
-                supportFinishAfterTransition();
-            }
+            save();
         }
 
         return super.onOptionsItemSelected(item);
@@ -111,9 +111,7 @@ public class EditEntryActivity extends LockingActivity {
     }
 
     private void delete() {
-        final Context context = this;
-
-        new AlertDialog.Builder(this)
+         new AlertDialog.Builder(this)
                 .setMessage("Are you sure you want to delete this entry?")
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
@@ -125,23 +123,33 @@ public class EditEntryActivity extends LockingActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mGroup.removeEntry(mEntry.getUUID());
-
-                        Toast.makeText(context, "Entry deleted.", Toast.LENGTH_SHORT).show();
-
-                        finish();
+                        save();
                     }
                 }).show();
     }
 
-    private Boolean save() {
+    private void save() {
         if (mAwesomeValidation.validate()) {
             mEntry.setTitle(mTitleEditText.getText().toString());
             mEntry.setUsername(mUsernameEditText.getText().toString());
             mEntry.setPassword(mPasswordEditText.getText().toString());
             mEntry.setUrl(mUrlEditText.getText().toString());
-            return true;
-        } else {
-            return false;
+
+            Vault vault = Vault.getInstance();
+
+            SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
+
+            Bundle args = new Bundle();
+            args.putSerializable("type", SyncManager.SyncType.WRITE);
+            args.putSerializable("password", vault.getPassword());
+
+            syncDialogFragment.setArguments(args);
+            syncDialogFragment.show(getFragmentManager(), "dialog");
         }
+    }
+
+    @Override
+    public void syncComplete(UUID uuid) {
+        supportFinishAfterTransition();
     }
 }
