@@ -15,7 +15,6 @@ import java.util.UUID;
 import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultGroup;
-import co.blustor.passwordvault.extensions.LockingActivity;
 import co.blustor.passwordvault.sync.SyncDialogFragment;
 import co.blustor.passwordvault.sync.SyncManager;
 

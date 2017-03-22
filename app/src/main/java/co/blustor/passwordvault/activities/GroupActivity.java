@@ -30,11 +30,9 @@ import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
-import co.blustor.passwordvault.extensions.LockingActivity;
 import co.blustor.passwordvault.services.NotificationService;
 import co.blustor.passwordvault.sync.SyncDialogFragment;
 import co.blustor.passwordvault.sync.SyncManager;
-import co.blustor.passwordvault.utils.AlertUtils;
 
 public class GroupActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "GroupActivity";
@@ -151,8 +149,6 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
 
             startActivity(editGroupActivity);
         } else if (id == R.id.action_delete) {
-            final Context context = this;
-
             if (mGroup.getParentUUID() == null) {
                 Toast.makeText(this, "Cannot delete root group.", Toast.LENGTH_SHORT).show();
             } else {
@@ -206,6 +202,24 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         } else {
             return new ArrayList<>();
         }
+    }
+
+    public void save() {
+        Vault vault = Vault.getInstance();
+
+        SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
+
+        Bundle args = new Bundle();
+        args.putSerializable("type", SyncManager.SyncType.WRITE);
+        args.putSerializable("password", vault.getPassword());
+
+        syncDialogFragment.setArguments(args);
+        syncDialogFragment.show(getFragmentManager(), "dialog");
+    }
+
+    @Override
+    public void syncComplete(UUID uuid) {
+        finish();
     }
 
     private class GroupEntryAdapter extends RecyclerView.Adapter<GroupEntryAdapter.GroupEntryViewHolder> {
@@ -299,23 +313,5 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                 }
             }
         }
-    }
-
-    public void save() {
-        Vault vault = Vault.getInstance();
-
-        SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
-
-        Bundle args = new Bundle();
-        args.putSerializable("type", SyncManager.SyncType.WRITE);
-        args.putSerializable("password", vault.getPassword());
-
-        syncDialogFragment.setArguments(args);
-        syncDialogFragment.show(getFragmentManager(), "dialog");
-    }
-
-    @Override
-    public void syncComplete(UUID uuid) {
-        finish();
     }
 }

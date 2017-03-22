@@ -25,13 +25,6 @@ public class SyncManager {
     private static String CARD_NAME = "CYBERGATE";
     private static String VAULT_PATH = "/passwordvault/vault.kdbx";
 
-    public enum SyncType {
-        READ, WRITE
-    }
-    enum SyncStatus {
-        TRANSFERRING, ENCRYPTING, DECRYPTING
-    }
-
     static Promise<VaultGroup, Exception, SyncStatus> getRoot(final Context context, final String password) {
         final DeferredObject<VaultGroup, Exception, SyncStatus> deferredObject = new DeferredObject<>();
         new Thread() {
@@ -136,7 +129,15 @@ public class SyncManager {
         return deferredObject.promise();
     }
 
-    public static class SyncManagerException extends Exception {
+    public enum SyncType {
+        READ, WRITE
+    }
+
+    enum SyncStatus {
+        TRANSFERRING, ENCRYPTING, DECRYPTING
+    }
+
+    private static class SyncManagerException extends Exception {
         SyncManagerException(String messasge) {
             super(messasge);
         }

@@ -1,4 +1,4 @@
-package co.blustor.passwordvault.extensions;
+package co.blustor.passwordvault.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

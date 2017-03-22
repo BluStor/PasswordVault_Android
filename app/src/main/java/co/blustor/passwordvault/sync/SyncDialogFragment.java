@@ -23,10 +23,6 @@ import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.utils.AlertUtils;
 
 public class SyncDialogFragment extends DialogFragment {
-    public interface SyncInterface {
-        void syncComplete(UUID uuid);
-    }
-
     private static final String TAG = "SyncDialogFragment";
 
     @Nullable
@@ -83,5 +79,9 @@ public class SyncDialogFragment extends DialogFragment {
         });
 
         return view;
+    }
+
+    public interface SyncInterface {
+        void syncComplete(UUID uuid);
     }
 }

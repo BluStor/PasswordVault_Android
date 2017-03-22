@@ -5,13 +5,7 @@ import android.util.Log;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
-import java.io.InputStream;
 import java.util.UUID;
-
-import de.slackspace.openkeepass.KeePassDatabase;
-import de.slackspace.openkeepass.domain.Group;
-import de.slackspace.openkeepass.domain.KeePassFile;
-import de.slackspace.openkeepass.exception.KeePassDatabaseUnreadableException;
 
 public class Vault {
     private static final String TAG = "Vault";
@@ -74,13 +68,14 @@ public class Vault {
         mRoot = group;
     }
 
-    public void setPassword(String password) {
-        mPassword = password;
-    }
-
     public String getPassword() {
         return mPassword;
     }
 
-    public static class GroupNotFoundException extends Exception {}
+    public void setPassword(String password) {
+        mPassword = password;
+    }
+
+    public static class GroupNotFoundException extends Exception {
+    }
 }
