@@ -55,6 +55,12 @@ public class NotificationService extends Service {
     }
 
     private Notification getUnlockedNotification() {
+        NotificationCompat.Action lockAction = new NotificationCompat.Action.Builder(
+                R.drawable.lock_black,
+                "Lock database",
+                getLockDatabaseIntent()
+        ).build();
+
         return new NotificationCompat.Builder(this)
                 .setOngoing(true)
                 .setVisibility(VISIBILITY_PUBLIC)
@@ -62,7 +68,7 @@ public class NotificationService extends Service {
                 .setContentText("Database is unlocked.")
                 .setContentIntent(getSwitchToAppPendingIntent())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .addAction(R.drawable.lock_black, "Lock database", getLockDatabaseIntent())
+                .addAction(lockAction)
                 .build();
     }
 }
