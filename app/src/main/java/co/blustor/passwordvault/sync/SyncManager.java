@@ -70,11 +70,15 @@ public class SyncManager {
                     } else {
                         deferredObject.reject(new SyncManagerException("Card returned status: " + status));
                     }
-
-                    card.disconnect();
                 } catch (IOException e) {
                     e.printStackTrace();
                     deferredObject.reject(new SyncManagerException("Unable to connect to Bluetooth card."));
+                }
+
+                try {
+                    card.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }.start();
@@ -87,6 +91,8 @@ public class SyncManager {
             @Override
             public void run() {
                 deferredObject.notify(SyncStatus.ENCRYPTING);
+
+                GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
 
                 try {
                     VaultGroup rootGroup = vault.getRoot();
@@ -101,7 +107,6 @@ public class SyncManager {
 
                     deferredObject.notify(SyncStatus.TRANSFERRING);
 
-                    GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
                     GKCard.Response response = card.put(VAULT_PATH, byteArrayInputStream);
 
                     int status = response.getStatus();
@@ -115,19 +120,23 @@ public class SyncManager {
                     } else {
                         deferredObject.reject(new SyncManagerException("Card returned status: " + status));
                     }
-
-                    card.disconnect();
                 } catch (Vault.GroupNotFoundException e) {
                     deferredObject.reject(new SyncManagerException("Vault is empty."));
                 } catch (IOException e) {
                     deferredObject.reject(new SyncManagerException(e.getMessage()));
+                }
+
+                try {
+                    card.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }.start();
         return deferredObject.promise();
     }
 
-    static class SyncManagerException extends Exception {
+    public static class SyncManagerException extends Exception {
         SyncManagerException(String messasge) {
             super(messasge);
         }
