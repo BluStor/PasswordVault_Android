@@ -16,12 +16,11 @@ import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
-import co.blustor.passwordvault.sync.SyncDialogFragment;
 import co.blustor.passwordvault.sync.SyncManager;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class AddEntryActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
+public class AddEntryActivity extends LockingActivity {
     private static final String TAG = "AddEntryActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup;
@@ -103,19 +102,8 @@ public class AddEntryActivity extends LockingActivity implements SyncDialogFragm
 
             Vault vault = Vault.getInstance();
 
-            SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
-
-            Bundle args = new Bundle();
-            args.putSerializable("type", SyncManager.SyncType.WRITE);
-            args.putSerializable("password", vault.getPassword());
-
-            syncDialogFragment.setArguments(args);
-            syncDialogFragment.show(getFragmentManager(), "dialog");
+            SyncManager.setRoot(this, vault.getPassword());
+            finish();
         }
-    }
-
-    @Override
-    public void syncComplete(UUID uuid) {
-        finish();
     }
 }

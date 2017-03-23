@@ -1,9 +1,9 @@
 package co.blustor.passwordvault.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
@@ -21,7 +21,7 @@ import co.blustor.passwordvault.sync.SyncManager;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class InitializeActivity extends Activity implements SyncDialogFragment.SyncInterface {
+public class InitializeActivity extends AppCompatActivity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "InitializeActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
 
@@ -29,6 +29,8 @@ public class InitializeActivity extends Activity implements SyncDialogFragment.S
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_initialize);
+
+        setTitle("New database");
 
         // Validation
 

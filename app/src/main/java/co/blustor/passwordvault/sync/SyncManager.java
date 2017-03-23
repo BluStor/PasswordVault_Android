@@ -25,7 +25,7 @@ public class SyncManager {
     private static String CARD_NAME = "CYBERGATE";
     private static String VAULT_PATH = "/passwordvault/vault.kdbx";
 
-    static Promise<VaultGroup, Exception, SyncStatus> getRoot(final Context context, final String password) {
+    public static Promise<VaultGroup, Exception, SyncStatus> getRoot(final Context context, final String password) {
         final DeferredObject<VaultGroup, Exception, SyncStatus> deferredObject = new DeferredObject<>();
         new Thread() {
             @Override
@@ -48,7 +48,7 @@ public class SyncManager {
                             KeePassFile keePassFile = KeePassDatabase.getInstance(file).openDatabase(password);
 
                             Group keePassRoot = keePassFile.getRoot().getGroups().get(0);
-                            VaultGroup group = Translator.importKeePass(keePassRoot, new VaultGroup(null, keePassRoot.getUuid(), keePassRoot.getName()));
+                            VaultGroup group = Translator.importKeePass(keePassRoot);
 
                             Vault vault = Vault.getInstance();
                             vault.setRoot(group);
@@ -61,11 +61,11 @@ public class SyncManager {
                     } else if (status == 550) {
                         deferredObject.reject(new SyncManagerException("Database not found on card."));
                     } else {
-                        deferredObject.reject(new SyncManagerException("Card returned status: " + status));
+                        deferredObject.reject(new SyncManagerException("Card status: " + status));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    deferredObject.reject(new SyncManagerException("Unable to connect to Bluetooth card."));
+                    deferredObject.reject(new SyncManagerException("Unable to connect to card."));
                 }
 
                 try {
@@ -78,7 +78,7 @@ public class SyncManager {
         return deferredObject.promise();
     }
 
-    static Promise<VaultGroup, Exception, SyncStatus> setRoot(final Context context, final Vault vault, final String password) {
+    public static Promise<VaultGroup, Exception, SyncStatus> setRoot(final Context context, final String password) {
         final DeferredObject<VaultGroup, Exception, SyncStatus> deferredObject = new DeferredObject<>();
         new Thread() {
             @Override
@@ -88,9 +88,10 @@ public class SyncManager {
                 GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
 
                 try {
+                    Vault vault = Vault.getInstance();
                     VaultGroup rootGroup = vault.getRoot();
 
-                    Group group = Translator.exportKeePass(rootGroup);
+                    Group group = Translator.exportKeePass(vault.getRoot());
 
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -104,19 +105,18 @@ public class SyncManager {
 
                     int status = response.getStatus();
                     if (status == 226) {
-                        Vault vault = Vault.getInstance();
                         vault.setPassword(password);
 
                         card.finalize(VAULT_PATH);
 
                         deferredObject.resolve(rootGroup);
                     } else {
-                        deferredObject.reject(new SyncManagerException("Card returned status: " + status));
+                        deferredObject.reject(new SyncManagerException("Card status: " + status));
                     }
                 } catch (Vault.GroupNotFoundException e) {
                     deferredObject.reject(new SyncManagerException("Vault is empty."));
                 } catch (IOException e) {
-                    deferredObject.reject(new SyncManagerException(e.getMessage()));
+                    deferredObject.reject(new SyncManagerException("Unable to connect to card."));
                 }
 
                 try {

@@ -29,26 +29,33 @@ public class Translator {
     private static List<VaultEntry> importEntries(Group group) {
         ArrayList<VaultEntry> entries = new ArrayList<>();
         for (Entry entry : group.getEntries()) {
-            entries.add(new VaultEntry(entry.getUuid(), entry.getTitle(), entry.getUsername(), entry.getPassword()));
+            entries.add(new VaultEntry(
+                    entry.getUuid(),
+                    entry.getTitle(),
+                    entry.getUsername(),
+                    entry.getPassword()
+            ));
         }
         return entries;
     }
 
-    public static VaultGroup importKeePass(Group keePassGroup, VaultGroup rootGroup) {
-        List<Group> keePassGroups = keePassGroup.getGroups();
-        for (Group group : keePassGroups) {
-            VaultGroup newGroup = new VaultGroup(keePassGroup.getUuid(), group.getUuid(), group.getName());
-            for (Entry entry : group.getEntries()) {
-                newGroup.add(new VaultEntry(
-                        entry.getUuid(),
-                        entry.getTitle(),
-                        entry.getUsername(),
-                        entry.getPassword()
-                ));
-            }
+    private static VaultGroup importGroup(Group keePassGroup) {
+        VaultGroup group = new VaultGroup(keePassGroup.getUuid(), keePassGroup.getUuid(), keePassGroup.getName());
+        group.addEntries(importEntries(keePassGroup));
 
-            rootGroup.add(newGroup);
-            importKeePass(group, newGroup);
+        for (Group g : keePassGroup.getGroups()) {
+            group.add(importGroup(g));
+        }
+
+        return group;
+    }
+
+    public static VaultGroup importKeePass(Group keePassGroup) {
+        VaultGroup rootGroup = new VaultGroup(null, keePassGroup.getUuid(), keePassGroup.getName());
+        rootGroup.addEntries(importEntries(keePassGroup));
+
+        for (Group group : keePassGroup.getGroups()) {
+            rootGroup.add(importGroup(group));
         }
 
         return rootGroup;
@@ -60,7 +67,6 @@ public class Translator {
 
         for (VaultGroup vaultGroup : group.getGroups()) {
             groupBuilder.addGroup(exportKeePass(vaultGroup));
-            groupBuilder.addEntries(exportKeePassEntries(vaultGroup));
         }
 
         return groupBuilder.build();

@@ -18,7 +18,6 @@ import org.jdeferred.android.AndroidDeferredManager;
 import java.util.UUID;
 
 import co.blustor.passwordvault.R;
-import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.utils.AlertUtils;
 
@@ -43,8 +42,7 @@ public class SyncDialogFragment extends DialogFragment {
         if (syncType == SyncManager.SyncType.READ) {
             promise = SyncManager.getRoot(getActivity(), password);
         } else {
-            Vault vault = Vault.getInstance();
-            promise = SyncManager.setRoot(getActivity(), vault, password);
+            promise = SyncManager.setRoot(getActivity(), password);
         }
 
         statusTextView.setText("Connecting");
