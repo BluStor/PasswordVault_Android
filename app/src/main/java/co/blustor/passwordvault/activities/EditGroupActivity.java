@@ -3,6 +3,7 @@ package co.blustor.passwordvault.activities;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -45,6 +46,7 @@ public class EditGroupActivity extends LockingActivity {
         try {
             Vault vault = Vault.getInstance();
             mGroup = vault.getGroupByUUID(uuid);
+
             load();
         } catch (Vault.GroupNotFoundException e) {
             finish();
@@ -69,17 +71,21 @@ public class EditGroupActivity extends LockingActivity {
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setMessage("Close without saving?")
-                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
+        if (hasBeenEdited()) {
+            new AlertDialog.Builder(this)
+                    .setMessage("Close without saving?")
+                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
 
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        } else {
+            finish();
+        }
     }
 
     private void load() {
@@ -89,12 +95,23 @@ public class EditGroupActivity extends LockingActivity {
 
     private void save() {
         if (mAwesomeValidation.validate()) {
-            mGroup.setName(mNameEditText.getText().toString());
+            if (hasBeenEdited()) {
+                mGroup.setName(mNameEditText.getText().toString());
 
-            Vault vault = Vault.getInstance();
+                Vault vault = Vault.getInstance();
+                SyncManager.setRoot(this, vault.getPassword());
+            }
 
-            SyncManager.setRoot(this, vault.getPassword());
             finish();
+        }
+    }
+
+    private boolean hasBeenEdited() {
+        if (mGroup.getName().equals(mNameEditText.getText().toString())) {
+            return false;
+        } else {
+            Log.d(TAG, "'" + mGroup.getName() + "' does not equal '" + mNameEditText.getText().toString() + "'.");
+            return true;
         }
     }
 }

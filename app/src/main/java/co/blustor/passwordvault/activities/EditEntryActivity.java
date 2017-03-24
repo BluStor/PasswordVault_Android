@@ -84,17 +84,21 @@ public class EditEntryActivity extends LockingActivity {
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setMessage("Close without saving?")
-                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        supportFinishAfterTransition();
-                    }
+        if (hasBeenEdited()) {
+            new AlertDialog.Builder(this)
+                    .setMessage("Close without saving?")
+                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            supportFinishAfterTransition();
+                        }
 
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        } else {
+            supportFinishAfterTransition();
+        }
     }
 
     private void load() {
@@ -130,15 +134,25 @@ public class EditEntryActivity extends LockingActivity {
 
     private void save() {
         if (mAwesomeValidation.validate()) {
-            mEntry.setTitle(mTitleEditText.getText().toString());
-            mEntry.setUsername(mUsernameEditText.getText().toString());
-            mEntry.setPassword(mPasswordEditText.getText().toString());
-            mEntry.setUrl(mUrlEditText.getText().toString());
+            if (hasBeenEdited()) {
+                mEntry.setTitle(mTitleEditText.getText().toString());
+                mEntry.setUsername(mUsernameEditText.getText().toString());
+                mEntry.setPassword(mPasswordEditText.getText().toString());
+                mEntry.setUrl(mUrlEditText.getText().toString());
 
-            Vault vault = Vault.getInstance();
+                Vault vault = Vault.getInstance();
 
-            SyncManager.setRoot(this, vault.getPassword());
+                SyncManager.setRoot(this, vault.getPassword());
+            }
+
             finish();
         }
+    }
+
+    private Boolean hasBeenEdited() {
+        return !(mEntry.getTitle().equals(mTitleEditText.getText().toString())
+                && mEntry.getUsername().equals(mUsernameEditText.getText().toString())
+                && mEntry.getPassword().equals(mPasswordEditText.getText().toString())
+                && mEntry.getUrl().equals(mUrlEditText.getText().toString()));
     }
 }
