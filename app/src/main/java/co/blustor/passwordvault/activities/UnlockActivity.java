@@ -1,6 +1,8 @@
 package co.blustor.passwordvault.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -24,6 +26,8 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_unlock);
+
+        setTitle(getApplicationTitle());
 
         // Views
 
@@ -58,6 +62,21 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
 
         syncDialogFragment.setArguments(args);
         syncDialogFragment.show(getFragmentManager(), "dialog");
+    }
+
+    String getApplicationTitle() {
+        PackageManager packageManager = getPackageManager();
+
+        String name = getApplicationInfo().loadLabel(packageManager).toString();
+        String version;
+        try {
+            PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
+            version = packageInfo.versionName + "." + packageInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            version = "?.?";
+        }
+
+        return name + " " + version;
     }
 
     @Override
