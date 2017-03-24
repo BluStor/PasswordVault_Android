@@ -21,10 +21,10 @@ android {
 
 dependencies {
     compile 'co.blustor:gatekeeper-sdk:0.19.0'
-    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:25.3.0'
-    compile 'com.android.support:support-v4:25.3.0'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:support-v4:25.3.1'
     compile 'com.basgeekball:awesome-validation:2.0'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.google.guava:guava:20.0'
