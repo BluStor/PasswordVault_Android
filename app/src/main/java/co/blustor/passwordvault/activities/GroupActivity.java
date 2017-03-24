@@ -184,8 +184,8 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         super.onBackPressed();
 
         if (mGroup.getParentUUID() == null) {
-            Intent notificationService = new Intent(this, NotificationService.class);
-            stopService(notificationService);
+            Vault vault = Vault.getInstance();
+            vault.lock();
         }
     }
 
