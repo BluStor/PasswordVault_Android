@@ -119,7 +119,11 @@ public class EditEntryActivity extends LockingActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mGroup.removeEntry(mEntry.getUUID());
-                        save();
+
+                        Vault vault = Vault.getInstance();
+
+                        SyncManager.setRoot(EditEntryActivity.this, vault.getPassword());
+                        finish();
                     }
                 }).show();
     }

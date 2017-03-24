@@ -166,7 +166,8 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                                     Vault vault = Vault.getInstance();
                                     vault.getGroupByUUID(mGroup.getParentUUID()).removeGroup(mGroup.getUUID());
 
-                                    save();
+                                    SyncManager.setRoot(GroupActivity.this, vault.getPassword());
+                                    finish();
                                 } catch (Vault.GroupNotFoundException e) {
                                     e.printStackTrace();
                                 }
@@ -201,19 +202,6 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         } else {
             return new ArrayList<>();
         }
-    }
-
-    public void save() {
-        Vault vault = Vault.getInstance();
-
-        SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
-
-        Bundle args = new Bundle();
-        args.putSerializable("type", SyncManager.SyncType.WRITE);
-        args.putSerializable("password", vault.getPassword());
-
-        syncDialogFragment.setArguments(args);
-        syncDialogFragment.show(getFragmentManager(), "dialog");
     }
 
     @Override
