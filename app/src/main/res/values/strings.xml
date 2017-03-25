@@ -5,4 +5,5 @@
     <string name="imageview_icon_content_description">Icon</string>
     <string name="textview_empty">Empty</string>
     <string name="textview_name">Name</string>
+    <string name="welcome_to">Welcome to</string>
 </resources>
