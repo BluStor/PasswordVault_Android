@@ -30,7 +30,7 @@ import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.services.NotificationService;
-import co.blustor.passwordvault.sync.SyncDialogFragment;
+import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.sync.SyncManager;
 
 public class GroupActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {

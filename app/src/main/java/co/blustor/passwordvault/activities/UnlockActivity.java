@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import co.blustor.passwordvault.R;
-import co.blustor.passwordvault.sync.SyncDialogFragment;
+import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.sync.SyncManager;
 
 public class UnlockActivity extends AppCompatActivity implements SyncDialogFragment.SyncInterface {

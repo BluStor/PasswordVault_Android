@@ -22,11 +22,23 @@ import de.slackspace.openkeepass.domain.KeePassFileBuilder;
 import de.slackspace.openkeepass.exception.KeePassDatabaseUnreadableException;
 
 public class SyncManager {
-    private static String CARD_NAME = "CYBERGATE";
-    private static String VAULT_PATH = "/passwordvault/vault.kdbx";
+    public enum SyncType {
+        READ, WRITE
+    }
+
+    public enum SyncStatus {
+        TRANSFERRING, ENCRYPTING, DECRYPTING, FAILED, SYNCED
+    }
+    
+
+    private static final String CARD_NAME = "CYBERGATE";
+    private static final String VAULT_PATH = "/passwordvault/vault.kdbx";
+
+    private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
+    private static DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
 
     public static Promise<VaultGroup, Exception, SyncStatus> getRoot(final Context context, final String password) {
-        final DeferredObject<VaultGroup, Exception, SyncStatus> deferredObject = new DeferredObject<>();
+        final DeferredObject<VaultGroup, Exception, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
             public void run() {
@@ -35,7 +47,7 @@ public class SyncManager {
                 try {
                     card.connect();
 
-                    deferredObject.notify(SyncStatus.TRANSFERRING);
+                    task.notify(SyncStatus.TRANSFERRING);
 
                     GKCard.Response response = card.get(VAULT_PATH);
                     int status = response.getStatus();
@@ -44,7 +56,7 @@ public class SyncManager {
                         File file = response.getDataFile();
 
                         try {
-                            deferredObject.notify(SyncStatus.DECRYPTING);
+                            task.notify(SyncStatus.DECRYPTING);
                             KeePassFile keePassFile = KeePassDatabase.getInstance(file).openDatabase(password);
 
                             Group keePassRoot = keePassFile.getRoot().getGroups().get(0);
@@ -54,18 +66,18 @@ public class SyncManager {
                             vault.setRoot(group);
                             vault.setPassword(password);
 
-                            deferredObject.resolve(group);
+                            task.resolve(group);
                         } catch (KeePassDatabaseUnreadableException e) {
-                            deferredObject.reject(new SyncManagerException("Database password invalid."));
+                            task.reject(new SyncManagerException("Database password invalid."));
                         }
                     } else if (status == 550) {
-                        deferredObject.reject(new SyncManagerException("Database not found on card."));
+                        task.reject(new SyncManagerException("Database not found on card."));
                     } else {
-                        deferredObject.reject(new SyncManagerException("Card status: " + status));
+                        task.reject(new SyncManagerException("Card status: " + status));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    deferredObject.reject(new SyncManagerException("Unable to connect to card."));
+                    task.reject(new SyncManagerException("Unable to connect to card."));
                 }
 
                 try {
@@ -75,15 +87,17 @@ public class SyncManager {
                 }
             }
         }.start();
-        return deferredObject.promise();
+        return task.promise();
     }
 
     public static Promise<VaultGroup, Exception, SyncStatus> setRoot(final Context context, final String password) {
-        final DeferredObject<VaultGroup, Exception, SyncStatus> deferredObject = new DeferredObject<>();
+        final DeferredObject<VaultGroup, Exception, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
             public void run() {
-                deferredObject.notify(SyncStatus.ENCRYPTING);
+                task.notify(SyncStatus.ENCRYPTING);
+                syncStatus.notify(SyncStatus.ENCRYPTING);
+                lastSyncStatus = SyncStatus.ENCRYPTING;
 
                 GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
 
@@ -99,7 +113,9 @@ public class SyncManager {
                     KeePassDatabase.write(keePassFile, password, byteArrayOutputStream);
                     ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 
-                    deferredObject.notify(SyncStatus.TRANSFERRING);
+                    task.notify(SyncStatus.TRANSFERRING);
+                    syncStatus.notify(SyncStatus.TRANSFERRING);
+                    lastSyncStatus = SyncStatus.TRANSFERRING;
 
                     GKCard.Response response = card.put(VAULT_PATH, byteArrayInputStream);
 
@@ -109,14 +125,22 @@ public class SyncManager {
 
                         card.finalize(VAULT_PATH);
 
-                        deferredObject.resolve(rootGroup);
+                        task.resolve(rootGroup);
+                        syncStatus.notify(SyncStatus.SYNCED);
+                        lastSyncStatus = SyncStatus.SYNCED;
                     } else {
-                        deferredObject.reject(new SyncManagerException("Card status: " + status));
+                        task.reject(new SyncManagerException("Card status: " + status));
+                        syncStatus.notify(SyncStatus.FAILED);
+                        lastSyncStatus = SyncStatus.FAILED;
                     }
                 } catch (Vault.GroupNotFoundException e) {
-                    deferredObject.reject(new SyncManagerException("Vault is empty."));
+                    task.reject(new SyncManagerException("Vault is empty."));
+                    syncStatus.notify(SyncStatus.FAILED);
+                    lastSyncStatus = SyncStatus.FAILED;
                 } catch (IOException e) {
-                    deferredObject.reject(new SyncManagerException("Unable to connect to card."));
+                    task.reject(new SyncManagerException("Unable to connect to card."));
+                    syncStatus.notify(SyncStatus.FAILED);
+                    lastSyncStatus = SyncStatus.FAILED;
                 }
 
                 try {
@@ -126,15 +150,15 @@ public class SyncManager {
                 }
             }
         }.start();
-        return deferredObject.promise();
+        return task.promise();
     }
 
-    public enum SyncType {
-        READ, WRITE
+    Promise<Void, Exception, SyncStatus> getWriteStatus() {
+        return syncStatus.promise();
     }
 
-    enum SyncStatus {
-        TRANSFERRING, ENCRYPTING, DECRYPTING
+    SyncStatus getLastWriteStatus() {
+        return lastSyncStatus;
     }
 
     private static class SyncManagerException extends Exception {

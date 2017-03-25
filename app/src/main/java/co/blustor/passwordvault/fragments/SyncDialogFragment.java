@@ -1,4 +1,4 @@
-package co.blustor.passwordvault.sync;
+package co.blustor.passwordvault.fragments;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.VaultGroup;
+import co.blustor.passwordvault.sync.SyncManager;
 import co.blustor.passwordvault.utils.AlertUtils;
 
 public class SyncDialogFragment extends DialogFragment {
