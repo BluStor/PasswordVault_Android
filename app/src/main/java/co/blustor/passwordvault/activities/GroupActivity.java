@@ -174,6 +174,9 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                             }
                         }).show();
             }
+        } else if (id == R.id.action_settings) {
+            Intent settingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(settingsActivity);
         }
 
         return super.onOptionsItemSelected(item);
