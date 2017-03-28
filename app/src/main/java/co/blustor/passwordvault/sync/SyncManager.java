@@ -153,11 +153,11 @@ public class SyncManager {
         return task.promise();
     }
 
-    Promise<Void, Exception, SyncStatus> getWriteStatus() {
+    public static Promise<Void, Exception, SyncStatus> getWriteStatusPromise() {
         return syncStatus.promise();
     }
 
-    SyncStatus getLastWriteStatus() {
+    public static SyncStatus getLastWriteStatus() {
         return lastSyncStatus;
     }
 
