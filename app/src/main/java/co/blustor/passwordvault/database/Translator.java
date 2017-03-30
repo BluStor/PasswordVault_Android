@@ -1,5 +1,7 @@
 package co.blustor.passwordvault.database;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +21,7 @@ public class Translator {
                     .username(vaultEntry.getUsername())
                     .password(vaultEntry.getPassword())
                     .url(vaultEntry.getUrl())
+                    .notes(vaultEntry.getNotes())
                     .build();
             entries.add(entry);
         }
@@ -29,12 +32,15 @@ public class Translator {
     private static List<VaultEntry> importEntries(Group group) {
         ArrayList<VaultEntry> entries = new ArrayList<>();
         for (Entry entry : group.getEntries()) {
-            entries.add(new VaultEntry(
+            VaultEntry vaultEntry = new VaultEntry(
                     entry.getUuid(),
                     entry.getTitle(),
                     entry.getUsername(),
                     entry.getPassword()
-            ));
+            );
+            vaultEntry.setUrl(entry.getUrl());
+            vaultEntry.setNotes(entry.getNotes());
+            entries.add(vaultEntry);
         }
         return entries;
     }

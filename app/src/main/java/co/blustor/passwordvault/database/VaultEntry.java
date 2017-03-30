@@ -6,10 +6,11 @@ public class VaultEntry {
     private static final String TAG = "VaultEntry";
 
     private final UUID mUUID;
-    private String mTitle;
-    private String mUsername;
-    private String mPassword;
+    private String mTitle = "";
+    private String mUsername = "";
+    private String mPassword = "";
     private String mUrl = "";
+    private String mNotes = "";
 
     public VaultEntry(UUID uuid, String title, String username, String password) {
         mUUID = uuid;
@@ -52,5 +53,13 @@ public class VaultEntry {
 
     public void setUrl(String url) {
         mUrl = url;
+    }
+
+    public String getNotes() {
+        return mNotes;
+    }
+
+    public void setNotes(String notes) {
+        mNotes = notes;
     }
 }

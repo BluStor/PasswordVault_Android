@@ -45,18 +45,21 @@ public class SyncStatusFragment extends Fragment {
     }
 
     private void setSyncStatus(SyncManager.SyncStatus syncStatus) {
-        if (syncStatus == SyncManager.SyncStatus.ENCRYPTING) {
-            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusEncrypting));
-            mStatusTextView.setText("Encrypting");
-        } else if (syncStatus == SyncManager.SyncStatus.TRANSFERRING) {
-            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusTransferring));
-            mStatusTextView.setText("Transferring");
-        } else if (syncStatus == SyncManager.SyncStatus.FAILED) {
-            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusFailed));
-            mStatusTextView.setText("Failed");
-        } else if (syncStatus == SyncManager.SyncStatus.SYNCED) {
-            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusSynced));
-            mStatusTextView.setText("Synced");
+        Context context = getContext();
+        if (context != null) {
+            if (syncStatus == SyncManager.SyncStatus.ENCRYPTING) {
+                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusEncrypting));
+                mStatusTextView.setText("Encrypting");
+            } else if (syncStatus == SyncManager.SyncStatus.TRANSFERRING) {
+                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusTransferring));
+                mStatusTextView.setText("Transferring");
+            } else if (syncStatus == SyncManager.SyncStatus.FAILED) {
+                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusFailed));
+                mStatusTextView.setText("Failed");
+            } else if (syncStatus == SyncManager.SyncStatus.SYNCED) {
+                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusSynced));
+                mStatusTextView.setText("Synced");
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package co.blustor.passwordvault.activities;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -29,6 +30,7 @@ public class EditEntryActivity extends LockingActivity {
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
     private EditText mUrlEditText = null;
+    private EditText mNotesEditText = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class EditEntryActivity extends LockingActivity {
         mUsernameEditText = (EditText) findViewById(R.id.edittext_username);
         mPasswordEditText = (EditText) findViewById(R.id.edittext_password);
         mUrlEditText = (EditText) findViewById(R.id.edittext_url);
+        mNotesEditText = (EditText) findViewById(R.id.edittext_notes);
 
         // Load
 
@@ -108,6 +111,7 @@ public class EditEntryActivity extends LockingActivity {
         mUsernameEditText.setText(mEntry.getUsername());
         mPasswordEditText.setText(mEntry.getPassword());
         mUrlEditText.setText(mEntry.getUrl());
+        mNotesEditText.setText(mEntry.getNotes());
     }
 
     private void delete() {
@@ -139,6 +143,7 @@ public class EditEntryActivity extends LockingActivity {
                 mEntry.setUsername(mUsernameEditText.getText().toString());
                 mEntry.setPassword(mPasswordEditText.getText().toString());
                 mEntry.setUrl(mUrlEditText.getText().toString());
+                mEntry.setNotes(mNotesEditText.getText().toString());
 
                 Vault vault = Vault.getInstance();
 
@@ -153,6 +158,7 @@ public class EditEntryActivity extends LockingActivity {
         return !(mEntry.getTitle().equals(mTitleEditText.getText().toString())
                 && mEntry.getUsername().equals(mUsernameEditText.getText().toString())
                 && mEntry.getPassword().equals(mPasswordEditText.getText().toString())
-                && mEntry.getUrl().equals(mUrlEditText.getText().toString()));
+                && mEntry.getUrl().equals(mUrlEditText.getText().toString())
+                && mEntry.getNotes().equals(mNotesEditText.getText().toString()));
     }
 }

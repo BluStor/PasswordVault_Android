@@ -74,10 +74,6 @@ public class VaultGroup {
         Collections.sort(mGroups, new VaultGroupComparator());
     }
 
-    public void addGroups(List<VaultGroup> groups) {
-        mGroups.addAll(groups);
-    }
-
     public List<VaultGroup> getGroups() {
         return mGroups;
     }
@@ -109,6 +105,5 @@ public class VaultGroup {
         mName = name;
     }
 
-    public static class EntryNotFoundException extends Exception {
-    }
+    public static class EntryNotFoundException extends Exception {}
 }
