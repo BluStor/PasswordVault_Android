@@ -1,5 +1,6 @@
 package co.blustor.passwordvault.fragments;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import co.blustor.passwordvault.sync.SyncManager;
 
 public class SyncStatusFragment extends Fragment {
     TextView mStatusTextView = null;
+    AndroidDeferredManager mDeferredManager = new AndroidDeferredManager();
 
     @Nullable
     @Override
@@ -27,15 +29,14 @@ public class SyncStatusFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mStatusTextView = (TextView) view.findViewById(R.id.textview_status);
 
         setSyncStatus(SyncManager.getLastWriteStatus());
 
-        AndroidDeferredManager dm = new AndroidDeferredManager();
-        dm.when(SyncManager.getWriteStatusPromise()).progress(new ProgressCallback<SyncManager.SyncStatus>() {
+        mDeferredManager.when(SyncManager.getWriteStatusPromise()).progress(new ProgressCallback<SyncManager.SyncStatus>() {
             @Override
             public void onProgress(SyncManager.SyncStatus progress) {
                 setSyncStatus(progress);
@@ -44,18 +45,17 @@ public class SyncStatusFragment extends Fragment {
     }
 
     private void setSyncStatus(SyncManager.SyncStatus syncStatus) {
-        Resources resources = getResources();
         if (syncStatus == SyncManager.SyncStatus.ENCRYPTING) {
-            mStatusTextView.setTextColor(resources.getColor(R.color.syncStatusEncrypting));
+            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusEncrypting));
             mStatusTextView.setText("Encrypting");
         } else if (syncStatus == SyncManager.SyncStatus.TRANSFERRING) {
-            mStatusTextView.setTextColor(resources.getColor(R.color.syncStatusTransferring));
+            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusTransferring));
             mStatusTextView.setText("Transferring");
         } else if (syncStatus == SyncManager.SyncStatus.FAILED) {
-            mStatusTextView.setTextColor(resources.getColor(R.color.syncStatusFailed));
+            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusFailed));
             mStatusTextView.setText("Failed");
         } else if (syncStatus == SyncManager.SyncStatus.SYNCED) {
-            mStatusTextView.setTextColor(resources.getColor(R.color.syncStatusSynced));
+            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusSynced));
             mStatusTextView.setText("Synced");
         }
     }
