@@ -44,17 +44,18 @@ public class SyncStatusFragment extends Fragment {
     }
 
     private void setSyncStatus(SyncManager.SyncStatus syncStatus) {
+        Resources resources = getResources();
         if (syncStatus == SyncManager.SyncStatus.ENCRYPTING) {
-            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusEncrypting));
+            mStatusTextView.setTextColor(resources.getColor(R.color.syncStatusEncrypting));
             mStatusTextView.setText("Encrypting");
         } else if (syncStatus == SyncManager.SyncStatus.TRANSFERRING) {
-            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusTransferring));
+            mStatusTextView.setTextColor(resources.getColor(R.color.syncStatusTransferring));
             mStatusTextView.setText("Transferring");
         } else if (syncStatus == SyncManager.SyncStatus.FAILED) {
-            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusFailed));
+            mStatusTextView.setTextColor(resources.getColor(R.color.syncStatusFailed));
             mStatusTextView.setText("Failed");
         } else if (syncStatus == SyncManager.SyncStatus.SYNCED) {
-            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusSynced));
+            mStatusTextView.setTextColor(resources.getColor(R.color.syncStatusSynced));
             mStatusTextView.setText("Synced");
         }
     }

@@ -9,5 +9,5 @@
     <color name="syncStatusTransferring">#FFCC80</color>
     <color name="syncStatusFailed">#D50000</color>
     <color name="syncStatusSynced">#80CBC4</color>
-    <color name="horizontalLine">#eeeeee</color>
+    <color name="horizontalLine">#EEEEEE</color>
 </resources>
