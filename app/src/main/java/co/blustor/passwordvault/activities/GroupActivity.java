@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import co.blustor.passwordvault.R;
+import co.blustor.passwordvault.constants.Intents;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
@@ -184,11 +185,11 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
         if (mGroup.getParentUUID() == null) {
-            Vault vault = Vault.getInstance();
-            vault.lock();
+            Intent lockDatabase = new Intent(Intents.LOCK_DATABASE);
+            sendBroadcast(lockDatabase);
+        } else {
+            super.onBackPressed();
         }
     }
 
