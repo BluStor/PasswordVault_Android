@@ -6,9 +6,12 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 
@@ -21,6 +24,7 @@ import co.blustor.passwordvault.sync.SyncManager;
 
 public class UnlockActivity extends AppCompatActivity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "UnlockActivity";
+    private EditText mPasswordEditText = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +35,17 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
 
         // Views
 
-        final EditText passwordTextView = (EditText) findViewById(R.id.edittext_password);
+        mPasswordEditText = (EditText) findViewById(R.id.edittext_password);
+        mPasswordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    submit();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         Button newButton = (Button) findViewById(R.id.button_new);
         newButton.setOnClickListener(new View.OnClickListener() {
@@ -46,11 +60,15 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Editable editable = passwordTextView.getText();
-                openVault(editable.toString());
-                editable.clear();
+                submit();
             }
         });
+    }
+
+    public void submit() {
+        Editable editable = mPasswordEditText.getText();
+        openVault(editable.toString());
+        editable.clear();
     }
 
     void openVault(final String password) {
