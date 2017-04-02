@@ -1,8 +1,6 @@
 package co.blustor.passwordvault.fragments;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -50,12 +48,12 @@ public class SyncStatusFragment extends Fragment {
             if (syncStatus == SyncManager.SyncStatus.ENCRYPTING) {
                 mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusEncrypting));
                 mStatusTextView.setText("Encrypting");
-            } else if (syncStatus == SyncManager.SyncStatus.TRANSFERRING) {
-                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusTransferring));
-                mStatusTextView.setText("Transferring");
+            } else if (syncStatus == SyncManager.SyncStatus.SAVING) {
+                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusSaving));
+                mStatusTextView.setText("Saving");
             } else if (syncStatus == SyncManager.SyncStatus.FAILED) {
                 mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusFailed));
-                mStatusTextView.setText("Failed");
+                mStatusTextView.setText("Unable to Sync");
             } else if (syncStatus == SyncManager.SyncStatus.SYNCED) {
                 mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.syncStatusSynced));
                 mStatusTextView.setText("Synced");

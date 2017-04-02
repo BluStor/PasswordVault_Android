@@ -105,5 +105,6 @@ public class VaultGroup {
         mName = name;
     }
 
-    public static class EntryNotFoundException extends Exception {}
+    public static class EntryNotFoundException extends Exception {
+    }
 }

@@ -67,7 +67,7 @@ public class SyncDialogFragment extends DialogFragment {
             @Override
             public void onProgress(SyncManager.SyncStatus progress) {
                 Log.d(TAG, progress.name());
-                if (progress == SyncManager.SyncStatus.TRANSFERRING) {
+                if (progress == SyncManager.SyncStatus.SAVING) {
                     statusTextView.setText("Transferring");
                 } else if (progress == SyncManager.SyncStatus.DECRYPTING) {
                     statusTextView.setText("Decrypting");

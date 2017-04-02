@@ -23,16 +23,7 @@ import de.slackspace.openkeepass.domain.KeePassFileBuilder;
 import de.slackspace.openkeepass.exception.KeePassDatabaseUnreadableException;
 
 public class SyncManager {
-    public enum SyncType {
-        READ, WRITE
-    }
-
-    public enum SyncStatus {
-        TRANSFERRING, ENCRYPTING, DECRYPTING, FAILED, SYNCED
-    }
-
     private static final String VAULT_PATH = "/passwordvault/vault.kdbx";
-
     private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
     private static DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
 
@@ -41,7 +32,7 @@ public class SyncManager {
         new Thread() {
             @Override
             public void run() {
-                task.notify(SyncStatus.TRANSFERRING);
+                task.notify(SyncStatus.SAVING);
 
                 GKBluetoothCard card = MyApplication.getCard(context);
 
@@ -104,9 +95,9 @@ public class SyncManager {
                     KeePassDatabase.write(keePassFile, password, byteArrayOutputStream);
                     ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 
-                    task.notify(SyncStatus.TRANSFERRING);
-                    syncStatus.notify(SyncStatus.TRANSFERRING);
-                    lastSyncStatus = SyncStatus.TRANSFERRING;
+                    task.notify(SyncStatus.SAVING);
+                    syncStatus.notify(SyncStatus.SAVING);
+                    lastSyncStatus = SyncStatus.SAVING;
 
                     GKCard.Response response = card.put(VAULT_PATH, byteArrayInputStream);
 
@@ -144,6 +135,14 @@ public class SyncManager {
 
     public static SyncStatus getLastWriteStatus() {
         return lastSyncStatus;
+    }
+
+    public enum SyncType {
+        READ, WRITE
+    }
+
+    public enum SyncStatus {
+        SAVING, ENCRYPTING, DECRYPTING, FAILED, SYNCED
     }
 
     private static class SyncManagerException extends Exception {
