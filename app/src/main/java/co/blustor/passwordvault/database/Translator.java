@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import de.slackspace.openkeepass.domain.Entry;
 import de.slackspace.openkeepass.domain.EntryBuilder;
@@ -45,12 +46,12 @@ public class Translator {
         return entries;
     }
 
-    private static VaultGroup importGroup(Group keePassGroup) {
-        VaultGroup group = new VaultGroup(keePassGroup.getUuid(), keePassGroup.getUuid(), keePassGroup.getName());
+    private static VaultGroup importGroup(UUID parentUUID, Group keePassGroup) {
+        VaultGroup group = new VaultGroup(parentUUID, keePassGroup.getUuid(), keePassGroup.getName());
         group.addEntries(importEntries(keePassGroup));
 
         for (Group g : keePassGroup.getGroups()) {
-            group.add(importGroup(g));
+            group.add(importGroup(keePassGroup.getUuid(), g));
         }
 
         return group;
@@ -61,7 +62,7 @@ public class Translator {
         rootGroup.addEntries(importEntries(keePassGroup));
 
         for (Group group : keePassGroup.getGroups()) {
-            rootGroup.add(importGroup(group));
+            rootGroup.add(importGroup(keePassGroup.getUuid(), group));
         }
 
         return rootGroup;
