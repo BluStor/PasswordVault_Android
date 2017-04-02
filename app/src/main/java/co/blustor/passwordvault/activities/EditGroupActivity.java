@@ -91,6 +91,8 @@ public class EditGroupActivity extends LockingActivity {
     private void load() {
         setTitle("Edit group");
         mNameEditText.setText(mGroup.getName());
+
+        mNameEditText.setSelection(mNameEditText.getText().length());
     }
 
     private void save() {

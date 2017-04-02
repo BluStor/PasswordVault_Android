@@ -112,6 +112,8 @@ public class EditEntryActivity extends LockingActivity {
         mPasswordEditText.setText(mEntry.getPassword());
         mUrlEditText.setText(mEntry.getUrl());
         mNotesEditText.setText(mEntry.getNotes());
+
+        mTitleEditText.setSelection(mTitleEditText.getText().length());
     }
 
     private void delete() {

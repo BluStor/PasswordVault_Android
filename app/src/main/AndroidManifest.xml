@@ -13,8 +13,8 @@
         <activity android:name=".activities.AddEntryActivity" android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.AddGroupActivity" android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.CloseActivity" />
-        <activity android:name=".activities.EditEntryActivity" android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.EditGroupActivity" android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".activities.EditEntryActivity" android:windowSoftInputMode="stateVisible" />
+        <activity android:name=".activities.EditGroupActivity" android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.GroupActivity" />
         <activity android:name=".activities.InitializeActivity" android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity android:name=".activities.SettingsActivity" />
