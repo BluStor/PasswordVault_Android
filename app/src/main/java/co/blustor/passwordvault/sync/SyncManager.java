@@ -15,6 +15,7 @@ import co.blustor.gatekeepersdk.devices.GKCard;
 import co.blustor.passwordvault.database.Translator;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultGroup;
+import co.blustor.passwordvault.utils.MyApplication;
 import de.slackspace.openkeepass.KeePassDatabase;
 import de.slackspace.openkeepass.domain.Group;
 import de.slackspace.openkeepass.domain.KeePassFile;
@@ -29,9 +30,7 @@ public class SyncManager {
     public enum SyncStatus {
         TRANSFERRING, ENCRYPTING, DECRYPTING, FAILED, SYNCED
     }
-    
 
-    private static final String CARD_NAME = "CYBERGATE";
     private static final String VAULT_PATH = "/passwordvault/vault.kdbx";
 
     private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
@@ -42,13 +41,11 @@ public class SyncManager {
         new Thread() {
             @Override
             public void run() {
-                GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
+                task.notify(SyncStatus.TRANSFERRING);
+
+                GKBluetoothCard card = MyApplication.getCard(context);
 
                 try {
-                    card.connect();
-
-                    task.notify(SyncStatus.TRANSFERRING);
-
                     GKCard.Response response = card.get(VAULT_PATH);
                     int status = response.getStatus();
 
@@ -79,12 +76,6 @@ public class SyncManager {
                     e.printStackTrace();
                     task.reject(new SyncManagerException("Unable to connect to card."));
                 }
-
-                try {
-                    card.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         }.start();
         return task.promise();
@@ -99,7 +90,7 @@ public class SyncManager {
                 syncStatus.notify(SyncStatus.ENCRYPTING);
                 lastSyncStatus = SyncStatus.ENCRYPTING;
 
-                GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
+                GKBluetoothCard card = MyApplication.getCard(context);
 
                 try {
                     Vault vault = Vault.getInstance();
@@ -141,12 +132,6 @@ public class SyncManager {
                     task.reject(new SyncManagerException("Unable to connect to card."));
                     syncStatus.notify(SyncStatus.FAILED);
                     lastSyncStatus = SyncStatus.FAILED;
-                }
-
-                try {
-                    card.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
         }.start();
