@@ -22,10 +22,13 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.google.common.base.Joiner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import co.blustor.passwordvault.R;
+import co.blustor.passwordvault.comparators.VaultEntryComparator;
+import co.blustor.passwordvault.comparators.VaultGroupComparator;
 import co.blustor.passwordvault.constants.Intents;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
@@ -254,6 +257,9 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                 mGroups.addAll(mGroup.getGroups());
                 mEntries.clear();
                 mEntries.addAll(mGroup.getEntries());
+
+                Collections.sort(mGroups, new VaultGroupComparator());
+                Collections.sort(mEntries, new VaultEntryComparator());
 
                 if (mGroups.size() > 0 || mEntries.size() > 0) {
                     mEmptyTextView.setVisibility(View.INVISIBLE);

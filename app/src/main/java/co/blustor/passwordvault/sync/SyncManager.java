@@ -1,6 +1,7 @@
 package co.blustor.passwordvault.sync;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.jdeferred.Promise;
 import org.jdeferred.impl.DeferredObject;
@@ -23,9 +24,20 @@ import de.slackspace.openkeepass.domain.KeePassFileBuilder;
 import de.slackspace.openkeepass.exception.KeePassDatabaseUnreadableException;
 
 public class SyncManager {
-    private static final String VAULT_PATH = "/passwordvault/vault.kdbx";
+    private static final String TAG = "SyncManager";
+    private static final String VAULT_PATH = "/passwordvault/db.kdbx";
     private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
     private static DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
+
+    private static void connect(Context context) throws IOException {
+        GKBluetoothCard card = MyApplication.getCard(context);
+
+        Log.d(TAG, "Connection state before: " + card.getConnectionState().name());
+        if (card.getConnectionState() == GKCard.ConnectionState.DISCONNECTED) {
+            card.connect();
+        }
+        Log.d(TAG, "Connection state after: " + card.getConnectionState().name());
+    }
 
     public static Promise<VaultGroup, Exception, SyncStatus> getRoot(final Context context, final String password) {
         final DeferredObject<VaultGroup, Exception, SyncStatus> task = new DeferredObject<>();
@@ -37,6 +49,12 @@ public class SyncManager {
                 GKBluetoothCard card = MyApplication.getCard(context);
 
                 try {
+                    Log.d(TAG, "Connection state before: " + card.getConnectionState().name());
+                    if (card.getConnectionState() == GKCard.ConnectionState.DISCONNECTED) {
+                        card.connect();
+                    }
+                    Log.d(TAG, "Connection state after: " + card.getConnectionState().name());
+
                     GKCard.Response response = card.get(VAULT_PATH);
                     int status = response.getStatus();
 
@@ -66,6 +84,12 @@ public class SyncManager {
                 } catch (IOException e) {
                     e.printStackTrace();
                     task.reject(new SyncManagerException("Unable to connect to card."));
+                }
+
+                try {
+                    card.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }.start();
@@ -99,6 +123,8 @@ public class SyncManager {
                     syncStatus.notify(SyncStatus.SAVING);
                     lastSyncStatus = SyncStatus.SAVING;
 
+                    connect(context);
+
                     GKCard.Response response = card.put(VAULT_PATH, byteArrayInputStream);
 
                     int status = response.getStatus();
@@ -123,6 +149,12 @@ public class SyncManager {
                     task.reject(new SyncManagerException("Unable to connect to card."));
                     syncStatus.notify(SyncStatus.FAILED);
                     lastSyncStatus = SyncStatus.FAILED;
+                }
+
+                try {
+                    card.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }.start();
