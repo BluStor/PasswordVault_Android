@@ -51,8 +51,8 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
         newButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent initializeActivity = new Intent(v.getContext(), InitializeActivity.class);
-                startActivity(initializeActivity);
+                Intent createActivity = new Intent(v.getContext(), CreateActivity.class);
+                startActivity(createActivity);
             }
         });
 

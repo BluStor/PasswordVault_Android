@@ -16,7 +16,7 @@
         <activity android:name=".activities.EditEntryActivity" android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.EditGroupActivity" android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.GroupActivity" />
-        <activity android:name=".activities.InitializeActivity" android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity android:name=".activities.CreateActivity" android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity android:name=".activities.SettingsActivity" />
         <activity android:name=".activities.SplashActivity">
             <intent-filter>
