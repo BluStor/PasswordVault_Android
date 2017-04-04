@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.activities.CloseActivity;
@@ -28,14 +27,12 @@ public class NotificationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand");
         Vault vault = Vault.getInstance();
 
         if (vault.isUnlocked()) {
             stopForeground(true);
             startForeground(Notifications.LOCK_STATUS_NOTIFICATION, getUnlockedNotification());
         } else {
-            Log.d(TAG, "Stopping self.");
             stopSelf();
         }
 
@@ -56,7 +53,7 @@ public class NotificationService extends Service {
 
     private Notification getUnlockedNotification() {
         NotificationCompat.Action lockAction = new NotificationCompat.Action.Builder(
-                R.drawable.lock_black,
+                R.drawable.ic_00,
                 "Lock database",
                 getLockDatabaseIntent()
         ).build();
