@@ -22,6 +22,7 @@ public class VaultGroup {
     private final List<VaultGroup> mGroups = new ArrayList<>();
     private final List<VaultEntry> mEntries = new ArrayList<>();
     private String mName;
+    private Integer mIconId;
 
     public VaultGroup(UUID parentUUID, UUID uuid, String name) {
         mParentUUID = parentUUID;
@@ -97,6 +98,14 @@ public class VaultGroup {
 
     public void setName(String name) {
         mName = name;
+    }
+
+    public Integer getIconId() {
+        return mIconId;
+    }
+
+    public void setIconId(Integer iconId) {
+        mIconId = iconId;
     }
 
     public static class EntryNotFoundException extends Exception {

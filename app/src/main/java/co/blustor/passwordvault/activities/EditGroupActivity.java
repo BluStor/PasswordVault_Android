@@ -1,6 +1,7 @@
 package co.blustor.passwordvault.activities;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -18,12 +19,14 @@ import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.sync.SyncManager;
 
+import static co.blustor.passwordvault.activities.IconPickerActivity.REQUEST_ICON_CODE;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class EditGroupActivity extends LockingActivity {
     private static final String TAG = "EditGroupActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup = null;
+    private Integer mIconId = 0;
     private EditText mNameEditText = null;
 
     @Override
@@ -50,6 +53,13 @@ public class EditGroupActivity extends LockingActivity {
             load();
         } catch (Vault.GroupNotFoundException e) {
             finish();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ICON_CODE) {
+            mIconId = data.getIntExtra("icon", 0);
         }
     }
 
@@ -99,6 +109,7 @@ public class EditGroupActivity extends LockingActivity {
         if (mAwesomeValidation.validate()) {
             if (hasBeenEdited()) {
                 mGroup.setName(mNameEditText.getText().toString());
+                mGroup.setIconId(mIconId);
 
                 Vault vault = Vault.getInstance();
                 SyncManager.setRoot(this, vault.getPassword());

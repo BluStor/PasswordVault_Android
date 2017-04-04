@@ -7,9 +7,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ImageView
-        android:src="@drawable/vaultentry_gray"
-        android:transitionName="entry"
+        android:id="@+id/imageview_icon"
         android:minHeight="100dp"
+        android:tint="@color/iconBasic"
+        android:transitionName="entry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <android.support.design.widget.TextInputLayout
@@ -71,6 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp" />
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp" />
     </android.support.design.widget.TextInputLayout>
 </LinearLayout>

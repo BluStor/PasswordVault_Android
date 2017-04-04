@@ -9,14 +9,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.UnlockActivity" android:windowSoftInputMode="stateHidden|adjustResize"/>
+        <activity android:name=".activities.CreateActivity" android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity android:name=".activities.AddEntryActivity" android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.AddGroupActivity" android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.CloseActivity" />
         <activity android:name=".activities.EditEntryActivity" android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.EditGroupActivity" android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.GroupActivity" />
-        <activity android:name=".activities.CreateActivity" android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity android:name=".activities.IconPickerActivity" />
         <activity android:name=".activities.SettingsActivity" />
         <activity android:name=".activities.SplashActivity">
             <intent-filter>
@@ -24,6 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.UnlockActivity" android:windowSoftInputMode="stateHidden|adjustResize"/>
         <receiver
             android:name=".receivers.AppBroadcastReceiver"
             android:exported="false">

@@ -146,7 +146,7 @@ public class SyncManager {
                     syncStatus.notify(SyncStatus.FAILED);
                     lastSyncStatus = SyncStatus.FAILED;
                 } catch (IOException e) {
-                    task.reject(new SyncManagerException("Unable to connect to card."));
+                    task.reject(new SyncManagerException(e.getMessage()));
                     syncStatus.notify(SyncStatus.FAILED);
                     lastSyncStatus = SyncStatus.FAILED;
                 }

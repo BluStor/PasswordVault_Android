@@ -2,8 +2,13 @@ package co.blustor.passwordvault.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,6 +41,7 @@ import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.services.NotificationService;
 import co.blustor.passwordvault.sync.SyncManager;
+import co.blustor.passwordvault.utils.MyApplication;
 
 public class GroupActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "GroupActivity";
@@ -239,9 +245,13 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                 VaultGroup group = mGroups.get(position);
                 holder.titleTextView.setText(group.getName());
             } else {
-                holder.iconImageView.setImageResource(R.drawable.vaultentry_gray);
-
                 VaultEntry entry = mEntries.get(position - mGroups.size());
+
+                Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), MyApplication.getIcons().get(entry.getIconId()));
+                DrawableCompat.setTint(drawable, ContextCompat.getColor(getApplicationContext(), R.color.iconBasic));
+
+                holder.iconImageView.setImageDrawable(drawable);
+
                 holder.titleTextView.setText(entry.getTitle());
             }
         }

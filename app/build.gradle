@@ -28,7 +28,7 @@ dependencies {
     compile 'com.basgeekball:awesome-validation:2.0'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.google.guava:guava:20.0'
-    compile('de.slackspace:openkeepass:0.6.0') {
+    compile('de.slackspace:openkeepass:0.6.1') {
         exclude module: 'stax'
         exclude module: 'stax-api'
         exclude module: 'xpp3'

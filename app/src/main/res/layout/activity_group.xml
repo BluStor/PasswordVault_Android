@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
@@ -20,18 +21,19 @@
     <fragment
         android:id="@+id/fragment_syncstatus"
         android:name="co.blustor.passwordvault.fragments.SyncStatusFragment"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/textview_path"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout="@layout/fragment_syncstatus" />
     <TextView
         android:id="@+id/textview_empty"
         android:textSize="20sp"
         android:text="@string/textview_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/fragment_syncstatus"
+        app:layout_constraintTop_toTopOf="@+id/fragment_syncstatus"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
@@ -42,7 +44,8 @@
         app:layout_constraintTop_toBottomOf="@+id/fragment_syncstatus"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        tools:listitem="@layout/item_groupentry" />
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/fam"
         android:src="@drawable/fab_add"

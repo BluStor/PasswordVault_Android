@@ -1,11 +1,15 @@
 package co.blustor.passwordvault.activities;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
@@ -17,7 +21,9 @@ import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.sync.SyncManager;
+import co.blustor.passwordvault.utils.MyApplication;
 
+import static co.blustor.passwordvault.activities.IconPickerActivity.REQUEST_ICON_CODE;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class EditEntryActivity extends LockingActivity {
@@ -25,6 +31,8 @@ public class EditEntryActivity extends LockingActivity {
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup = null;
     private VaultEntry mEntry = null;
+    private ImageView mIconImageView = null;
+    private Integer mIconId = 0;
     private EditText mTitleEditText = null;
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
@@ -42,11 +50,20 @@ public class EditEntryActivity extends LockingActivity {
 
         // Views
 
+        mIconImageView = (ImageView) findViewById(R.id.imageview_icon);
         mTitleEditText = (EditText) findViewById(R.id.edittext_title);
         mUsernameEditText = (EditText) findViewById(R.id.edittext_username);
         mPasswordEditText = (EditText) findViewById(R.id.edittext_password);
         mUrlEditText = (EditText) findViewById(R.id.edittext_url);
         mNotesEditText = (EditText) findViewById(R.id.edittext_notes);
+
+        mIconImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
+                startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
+            }
+        });
 
         // Load
 
@@ -103,6 +120,14 @@ public class EditEntryActivity extends LockingActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ICON_CODE) {
+            mIconId = data.getIntExtra("icon", 0);
+            mIconImageView.setImageResource(MyApplication.getIcons().get(mIconId));
+        }
+    }
+
     private void load() {
         setTitle("Edit entry");
 
@@ -111,6 +136,9 @@ public class EditEntryActivity extends LockingActivity {
         mPasswordEditText.setText(mEntry.getPassword());
         mUrlEditText.setText(mEntry.getUrl());
         mNotesEditText.setText(mEntry.getNotes());
+
+        mIconId = mEntry.getIconId();
+        mIconImageView.setImageResource(MyApplication.getIcons().get(mIconId));
 
         mTitleEditText.setSelection(mTitleEditText.getText().length());
     }
@@ -145,6 +173,7 @@ public class EditEntryActivity extends LockingActivity {
                 mEntry.setPassword(mPasswordEditText.getText().toString());
                 mEntry.setUrl(mUrlEditText.getText().toString());
                 mEntry.setNotes(mNotesEditText.getText().toString());
+                mEntry.setIconId(mIconId);
 
                 Vault vault = Vault.getInstance();
 
@@ -160,6 +189,7 @@ public class EditEntryActivity extends LockingActivity {
                 && mEntry.getUsername().equals(mUsernameEditText.getText().toString())
                 && mEntry.getPassword().equals(mPasswordEditText.getText().toString())
                 && mEntry.getUrl().equals(mUrlEditText.getText().toString())
-                && mEntry.getNotes().equals(mNotesEditText.getText().toString()));
+                && mEntry.getNotes().equals(mNotesEditText.getText().toString())
+                && mEntry.getIconId().equals(mIconId));
     }
 }

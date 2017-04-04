@@ -10,4 +10,5 @@
     <color name="syncStatusFailed">#D50000</color>
     <color name="syncStatusSynced">#80CBC4</color>
     <color name="horizontalLine">#EEEEEE</color>
+    <color name="iconBasic">#DADADA</color>
 </resources>

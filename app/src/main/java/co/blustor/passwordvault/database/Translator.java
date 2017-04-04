@@ -21,6 +21,7 @@ public class Translator {
                     .password(vaultEntry.getPassword())
                     .url(vaultEntry.getUrl())
                     .notes(vaultEntry.getNotes())
+                    .iconId(vaultEntry.getIconId())
                     .build();
             entries.add(entry);
         }
@@ -39,6 +40,7 @@ public class Translator {
             );
             vaultEntry.setUrl(entry.getUrl());
             vaultEntry.setNotes(entry.getNotes());
+            vaultEntry.setIconId(entry.getIconId());
             entries.add(vaultEntry);
         }
         return entries;
@@ -46,6 +48,8 @@ public class Translator {
 
     private static VaultGroup importGroup(UUID parentUUID, Group keePassGroup) {
         VaultGroup group = new VaultGroup(parentUUID, keePassGroup.getUuid(), keePassGroup.getName());
+        group.setIconId(keePassGroup.getIconId());
+
         group.addEntries(importEntries(keePassGroup));
 
         for (Group g : keePassGroup.getGroups()) {
@@ -58,6 +62,7 @@ public class Translator {
     public static VaultGroup importKeePass(Group keePassGroup) {
         VaultGroup rootGroup = new VaultGroup(null, keePassGroup.getUuid(), keePassGroup.getName());
         rootGroup.addEntries(importEntries(keePassGroup));
+        rootGroup.setIconId(keePassGroup.getIconId());
 
         for (Group group : keePassGroup.getGroups()) {
             rootGroup.add(importGroup(keePassGroup.getUuid(), group));

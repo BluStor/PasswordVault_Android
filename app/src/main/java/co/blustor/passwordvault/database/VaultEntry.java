@@ -11,6 +11,7 @@ public class VaultEntry {
     private String mPassword = "";
     private String mUrl = "";
     private String mNotes = "";
+    private Integer mIconId = 0;
 
     public VaultEntry(UUID uuid, String title, String username, String password) {
         mUUID = uuid;
@@ -61,5 +62,13 @@ public class VaultEntry {
 
     public void setNotes(String notes) {
         mNotes = notes;
+    }
+
+    public Integer getIconId() {
+        return mIconId;
+    }
+
+    public void setIconId(Integer iconId) {
+        mIconId = iconId;
     }
 }

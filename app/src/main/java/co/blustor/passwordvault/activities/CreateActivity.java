@@ -31,7 +31,7 @@ public class CreateActivity extends AppCompatActivity implements SyncDialogFragm
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_initialize);
+        setContentView(R.layout.activity_create);
 
         setTitle("New database");
 

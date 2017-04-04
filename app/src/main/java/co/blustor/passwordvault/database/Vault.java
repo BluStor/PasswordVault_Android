@@ -31,7 +31,6 @@ public class Vault {
 
     public void create() {
         mRoot = new VaultGroup(null, UUID.randomUUID(), "Passwords");
-        Log.d(TAG, "Created new vault with root group " + mRoot.getUUID());
     }
 
     public VaultGroup getGroupByUUID(final UUID uuid) throws GroupNotFoundException {
