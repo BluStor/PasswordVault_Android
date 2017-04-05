@@ -1,7 +1,6 @@
 package co.blustor.passwordvault.sync;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.jdeferred.Promise;
 import org.jdeferred.impl.DeferredObject;
@@ -29,16 +28,6 @@ public class SyncManager {
     private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
     private static DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
 
-    private static void connect(Context context) throws IOException {
-        GKBluetoothCard card = MyApplication.getCard(context);
-
-        Log.d(TAG, "Connection state before: " + card.getConnectionState().name());
-        if (card.getConnectionState() == GKCard.ConnectionState.DISCONNECTED) {
-            card.connect();
-        }
-        Log.d(TAG, "Connection state after: " + card.getConnectionState().name());
-    }
-
     public static Promise<VaultGroup, Exception, SyncStatus> getRoot(final Context context, final String password) {
         final DeferredObject<VaultGroup, Exception, SyncStatus> task = new DeferredObject<>();
         new Thread() {
@@ -49,41 +38,53 @@ public class SyncManager {
                 GKBluetoothCard card = MyApplication.getCard(context);
 
                 try {
-                    Log.d(TAG, "Connection state before: " + card.getConnectionState().name());
-                    if (card.getConnectionState() == GKCard.ConnectionState.DISCONNECTED) {
-                        card.connect();
-                    }
-                    Log.d(TAG, "Connection state after: " + card.getConnectionState().name());
-
-                    GKCard.Response response = card.get(VAULT_PATH);
-                    int status = response.getStatus();
-
-                    if (status == 226) {
-                        File file = response.getDataFile();
-
-                        try {
-                            task.notify(SyncStatus.DECRYPTING);
-                            KeePassFile keePassFile = KeePassDatabase.getInstance(file).openDatabase(password);
-
-                            Group keePassRoot = keePassFile.getRoot().getGroups().get(0);
-                            VaultGroup group = Translator.importKeePass(keePassRoot);
-
-                            Vault vault = Vault.getInstance();
-                            vault.setRoot(group);
-                            vault.setPassword(password);
-
-                            task.resolve(group);
-                        } catch (KeePassDatabaseUnreadableException e) {
-                            task.reject(new SyncManagerException("Database password invalid."));
+                    try {
+                        if (card.getConnectionState() == GKCard.ConnectionState.DISCONNECTED) {
+                            card.connect();
+                            Thread.sleep(1000);
                         }
-                    } else if (status == 550) {
-                        task.reject(new SyncManagerException("Database not found on card."));
-                    } else {
-                        task.reject(new SyncManagerException("Card status: " + status));
+
+                        if (card.getConnectionState() == GKCard.ConnectionState.CARD_NOT_PAIRED) {
+                            throw new SyncManagerException("Card is not paired.");
+                        } else if (card.getConnectionState() == GKCard.ConnectionState.BLUETOOTH_DISABLED) {
+                            throw new SyncManagerException("Bluetooth is not enabled.");
+                        }
+
+                        GKCard.Response response = card.get(VAULT_PATH);
+                        int status = response.getStatus();
+
+                        if (status == 226) {
+                            File file = response.getDataFile();
+
+                            try {
+                                task.notify(SyncStatus.DECRYPTING);
+                                KeePassFile keePassFile = KeePassDatabase.getInstance(file).openDatabase(password);
+
+                                Group keePassRoot = keePassFile.getRoot().getGroups().get(0);
+                                VaultGroup group = Translator.importKeePass(keePassRoot);
+
+                                Vault vault = Vault.getInstance();
+                                vault.setRoot(group);
+                                vault.setPassword(password);
+
+                                task.resolve(group);
+                            } catch (KeePassDatabaseUnreadableException e) {
+                                task.reject(new SyncManagerException("Database password invalid."));
+                            }
+                        } else if (status == 550) {
+                            throw new SyncManagerException("Database not found on card.");
+                        } else {
+                            throw new SyncManagerException("Card status: " + status);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        throw new SyncManagerException("Unable to connect to card.");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        throw new SyncManagerException("Wait for connection was interrupted.");
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    task.reject(new SyncManagerException("Unable to connect to card."));
+                } catch (SyncManagerException e) {
+                    task.reject(e);
                 }
 
                 try {
@@ -108,47 +109,59 @@ public class SyncManager {
                 GKBluetoothCard card = MyApplication.getCard(context);
 
                 try {
-                    Vault vault = Vault.getInstance();
-                    VaultGroup rootGroup = vault.getRoot();
+                    try {
+                        Vault vault = Vault.getInstance();
+                        VaultGroup rootGroup = vault.getRoot();
 
-                    Group group = Translator.exportKeePass(vault.getRoot());
+                        Group group = Translator.exportKeePass(vault.getRoot());
 
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-                    KeePassFile keePassFile = new KeePassFileBuilder("passwords").addTopGroups(group).build();
-                    KeePassDatabase.write(keePassFile, password, byteArrayOutputStream);
-                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+                        KeePassFile keePassFile = new KeePassFileBuilder("passwords").addTopGroups(group).build();
+                        KeePassDatabase.write(keePassFile, password, byteArrayOutputStream);
+                        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
 
-                    task.notify(SyncStatus.SAVING);
-                    syncStatus.notify(SyncStatus.SAVING);
-                    lastSyncStatus = SyncStatus.SAVING;
+                        task.notify(SyncStatus.SAVING);
+                        syncStatus.notify(SyncStatus.SAVING);
+                        lastSyncStatus = SyncStatus.SAVING;
 
-                    connect(context);
+                        if (card.getConnectionState() == GKCard.ConnectionState.DISCONNECTED) {
+                            card.connect();
+                            Thread.sleep(1000);
+                        }
 
-                    GKCard.Response response = card.put(VAULT_PATH, byteArrayInputStream);
+                        if (card.getConnectionState() == GKCard.ConnectionState.CARD_NOT_PAIRED) {
+                            throw new SyncManagerException("Card is not paired.");
+                        } else if (card.getConnectionState() == GKCard.ConnectionState.BLUETOOTH_DISABLED) {
+                            throw new SyncManagerException("Bluetooth is not enabled.");
+                        }
 
-                    int status = response.getStatus();
-                    if (status == 226) {
-                        vault.setPassword(password);
+                        GKCard.Response response = card.put(VAULT_PATH, byteArrayInputStream);
 
-                        card.finalize(VAULT_PATH);
+                        int status = response.getStatus();
+                        if (status == 226) {
+                            vault.setPassword(password);
 
-                        task.resolve(rootGroup);
-                        syncStatus.notify(SyncStatus.SYNCED);
-                        lastSyncStatus = SyncStatus.SYNCED;
-                    } else {
-                        task.reject(new SyncManagerException("Card status: " + status));
-                        syncStatus.notify(SyncStatus.FAILED);
-                        lastSyncStatus = SyncStatus.FAILED;
+                            card.finalize(VAULT_PATH);
+
+                            task.resolve(rootGroup);
+                            syncStatus.notify(SyncStatus.SYNCED);
+                            lastSyncStatus = SyncStatus.SYNCED;
+                        } else {
+                            throw new SyncManagerException("Card status: " + status);
+                        }
+                    } catch (Vault.GroupNotFoundException e) {
+                        throw new SyncManagerException("Vault is empty.");
+                    } catch (IOException e) {
+                        throw new SyncManagerException(e.getMessage());
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        throw new SyncManagerException("Connection wait was interrupted.");
                     }
-                } catch (Vault.GroupNotFoundException e) {
-                    task.reject(new SyncManagerException("Vault is empty."));
+                } catch (SyncManagerException e) {
                     syncStatus.notify(SyncStatus.FAILED);
                     lastSyncStatus = SyncStatus.FAILED;
-                } catch (IOException e) {
-                    task.reject(new SyncManagerException(e.getMessage()));
-                    syncStatus.notify(SyncStatus.FAILED);
-                    lastSyncStatus = SyncStatus.FAILED;
+                    task.reject(e);
                 }
 
                 try {
