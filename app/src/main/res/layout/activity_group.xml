@@ -45,7 +45,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        tools:listitem="@layout/item_groupentry" />
+        tools:listitem="@layout/item_group" />
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/fam"
         android:src="@drawable/fab_add"

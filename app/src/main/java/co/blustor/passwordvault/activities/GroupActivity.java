@@ -2,8 +2,6 @@ package co.blustor.passwordvault.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -206,6 +204,7 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
     protected void onResume() {
         super.onResume();
 
+        Log.d(TAG, "updateData");
         mGroupEntryAdapter.updateData();
     }
 
@@ -223,7 +222,6 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
     }
 
     private class GroupEntryAdapter extends RecyclerView.Adapter<GroupEntryAdapter.GroupEntryViewHolder> {
-
         private final List<VaultGroup> mGroups = new ArrayList<>();
         private final List<VaultEntry> mEntries = new ArrayList<>();
 
@@ -233,25 +231,39 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
 
         @Override
         public GroupEntryAdapter.GroupEntryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_groupentry, parent, false);
+            View view;
+            if (viewType == 0) {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_group, parent, false);
+            } else {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_entry, parent, false);
+            }
             return new GroupEntryViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(GroupEntryAdapter.GroupEntryViewHolder holder, int position) {
+        public int getItemViewType(int position) {
             if (position < mGroups.size()) {
-                holder.iconImageView.setImageResource(R.drawable.vaultgroup_orange);
+                return 0;
+            } else {
+                return 1;
+            }
+        }
 
+        @Override
+        public void onBindViewHolder(GroupEntryAdapter.GroupEntryViewHolder holder, int position) {
+            if (holder.getItemViewType() == 0) {
                 VaultGroup group = mGroups.get(position);
+                Log.d(TAG, "Position " + position + " is folder. Icon is " + group.getIconId());
+
+                holder.subIconImageView.setImageResource(MyApplication.getIcons().get(group.getIconId()));
                 holder.titleTextView.setText(group.getName());
             } else {
                 VaultEntry entry = mEntries.get(position - mGroups.size());
+                Log.d(TAG, "Position " + position + " is entry. Icon is " + entry.getIconId());
 
                 Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), MyApplication.getIcons().get(entry.getIconId()));
-                DrawableCompat.setTint(drawable, ContextCompat.getColor(getApplicationContext(), R.color.iconBasic));
 
                 holder.iconImageView.setImageDrawable(drawable);
-
                 holder.titleTextView.setText(entry.getTitle());
             }
         }
@@ -286,6 +298,7 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
             final ImageView iconImageView;
+            final ImageView subIconImageView;
             final TextView titleTextView;
 
             GroupEntryViewHolder(View itemView) {
@@ -294,6 +307,7 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                 itemView.setOnClickListener(this);
 
                 iconImageView = (ImageView) itemView.findViewById(R.id.imageview_icon);
+                subIconImageView = (ImageView) itemView.findViewById(R.id.imageview_subicon);
                 titleTextView = (TextView) itemView.findViewById(R.id.textview_title);
             }
 

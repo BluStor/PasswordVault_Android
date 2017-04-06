@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:tint="@color/iconBasic"
+        android:tint="@color/iconEntry"
         android:contentDescription="Icon" />
     <TextView
         android:id="@+id/textview_icon_id"

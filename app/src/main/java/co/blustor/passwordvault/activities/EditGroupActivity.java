@@ -4,10 +4,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
@@ -18,6 +19,7 @@ import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.sync.SyncManager;
+import co.blustor.passwordvault.utils.MyApplication;
 
 import static co.blustor.passwordvault.activities.IconPickerActivity.REQUEST_ICON_CODE;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
@@ -27,6 +29,7 @@ public class EditGroupActivity extends LockingActivity {
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup = null;
     private Integer mIconId = 0;
+    private ImageView mIconImageView = null;
     private EditText mNameEditText = null;
 
     @Override
@@ -34,13 +37,24 @@ public class EditGroupActivity extends LockingActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_group);
 
+        setTitle("Edit group");
+
         // Validation
 
         mAwesomeValidation.addValidation(this, R.id.edittext_name, RegexTemplate.NOT_EMPTY, R.string.error_empty);
 
         // Views
 
+        mIconImageView = (ImageView) findViewById(R.id.imageview_icon);
         mNameEditText = (EditText) findViewById(R.id.edittext_name);
+
+        mIconImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
+                startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
+            }
+        });
 
         // Load
 
@@ -59,7 +73,10 @@ public class EditGroupActivity extends LockingActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ICON_CODE) {
-            mIconId = data.getIntExtra("icon", 0);
+            if (resultCode == RESULT_OK) {
+                mIconId = data.getIntExtra("icon", 49);
+                mIconImageView.setImageResource(MyApplication.getIcons().get(mIconId));
+            }
         }
     }
 
@@ -99,9 +116,9 @@ public class EditGroupActivity extends LockingActivity {
     }
 
     private void load() {
-        setTitle("Edit group");
-        mNameEditText.setText(mGroup.getName());
+        mIconImageView.setImageResource(MyApplication.getIcons().get(mGroup.getIconId()));
 
+        mNameEditText.setText(mGroup.getName());
         mNameEditText.setSelection(mNameEditText.getText().length());
     }
 
@@ -120,11 +137,7 @@ public class EditGroupActivity extends LockingActivity {
     }
 
     private boolean hasBeenEdited() {
-        if (mGroup.getName().equals(mNameEditText.getText().toString())) {
-            return false;
-        } else {
-            Log.d(TAG, "'" + mGroup.getName() + "' does not equal '" + mNameEditText.getText().toString() + "'.");
-            return true;
-        }
+        return !(mGroup.getName().equals(mNameEditText.getText().toString())
+                && mGroup.getIconId().equals(mIconId));
     }
 }

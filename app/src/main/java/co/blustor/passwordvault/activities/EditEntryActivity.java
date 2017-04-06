@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,8 +30,8 @@ public class EditEntryActivity extends LockingActivity {
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup = null;
     private VaultEntry mEntry = null;
-    private ImageView mIconImageView = null;
     private Integer mIconId = 0;
+    private ImageView mIconImageView = null;
     private EditText mTitleEditText = null;
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
@@ -43,6 +42,8 @@ public class EditEntryActivity extends LockingActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_entry);
+
+        setTitle("Edit entry");
 
         // Validation
 
@@ -123,14 +124,14 @@ public class EditEntryActivity extends LockingActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ICON_CODE) {
-            mIconId = data.getIntExtra("icon", 0);
-            mIconImageView.setImageResource(MyApplication.getIcons().get(mIconId));
+            if (resultCode == RESULT_OK) {
+                mIconId = data.getIntExtra("icon", 0);
+                mIconImageView.setImageResource(MyApplication.getIcons().get(mIconId));
+            }
         }
     }
 
     private void load() {
-        setTitle("Edit entry");
-
         mTitleEditText.setText(mEntry.getTitle());
         mUsernameEditText.setText(mEntry.getUsername());
         mPasswordEditText.setText(mEntry.getPassword());

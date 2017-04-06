@@ -27,7 +27,7 @@ public class IconPickerActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent data = new Intent();
                 data.putExtra("icon", position);
-                setResult(REQUEST_ICON_CODE, data);
+                setResult(RESULT_OK, data);
                 finish();
             }
         });

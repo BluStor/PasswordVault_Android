@@ -1,11 +1,14 @@
 package co.blustor.passwordvault.activities;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
@@ -17,13 +20,17 @@ import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.sync.SyncManager;
+import co.blustor.passwordvault.utils.MyApplication;
 
+import static co.blustor.passwordvault.activities.IconPickerActivity.REQUEST_ICON_CODE;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class AddEntryActivity extends LockingActivity {
     private static final String TAG = "AddEntryActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup;
+    private Integer mIconId = 0;
+    private ImageView mIconImageView = null;
     private EditText mTitleEditText = null;
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
@@ -41,10 +48,19 @@ public class AddEntryActivity extends LockingActivity {
         // Views
 
         setTitle("Add entry");
+        mIconImageView = (ImageView) findViewById(R.id.imageview_icon);
         mTitleEditText = (EditText) findViewById(R.id.edittext_title);
         mUsernameEditText = (EditText) findViewById(R.id.edittext_username);
         mPasswordEditText = (EditText) findViewById(R.id.edittext_password);
         mUrlEditText = (EditText) findViewById(R.id.edittext_url);
+
+        mIconImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
+                startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
+            }
+        });
 
         // Load
 
@@ -53,6 +69,8 @@ public class AddEntryActivity extends LockingActivity {
         try {
             Vault vault = Vault.getInstance();
             mGroup = vault.getGroupByUUID(uuid);
+
+            load();
         } catch (Vault.GroupNotFoundException e) {
             e.printStackTrace();
             finish();
@@ -89,6 +107,20 @@ public class AddEntryActivity extends LockingActivity {
                 .show();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ICON_CODE) {
+            if (resultCode == RESULT_OK) {
+                mIconId = data.getIntExtra("icon", 0);
+                mIconImageView.setImageResource(MyApplication.getIcons().get(mIconId));
+            }
+        }
+    }
+
+    private void load() {
+        mIconImageView.setImageResource(MyApplication.getIcons().get(0));
+    }
+
     private void save() {
         if (mAwesomeValidation.validate()) {
             VaultEntry entry = new VaultEntry(
@@ -98,6 +130,7 @@ public class AddEntryActivity extends LockingActivity {
                     mPasswordEditText.getText().toString()
             );
             entry.setUrl(mUrlEditText.getText().toString());
+            entry.setIconId(mIconId);
             mGroup.add(entry);
 
             Vault vault = Vault.getInstance();

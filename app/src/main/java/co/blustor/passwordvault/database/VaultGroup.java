@@ -21,8 +21,8 @@ public class VaultGroup {
     private final UUID mUUID;
     private final List<VaultGroup> mGroups = new ArrayList<>();
     private final List<VaultEntry> mEntries = new ArrayList<>();
-    private String mName;
-    private Integer mIconId;
+    private String mName = "";
+    private Integer mIconId = 49;
 
     public VaultGroup(UUID parentUUID, UUID uuid, String name) {
         mParentUUID = parentUUID;

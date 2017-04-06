@@ -73,6 +73,7 @@ public class Translator {
 
     public static Group exportKeePass(VaultGroup group) {
         GroupBuilder groupBuilder = new GroupBuilder(group.getName());
+        groupBuilder.iconId(group.getIconId());
         groupBuilder.addEntries(exportKeePassEntries(group));
 
         for (VaultGroup vaultGroup : group.getGroups()) {

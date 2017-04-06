@@ -15,7 +15,6 @@ import co.blustor.gatekeepersdk.devices.GKCard;
 import co.blustor.passwordvault.database.Translator;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultGroup;
-import co.blustor.passwordvault.utils.MyApplication;
 import de.slackspace.openkeepass.KeePassDatabase;
 import de.slackspace.openkeepass.domain.Group;
 import de.slackspace.openkeepass.domain.KeePassFile;
@@ -28,21 +27,18 @@ public class SyncManager {
     private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
     private static DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
 
-    public static Promise<VaultGroup, Exception, SyncStatus> getRoot(final Context context, final String password) {
+    public static synchronized Promise<VaultGroup, Exception, SyncStatus> getRoot(final Context context, final String password) {
         final DeferredObject<VaultGroup, Exception, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
             public void run() {
                 task.notify(SyncStatus.SAVING);
 
-                GKBluetoothCard card = MyApplication.getCard(context);
+                GKBluetoothCard card = new GKBluetoothCard("CYBERGATE", context.getCacheDir());
 
                 try {
                     try {
-                        if (card.getConnectionState() == GKCard.ConnectionState.DISCONNECTED) {
-                            card.connect();
-                            Thread.sleep(1000);
-                        }
+                        card.disconnect();
 
                         if (card.getConnectionState() == GKCard.ConnectionState.CARD_NOT_PAIRED) {
                             throw new SyncManagerException("Card is not paired.");
@@ -79,9 +75,6 @@ public class SyncManager {
                     } catch (IOException e) {
                         e.printStackTrace();
                         throw new SyncManagerException("Unable to connect to card.");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        throw new SyncManagerException("Wait for connection was interrupted.");
                     }
                 } catch (SyncManagerException e) {
                     task.reject(e);
@@ -97,7 +90,7 @@ public class SyncManager {
         return task.promise();
     }
 
-    public static Promise<VaultGroup, Exception, SyncStatus> setRoot(final Context context, final String password) {
+    public static synchronized Promise<VaultGroup, Exception, SyncStatus> setRoot(final Context context, final String password) {
         final DeferredObject<VaultGroup, Exception, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
@@ -106,7 +99,7 @@ public class SyncManager {
                 syncStatus.notify(SyncStatus.ENCRYPTING);
                 lastSyncStatus = SyncStatus.ENCRYPTING;
 
-                GKBluetoothCard card = MyApplication.getCard(context);
+                GKBluetoothCard card = new GKBluetoothCard("CYBERGATE", context.getCacheDir());
 
                 try {
                     try {
@@ -125,10 +118,7 @@ public class SyncManager {
                         syncStatus.notify(SyncStatus.SAVING);
                         lastSyncStatus = SyncStatus.SAVING;
 
-                        if (card.getConnectionState() == GKCard.ConnectionState.DISCONNECTED) {
-                            card.connect();
-                            Thread.sleep(1000);
-                        }
+                        card.disconnect();
 
                         if (card.getConnectionState() == GKCard.ConnectionState.CARD_NOT_PAIRED) {
                             throw new SyncManagerException("Card is not paired.");
@@ -153,10 +143,8 @@ public class SyncManager {
                     } catch (Vault.GroupNotFoundException e) {
                         throw new SyncManagerException("Vault is empty.");
                     } catch (IOException e) {
-                        throw new SyncManagerException(e.getMessage());
-                    } catch (InterruptedException e) {
                         e.printStackTrace();
-                        throw new SyncManagerException("Connection wait was interrupted.");
+                        throw new SyncManagerException(e.getMessage());
                     }
                 } catch (SyncManagerException e) {
                     syncStatus.notify(SyncStatus.FAILED);

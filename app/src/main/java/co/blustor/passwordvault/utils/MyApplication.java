@@ -1,15 +1,11 @@
 package co.blustor.passwordvault.utils;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.SparseIntArray;
 
-import co.blustor.gatekeepersdk.devices.GKBluetoothCard;
 import co.blustor.passwordvault.R;
 
 public class MyApplication extends Application {
-    private static final String DEVICE_NAME = "CYBERGATE";
-    private static GKBluetoothCard sCard;
     private static final SparseIntArray sIcons;
 
     static {
@@ -83,14 +79,6 @@ public class MyApplication extends Application {
         sIcons.append(66, R.drawable.ic_66);
         sIcons.append(67, R.drawable.ic_67);
         sIcons.append(68, R.drawable.ic_68);
-    }
-
-    public static GKBluetoothCard getCard(Context context) {
-        if (sCard == null) {
-            sCard = new GKBluetoothCard(DEVICE_NAME, context.getCacheDir());
-        }
-
-        return sCard;
     }
 
     public static SparseIntArray getIcons() {
