@@ -35,7 +35,7 @@ public class EditGroupActivity extends LockingActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_group);
+        setContentView(R.layout.activity_editgroup);
 
         setTitle("Edit group");
 
@@ -82,7 +82,7 @@ public class EditGroupActivity extends LockingActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_save, menu);
+        getMenuInflater().inflate(R.menu.menu_editgroup, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

@@ -6,8 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,8 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.cocosw.bottomsheet.BottomSheet;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.common.base.Joiner;
@@ -38,7 +36,6 @@ import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.services.NotificationService;
-import co.blustor.passwordvault.sync.SyncManager;
 import co.blustor.passwordvault.utils.MyApplication;
 
 public class GroupActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
@@ -148,41 +145,7 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_edit) {
-            Log.d(TAG, "Edit selected");
-            Intent editGroupActivity = new Intent(this, EditGroupActivity.class);
-            editGroupActivity.putExtra("uuid", mGroup.getUUID());
-            editGroupActivity.putStringArrayListExtra("path", mPath);
-
-            startActivity(editGroupActivity);
-        } else if (id == R.id.action_delete) {
-            if (mGroup.getParentUUID() == null) {
-                Toast.makeText(this, "Cannot delete root group.", Toast.LENGTH_SHORT).show();
-            } else {
-                new AlertDialog.Builder(this)
-                        .setMessage("Are you sure you want to delete this group?")
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        })
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                try {
-                                    Vault vault = Vault.getInstance();
-                                    vault.getGroupByUUID(mGroup.getParentUUID()).removeGroup(mGroup.getUUID());
-
-                                    SyncManager.setRoot(GroupActivity.this, vault.getPassword());
-                                    finish();
-                                } catch (Vault.GroupNotFoundException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).show();
-            }
-        } else if (id == R.id.action_settings) {
+        if (id == R.id.action_settings) {
             Intent settingsActivity = new Intent(this, SettingsActivity.class);
             startActivity(settingsActivity);
         }
@@ -204,7 +167,6 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
     protected void onResume() {
         super.onResume();
 
-        Log.d(TAG, "updateData");
         mGroupEntryAdapter.updateData();
     }
 
@@ -253,13 +215,11 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         public void onBindViewHolder(GroupEntryAdapter.GroupEntryViewHolder holder, int position) {
             if (holder.getItemViewType() == 0) {
                 VaultGroup group = mGroups.get(position);
-                Log.d(TAG, "Position " + position + " is folder. Icon is " + group.getIconId());
 
                 holder.subIconImageView.setImageResource(MyApplication.getIcons().get(group.getIconId()));
                 holder.titleTextView.setText(group.getName());
             } else {
                 VaultEntry entry = mEntries.get(position - mGroups.size());
-                Log.d(TAG, "Position " + position + " is entry. Icon is " + entry.getIconId());
 
                 Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), MyApplication.getIcons().get(entry.getIconId()));
 
@@ -295,7 +255,7 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
             }
         }
 
-        class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
             final ImageView iconImageView;
             final ImageView subIconImageView;
@@ -305,6 +265,7 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                 super(itemView);
 
                 itemView.setOnClickListener(this);
+                itemView.setOnLongClickListener(this);
 
                 iconImageView = (ImageView) itemView.findViewById(R.id.imageview_icon);
                 subIconImageView = (ImageView) itemView.findViewById(R.id.imageview_subicon);
@@ -332,6 +293,47 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                     ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(GroupActivity.this, iconImageView, "entry");
                     startActivity(editEntryActivity, activityOptions.toBundle());
                 }
+            }
+
+            @Override
+            public boolean onLongClick(View v) {
+                int position = getAdapterPosition();
+                if (position < mGroups.size()) {
+                    final VaultGroup group = mGroups.get(position);
+                    new BottomSheet.Builder(GroupActivity.this)
+                            .title(group.getName())
+                            .sheet(R.menu.menu_bottom_group)
+                            .listener(new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.d(TAG, "which = " + which);
+                                    if (which == R.id.action_edit) {
+                                        Intent editGroupActivity = new Intent(GroupActivity.this, EditGroupActivity.class);
+                                        editGroupActivity.putExtra("uuid", group.getUUID());
+                                        startActivity(editGroupActivity);
+                                    } else if (which == R.id.action_delete) {
+                                        mGroup.removeGroup(group.getUUID());
+                                        updateData();
+                                    }
+                                }
+                            }).show();
+                } else {
+                    final VaultEntry entry = mEntries.get(position - mGroups.size());
+                    new BottomSheet.Builder(GroupActivity.this)
+                            .title(entry.getTitle())
+                            .sheet(R.menu.menu_bottom_entry)
+                            .listener(new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (which == R.id.action_delete) {
+                                        mGroup.removeEntry(entry.getUUID());
+                                        updateData();
+                                    }
+                                }
+                            }).show();
+                }
+
+                return true;
             }
         }
     }

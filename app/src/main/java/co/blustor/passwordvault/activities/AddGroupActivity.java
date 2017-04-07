@@ -36,7 +36,7 @@ public class AddGroupActivity extends LockingActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_group);
+        setContentView(R.layout.activity_addgroup);
 
         setTitle("Add group");
 
@@ -74,7 +74,7 @@ public class AddGroupActivity extends LockingActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_save, menu);
+        getMenuInflater().inflate(R.menu.menu_addgroup, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

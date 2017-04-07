@@ -39,7 +39,7 @@ public class AddEntryActivity extends LockingActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_entry);
+        setContentView(R.layout.activity_addentry);
 
         // Validation
 
@@ -79,7 +79,7 @@ public class AddEntryActivity extends LockingActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_save, menu);
+        getMenuInflater().inflate(R.menu.menu_addentry, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

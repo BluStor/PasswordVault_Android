@@ -28,7 +28,6 @@ import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 public class EditEntryActivity extends LockingActivity {
     private static final String TAG = "EditEntryActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
-    private VaultGroup mGroup = null;
     private VaultEntry mEntry = null;
     private Integer mIconId = 0;
     private ImageView mIconImageView = null;
@@ -41,7 +40,7 @@ public class EditEntryActivity extends LockingActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_entry);
+        setContentView(R.layout.activity_editentry);
 
         setTitle("Edit entry");
 
@@ -74,7 +73,7 @@ public class EditEntryActivity extends LockingActivity {
         try {
             Vault vault = Vault.getInstance();
 
-            mGroup = vault.getGroupByUUID(groupUUID);
+            VaultGroup mGroup = vault.getGroupByUUID(groupUUID);
             mEntry = mGroup.getEntry(uuid);
             load();
         } catch (Vault.GroupNotFoundException | VaultGroup.EntryNotFoundException e) {
@@ -85,7 +84,7 @@ public class EditEntryActivity extends LockingActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_edit_entry, menu);
+        getMenuInflater().inflate(R.menu.menu_editentry, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -93,9 +92,7 @@ public class EditEntryActivity extends LockingActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_delete) {
-            delete();
-        } else if (id == R.id.action_save) {
+        if (id == R.id.action_save) {
             save();
         }
 
@@ -142,28 +139,6 @@ public class EditEntryActivity extends LockingActivity {
         mIconImageView.setImageResource(MyApplication.getIcons().get(mIconId));
 
         mTitleEditText.setSelection(mTitleEditText.getText().length());
-    }
-
-    private void delete() {
-        new AlertDialog.Builder(this)
-                .setMessage("Are you sure you want to delete this entry?")
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                })
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mGroup.removeEntry(mEntry.getUUID());
-
-                        Vault vault = Vault.getInstance();
-
-                        SyncManager.setRoot(EditEntryActivity.this, vault.getPassword());
-                        finish();
-                    }
-                }).show();
     }
 
     private void save() {
