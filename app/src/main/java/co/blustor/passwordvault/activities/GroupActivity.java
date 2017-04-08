@@ -88,7 +88,7 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
             pathTextView.setVisibility(View.GONE);
         }
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_groupsentries);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -148,6 +148,9 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         if (id == R.id.action_settings) {
             Intent settingsActivity = new Intent(this, SettingsActivity.class);
             startActivity(settingsActivity);
+        } else if (id == R.id.action_about) {
+            Intent aboutActivity = new Intent(this, AboutActivity.class);
+            startActivity(aboutActivity);
         }
 
         return super.onOptionsItemSelected(item);
