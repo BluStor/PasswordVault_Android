@@ -27,6 +27,8 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
     private static final char[] CHARS_SPECIAL = {'!', '@', '#', '$', '%', '^', '&', '*'};
     private static final char[] CHARS_BRACKETS = {'[', ']', '{', '}', '(', ')', '<', '>'};
 
+    private ArrayList<Character> mCharacters = new ArrayList<>();
+
     private TextView mPasswordTextView = null;
     private CheckBox mUpperCheckbox = null;
     private CheckBox mLowerCheckbox = null;
@@ -59,6 +61,8 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         mUpperCheckbox.setChecked(true);
         mLowerCheckbox.setChecked(true);
         mDigitsCheckbox.setChecked(true);
+
+        generateCharacters();
 
         final TextView lengthTextView = (TextView) findViewById(R.id.textview_length);
 
@@ -100,6 +104,7 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         CompoundButton.OnCheckedChangeListener checkedChangeListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                generateCharacters();
                 String passsword = generatePassword(seekBarLength.getProgress());
                 mPasswordTextView.setText(passsword);
             }
@@ -198,39 +203,45 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private String generatePassword(int length) {
-        ArrayList<Character> characters = new ArrayList<>();
+    private void generateCharacters() {
+        mCharacters.clear();
+
         if (mUpperCheckbox.isChecked()) {
-            characters.addAll(Chars.asList(CHARS_UPPER));
+            mCharacters.addAll(Chars.asList(CHARS_UPPER));
         }
         if (mLowerCheckbox.isChecked()) {
-            characters.addAll(Chars.asList(CHARS_LOWER));
+            mCharacters.addAll(Chars.asList(CHARS_LOWER));
         }
         if (mDigitsCheckbox.isChecked()) {
-            characters.addAll(Chars.asList(CHARS_DIGITS));
+            mCharacters.addAll(Chars.asList(CHARS_DIGITS));
         }
         if (mDashCheckbox.isChecked()) {
-            characters.add('-');
+            mCharacters.add('-');
         }
         if (mUnderscoreCheckbox.isChecked()) {
-            characters.add('_');
+            mCharacters.add('_');
         }
         if (mSpaceCheckbox.isChecked()) {
-            characters.add(' ');
+            mCharacters.add(' ');
         }
         if (mSpecialCheckbox.isChecked()) {
-            characters.addAll(Chars.asList(CHARS_SPECIAL));
+            mCharacters.addAll(Chars.asList(CHARS_SPECIAL));
         }
         if (mBracketsCheckbox.isChecked()) {
-            characters.addAll(Chars.asList(CHARS_BRACKETS));
+            mCharacters.addAll(Chars.asList(CHARS_BRACKETS));
         }
+    }
 
+    private String generatePassword(int length) {
         Random random = new Random();
         String password = "";
 
         for (int i = 0; i < length; i++) {
-            int item = random.nextInt(characters.size());
-            password += characters.get(item);
+            int size = mCharacters.size();
+            if (size > 0) {
+                int item = random.nextInt(size);
+                password += mCharacters.get(item);
+            }
         }
 
         return password;
