@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -25,8 +26,9 @@ import co.blustor.passwordvault.utils.MyApplication;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class AddEntryActivity extends LockingActivity {
-    private static final String TAG = "AddEntryActivity";
     public static final int REQUEST_ICON_CODE = 0;
+    public static final int REQUEST_PASSWORD = 1;
+    private static final String TAG = "AddEntryActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup;
     private Integer mIconId = 0;
@@ -59,6 +61,15 @@ public class AddEntryActivity extends LockingActivity {
             public void onClick(View v) {
                 Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
                 startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
+            }
+        });
+
+        Button generateButton = (Button) findViewById(R.id.button_generate);
+        generateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent passswordGeneratorActivity = new Intent(v.getContext(), PasswordGeneratorActivity.class);
+                startActivityForResult(passswordGeneratorActivity, REQUEST_PASSWORD);
             }
         });
 
@@ -113,6 +124,10 @@ public class AddEntryActivity extends LockingActivity {
             if (resultCode == RESULT_OK) {
                 mIconId = data.getIntExtra("icon", 0);
                 mIconImageView.setImageResource(MyApplication.getIcons().get(mIconId));
+            }
+        } else if (requestCode == REQUEST_PASSWORD) {
+            if (resultCode == RESULT_OK) {
+                mPasswordEditText.setText(data.getStringExtra("password"));
             }
         }
     }

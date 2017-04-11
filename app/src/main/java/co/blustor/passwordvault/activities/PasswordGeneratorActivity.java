@@ -4,31 +4,30 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.common.primitives.Chars;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 
 import co.blustor.passwordvault.R;
 
 public class PasswordGeneratorActivity extends AppCompatActivity {
-    private static final char[] CHARS_UPPER = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
-    private static final char[] CHARS_LOWER = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
-    private static final char[] CHARS_DIGITS = {'1','2','3','4','5','6','7','8','9','0'};
-    private static final char[] CHARS_SPECIAL = {'!','@','#','$','%','^','&','*'};
+    private static final char[] CHARS_UPPER = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+    private static final char[] CHARS_LOWER = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+    private static final char[] CHARS_DIGITS = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
+    private static final char[] CHARS_SPECIAL = {'!', '@', '#', '$', '%', '^', '&', '*'};
     private static final char[] CHARS_BRACKETS = {'[', ']', '{', '}', '(', ')', '<', '>'};
-    
+
     private TextView mPasswordTextView = null;
-    private EditText mLengthEditText = null;
     private CheckBox mUpperCheckbox = null;
     private CheckBox mLowerCheckbox = null;
     private CheckBox mDigitsCheckbox = null;
@@ -43,59 +42,146 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passwordgenerator);
 
+        setTitle("Generate password");
+
         // Views
 
         mPasswordTextView = (TextView) findViewById(R.id.textview_password);
+        mUpperCheckbox = (CheckBox) findViewById(R.id.checkbox_upper);
+        mLowerCheckbox = (CheckBox) findViewById(R.id.checkbox_lower);
+        mDigitsCheckbox = (CheckBox) findViewById(R.id.checkbox_digits);
+        mDashCheckbox = (CheckBox) findViewById(R.id.checkbox_dash);
+        mUnderscoreCheckbox = (CheckBox) findViewById(R.id.checkbox_underscore);
+        mSpaceCheckbox = (CheckBox) findViewById(R.id.checkbox_space);
+        mSpecialCheckbox = (CheckBox) findViewById(R.id.checkbox_special);
+        mBracketsCheckbox = (CheckBox) findViewById(R.id.checkbox_brackets);
+
+        mUpperCheckbox.setChecked(true);
+        mLowerCheckbox.setChecked(true);
+        mDigitsCheckbox.setChecked(true);
+
+        final TextView lengthTextView = (TextView) findViewById(R.id.textview_length);
+
+        final SeekBar seekBarLength = (SeekBar) findViewById(R.id.seekbar_length);
+        seekBarLength.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (progress < 1) {
+                    seekBar.setProgress(1);
+                } else if (progress > 200) {
+                    seekBar.setProgress(200);
+                }
+
+                String password = generatePassword(seekBar.getProgress());
+                mPasswordTextView.setText(password);
+                lengthTextView.setText(String.format(Locale.getDefault(), "%d characters", seekBar.getProgress()));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        seekBarLength.setProgress(32);
+
+        mPasswordTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String password = generatePassword(seekBarLength.getProgress());
+                mPasswordTextView.setText(password);
+            }
+        });
 
         CompoundButton.OnCheckedChangeListener checkedChangeListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String passsword = generatePassword();
+                String passsword = generatePassword(seekBarLength.getProgress());
                 mPasswordTextView.setText(passsword);
             }
         };
 
-        mLengthEditText = (EditText) findViewById(R.id.edittext_length);
-        mLengthEditText.setText("32");
-        mLengthEditText.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                String password = generatePassword();
-                mPasswordTextView.setText(password);
-                return true;
-            }
-        });
-
-        mUpperCheckbox = (CheckBox) findViewById(R.id.checkbox_upper);
-        mUpperCheckbox.setChecked(true);
         mUpperCheckbox.setOnCheckedChangeListener(checkedChangeListener);
-        mLowerCheckbox = (CheckBox) findViewById(R.id.checkbox_lower);
-        mLowerCheckbox.setChecked(true);
         mLowerCheckbox.setOnCheckedChangeListener(checkedChangeListener);
-        mDigitsCheckbox = (CheckBox) findViewById(R.id.checkbox_digits);
-        mDigitsCheckbox.setChecked(true);
         mDigitsCheckbox.setOnCheckedChangeListener(checkedChangeListener);
-        mDashCheckbox = (CheckBox) findViewById(R.id.checkbox_dash);
         mDashCheckbox.setOnCheckedChangeListener(checkedChangeListener);
-        mUnderscoreCheckbox = (CheckBox) findViewById(R.id.checkbox_underscore);
         mUnderscoreCheckbox.setOnCheckedChangeListener(checkedChangeListener);
-        mSpaceCheckbox = (CheckBox) findViewById(R.id.checkbox_space);
         mSpaceCheckbox.setOnCheckedChangeListener(checkedChangeListener);
-        mSpecialCheckbox = (CheckBox) findViewById(R.id.checkbox_special);
         mSpecialCheckbox.setOnCheckedChangeListener(checkedChangeListener);
-        mBracketsCheckbox = (CheckBox) findViewById(R.id.checkbox_brackets);
         mBracketsCheckbox.setOnCheckedChangeListener(checkedChangeListener);
 
-        // Initial
-
-        String password = generatePassword();
-        mPasswordTextView.setText(password);
+        TextView upperTextView = (TextView) findViewById(R.id.textview_upper);
+        upperTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mUpperCheckbox.toggle();
+            }
+        });
+        TextView lowerTextView = (TextView) findViewById(R.id.textview_lower);
+        lowerTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLowerCheckbox.toggle();
+            }
+        });
+        TextView digitsTextView = (TextView) findViewById(R.id.textview_digits);
+        digitsTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDigitsCheckbox.toggle();
+            }
+        });
+        TextView dashTextView = (TextView) findViewById(R.id.textview_dash);
+        dashTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDashCheckbox.toggle();
+            }
+        });
+        TextView underscoreTextView = (TextView) findViewById(R.id.textview_underscore);
+        underscoreTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mUnderscoreCheckbox.toggle();
+            }
+        });
+        TextView spaceTextView = (TextView) findViewById(R.id.textview_space);
+        spaceTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSpaceCheckbox.toggle();
+            }
+        });
+        TextView specialTextView = (TextView) findViewById(R.id.textview_special);
+        specialTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSpecialCheckbox.toggle();
+            }
+        });
+        TextView bracketsTextView = (TextView) findViewById(R.id.textview_brackets);
+        bracketsTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mBracketsCheckbox.toggle();
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_passwordgenerator, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(RESULT_CANCELED, null);
+        super.onBackPressed();
     }
 
     @Override
@@ -112,7 +198,7 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private String generatePassword() {
+    private String generatePassword(int length) {
         ArrayList<Character> characters = new ArrayList<>();
         if (mUpperCheckbox.isChecked()) {
             characters.addAll(Chars.asList(CHARS_UPPER));
@@ -139,17 +225,10 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
             characters.addAll(Chars.asList(CHARS_BRACKETS));
         }
 
-        int length;
-        try {
-            length = Integer.parseInt(mLengthEditText.getText().toString());
-        } catch (NumberFormatException e) {
-            length = 32;
-        }
-
         Random random = new Random();
         String password = "";
 
-        for (int i=0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             int item = random.nextInt(characters.size());
             password += characters.get(item);
         }

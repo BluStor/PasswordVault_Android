@@ -26,9 +26,9 @@ import co.blustor.passwordvault.utils.MyApplication;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class EditEntryActivity extends LockingActivity {
-    private static final String TAG = "EditEntryActivity";
     public static final int REQUEST_ICON_CODE = 0;
     public static final int REQUEST_PASSWORD = 1;
+    private static final String TAG = "EditEntryActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultEntry mEntry = null;
     private Integer mIconId = 0;
