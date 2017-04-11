@@ -66,8 +66,8 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
         seekBarLength.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress < 1) {
-                    seekBar.setProgress(1);
+                if (progress < 10) {
+                    seekBar.setProgress(10);
                 } else if (progress > 200) {
                     seekBar.setProgress(200);
                 }
