@@ -36,6 +36,7 @@ import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.services.NotificationService;
+import co.blustor.passwordvault.sync.SyncManager;
 import co.blustor.passwordvault.utils.MyApplication;
 
 public class GroupActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
@@ -317,6 +318,9 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                                     } else if (which == R.id.action_delete) {
                                         mGroup.removeGroup(group.getUUID());
                                         updateData();
+
+                                        Vault vault = Vault.getInstance();
+                                        SyncManager.setRoot(GroupActivity.this, vault.getPassword());
                                     }
                                 }
                             }).show();
@@ -331,6 +335,9 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                                     if (which == R.id.action_delete) {
                                         mGroup.removeEntry(entry.getUUID());
                                         updateData();
+
+                                        Vault vault = Vault.getInstance();
+                                        SyncManager.setRoot(GroupActivity.this, vault.getPassword());
                                     }
                                 }
                             }).show();
