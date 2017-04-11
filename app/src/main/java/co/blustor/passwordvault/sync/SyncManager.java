@@ -38,7 +38,7 @@ public class SyncManager {
 
                 try {
                     try {
-                        card.disconnect();
+                        card.connect();
 
                         if (card.getConnectionState() == GKCard.ConnectionState.CARD_NOT_PAIRED) {
                             throw new SyncManagerException("Card is not paired.");
@@ -118,7 +118,7 @@ public class SyncManager {
                         syncStatus.notify(SyncStatus.SAVING);
                         lastSyncStatus = SyncStatus.SAVING;
 
-                        card.disconnect();
+                        card.connect();
 
                         if (card.getConnectionState() == GKCard.ConnectionState.CARD_NOT_PAIRED) {
                             throw new SyncManagerException("Card is not paired.");

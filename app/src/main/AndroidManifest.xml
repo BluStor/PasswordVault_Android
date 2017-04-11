@@ -28,6 +28,7 @@
             android:windowSoftInputMode="stateVisible" />
         <activity android:name=".activities.GroupActivity" />
         <activity android:name=".activities.IconPickerActivity" />
+        <activity android:name=".activities.PasswordGeneratorActivity" />
         <activity android:name=".activities.SettingsActivity" />
         <activity android:name=".activities.SplashActivity">
             <intent-filter>

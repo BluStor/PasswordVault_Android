@@ -21,11 +21,11 @@ import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.sync.SyncManager;
 import co.blustor.passwordvault.utils.MyApplication;
 
-import static co.blustor.passwordvault.activities.IconPickerActivity.REQUEST_ICON_CODE;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class EditGroupActivity extends LockingActivity {
     private static final String TAG = "EditGroupActivity";
+    public static final int REQUEST_ICON_CODE = 0;
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup = null;
     private Integer mIconId = 0;

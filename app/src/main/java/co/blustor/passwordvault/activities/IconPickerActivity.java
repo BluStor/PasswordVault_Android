@@ -11,8 +11,6 @@ import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.adapters.IconAdapter;
 
 public class IconPickerActivity extends AppCompatActivity {
-    public static final int REQUEST_ICON_CODE = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
