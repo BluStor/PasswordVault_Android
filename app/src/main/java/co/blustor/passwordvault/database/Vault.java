@@ -30,7 +30,7 @@ public class Vault {
     }
 
     public void create() {
-        mRoot = new VaultGroup(null, UUID.randomUUID(), "Passwords");
+        mRoot = new VaultGroup(null, UUID.randomUUID(), "Password Vault");
     }
 
     public VaultGroup getGroupByUUID(final UUID uuid) throws GroupNotFoundException {
