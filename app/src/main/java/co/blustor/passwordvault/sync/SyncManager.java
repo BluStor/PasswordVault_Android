@@ -162,6 +162,17 @@ public class SyncManager {
         return task.promise();
     }
 
+    public static synchronized Promise<Boolean, SyncManagerException, SyncStatus> exists() {
+        final DeferredObject<Boolean, SyncManagerException, SyncStatus> task = new DeferredObject<>();
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+            }
+        };
+        return task.promise();
+    }
+
     public static Promise<Void, Exception, SyncStatus> getWriteStatusPromise() {
         return syncStatus.promise();
     }
