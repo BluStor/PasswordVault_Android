@@ -64,7 +64,7 @@ public class NotificationService extends Service {
                 .setContentTitle("BluStor KeePassDatabase")
                 .setContentText("Database is unlocked.")
                 .setContentIntent(getSwitchToAppPendingIntent())
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
                 .addAction(lockAction)
                 .build();
     }
