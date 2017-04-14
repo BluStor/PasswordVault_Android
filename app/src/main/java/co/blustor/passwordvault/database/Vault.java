@@ -35,25 +35,15 @@ public class Vault {
     }
 
     public VaultGroup getGroupByUUID(final UUID uuid) {
-        VaultGroup root = getRoot();
-
-        if (root != null) {
-            if (root.getUUID().equals(uuid)) {
-                return mRoot;
+        Optional<VaultGroup> match = VaultGroup.traverser.preOrderTraversal(mRoot).firstMatch(new Predicate<VaultGroup>() {
+            @Override
+            public boolean apply(VaultGroup input) {
+                return input.getUUID().equals(uuid);
             }
+        });
 
-            Optional<VaultGroup> match = VaultGroup.traverser.preOrderTraversal(root).firstMatch(new Predicate<VaultGroup>() {
-                @Override
-                public boolean apply(VaultGroup input) {
-                    return input.getUUID().equals(uuid);
-                }
-            });
-
-            if (match.isPresent()) {
-                return match.get();
-            } else {
-                return null;
-            }
+        if (match.isPresent()) {
+            return match.get();
         } else {
             return null;
         }
@@ -108,8 +98,8 @@ public class Vault {
         return vaultGroups.toList();
     }
 
-    public List<VaultEntry> findEntriesByTitle(String query) {
-        if (query.isEmpty()) {
+    public List<VaultEntry> findEntriesByTitle(String query, Boolean includeGroupName) {
+        if (query.length() < 2) {
             return new ArrayList<>();
         }
 
@@ -121,8 +111,16 @@ public class Vault {
 
         for (VaultGroup group : vaultGroups) {
             for (VaultEntry entry : group.getEntries()) {
-                if (entry.getTitle().toLowerCase().contains(loweredQuery)) {
-                    results.add(entry);
+                if (includeGroupName) {
+                    Boolean titleContains = entry.getTitle().toLowerCase().contains(loweredQuery);
+                    Boolean nameContains = group.getName().toLowerCase().contains(loweredQuery);
+                    if (group.getParentUUID() != null && (titleContains || nameContains)) {
+                        results.add(entry);
+                    }
+                } else {
+                    if (entry.getTitle().toLowerCase().contains(loweredQuery)) {
+                        results.add(entry);
+                    }
                 }
             }
         }

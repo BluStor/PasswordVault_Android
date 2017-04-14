@@ -37,12 +37,11 @@ import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.fragments.SearchFragment;
-import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.services.NotificationService;
 import co.blustor.passwordvault.sync.SyncManager;
 import co.blustor.passwordvault.utils.MyApplication;
 
-public class GroupActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
+public class GroupActivity extends LockingActivity {
     private static final String TAG = "GroupActivity";
     private VaultGroup mGroup = null;
     private GroupEntryAdapter mGroupEntryAdapter = new GroupEntryAdapter();
@@ -139,7 +138,7 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
 
         getMenuInflater().inflate(R.menu.menu_group, menu);
 
-        MenuItem menuItem = menu.findItem(R.id.action_search);
+        final MenuItem menuItem = menu.findItem(R.id.action_search);
         MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
@@ -154,7 +153,7 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
             }
         });
 
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -201,11 +200,6 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         super.onResume();
 
         mGroupEntryAdapter.updateData();
-    }
-
-    @Override
-    public void syncComplete(UUID uuid) {
-        finish();
     }
 
     private class GroupEntryAdapter extends RecyclerView.Adapter<GroupEntryAdapter.GroupEntryViewHolder> {

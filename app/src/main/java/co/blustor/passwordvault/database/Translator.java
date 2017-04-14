@@ -33,6 +33,7 @@ public class Translator {
         ArrayList<VaultEntry> entries = new ArrayList<>();
         for (Entry entry : group.getEntries()) {
             VaultEntry vaultEntry = new VaultEntry(
+                    group.getUuid(),
                     entry.getUuid(),
                     entry.getTitle(),
                     entry.getUsername(),

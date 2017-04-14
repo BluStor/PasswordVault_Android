@@ -5,6 +5,7 @@ import java.util.UUID;
 public class VaultEntry {
     private static final String TAG = "VaultEntry";
 
+    private final UUID mGroupUUID;
     private final UUID mUUID;
     private String mTitle = "";
     private String mUsername = "";
@@ -13,11 +14,16 @@ public class VaultEntry {
     private String mNotes = "";
     private Integer mIconId = 0;
 
-    public VaultEntry(UUID uuid, String title, String username, String password) {
+    public VaultEntry(UUID groupUUID, UUID uuid, String title, String username, String password) {
+        mGroupUUID = groupUUID;
         mUUID = uuid;
         mTitle = title;
         mUsername = username;
         mPassword = password;
+    }
+
+    public UUID getGroupUUID() {
+        return mGroupUUID;
     }
 
     public UUID getUUID() {

@@ -137,6 +137,7 @@ public class AddEntryActivity extends LockingActivity {
     private void save() {
         if (mAwesomeValidation.validate()) {
             VaultEntry entry = new VaultEntry(
+                    mGroup.getUUID(),
                     UUID.randomUUID(),
                     mTitleEditText.getText().toString(),
                     mUsernameEditText.getText().toString(),
