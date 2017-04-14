@@ -41,9 +41,9 @@ public class SyncManager {
                         card.connect();
 
                         if (card.getConnectionState() == GKCard.ConnectionState.CARD_NOT_PAIRED) {
-                            throw new SyncManagerException("Card is not paired.");
+                            throw new SyncManagerException("Card is not paired. Please pair your card with your phone.");
                         } else if (card.getConnectionState() == GKCard.ConnectionState.BLUETOOTH_DISABLED) {
-                            throw new SyncManagerException("Bluetooth is not enabled.");
+                            throw new SyncManagerException("Bluetooth is not enabled. Please enable bluetooth under settings.");
                         }
 
                         GKCard.Response response = card.get(VAULT_PATH);
