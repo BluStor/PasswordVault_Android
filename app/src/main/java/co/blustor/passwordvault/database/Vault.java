@@ -115,7 +115,7 @@ public class Vault {
 
         String loweredQuery = query.toLowerCase();
 
-        ArrayList<VaultEntry> results = new ArrayList<>();
+        List<VaultEntry> results = new ArrayList<>();
 
         List<VaultGroup> vaultGroups = VaultGroup.traverser.preOrderTraversal(mRoot).toList();
 

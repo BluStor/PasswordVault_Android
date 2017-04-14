@@ -120,7 +120,6 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
     public void syncComplete(UUID uuid) {
         Intent groupActivity = new Intent(UnlockActivity.this, GroupActivity.class);
         groupActivity.putExtra("uuid", uuid);
-        groupActivity.putExtra("path", new ArrayList<String>());
         startActivity(groupActivity);
     }
 }

@@ -2,6 +2,7 @@ package co.blustor.passwordvault.database;
 
 import android.support.annotation.NonNull;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.TreeTraverser;
 
 import java.util.ArrayList;
@@ -80,6 +81,21 @@ public class VaultGroup {
                 i.remove();
             }
         }
+    }
+
+    public List<String> getPath() {
+        Vault vault = Vault.getInstance();
+
+        List<String> reversePath = new ArrayList<>();
+
+        UUID uuid;
+        VaultGroup g = this;
+        while ((uuid = g.getParentUUID()) != null) {
+            g = vault.getGroupByUUID(uuid);
+            reversePath.add(g.getName());
+        }
+
+        return Lists.reverse(reversePath);
     }
 
     // Properties

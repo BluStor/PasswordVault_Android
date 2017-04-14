@@ -88,7 +88,6 @@ public class CreateActivity extends AppCompatActivity implements SyncDialogFragm
     public void syncComplete(UUID uuid) {
         Intent groupActivity = new Intent(CreateActivity.this, GroupActivity.class);
         groupActivity.putExtra("uuid", uuid);
-        groupActivity.putExtra("path", new ArrayList<String>());
         startActivity(groupActivity);
 
         finish();

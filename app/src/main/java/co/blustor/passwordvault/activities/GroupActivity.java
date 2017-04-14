@@ -44,7 +44,6 @@ import co.blustor.passwordvault.utils.MyApplication;
 
 public class GroupActivity extends LockingActivity implements SyncDialogFragment.SyncInterface {
     private static final String TAG = "GroupActivity";
-    private final ArrayList<String> mPath = new ArrayList<>();
     private VaultGroup mGroup = null;
     private GroupEntryAdapter mGroupEntryAdapter = new GroupEntryAdapter();
     private TextView mEmptyTextView = null;
@@ -59,13 +58,9 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
 
         Intent intent = getIntent();
         UUID uuid = (UUID) intent.getSerializableExtra("uuid");
-        ArrayList<String> paths = intent.getStringArrayListExtra("path");
 
         Vault vault = Vault.getInstance();
         mGroup = vault.getGroupByUUID(uuid);
-
-        mPath.addAll(paths);
-        mPath.add(mGroup.getName());
 
         // Start notification service if necessary
 
@@ -79,10 +74,10 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         mEmptyTextView = (TextView) findViewById(R.id.textview_empty);
 
         TextView pathTextView = (TextView) findViewById(R.id.textview_path);
-        List<String> displayPath = getDisplayPath();
-        if (displayPath.size() > 0) {
-            String path = "in " + Joiner.on("/").join(getDisplayPath());
-            pathTextView.setText(path);
+
+        List<String> path = mGroup.getPath();
+        if (path.size() > 0) {
+            pathTextView.setText("in " + Joiner.on("/").join(path));
         } else {
             pathTextView.setVisibility(View.GONE);
         }
@@ -208,14 +203,6 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         mGroupEntryAdapter.updateData();
     }
 
-    private List<String> getDisplayPath() {
-        if (mPath.size() > 1) {
-            return mPath.subList(0, mPath.size() - 1);
-        } else {
-            return new ArrayList<>();
-        }
-    }
-
     @Override
     public void syncComplete(UUID uuid) {
         finish();
@@ -318,7 +305,6 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
 
                     Intent groupActivity = new Intent(v.getContext(), GroupActivity.class);
                     groupActivity.putExtra("uuid", group.getUUID());
-                    groupActivity.putExtra("path", mPath);
 
                     startActivity(groupActivity);
                 } else {
