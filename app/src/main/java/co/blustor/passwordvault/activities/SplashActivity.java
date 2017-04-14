@@ -2,10 +2,17 @@ package co.blustor.passwordvault.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
+import org.jdeferred.DoneCallback;
+import org.jdeferred.FailCallback;
+import org.jdeferred.Promise;
+import org.jdeferred.android.AndroidDeferredManager;
+
 import co.blustor.passwordvault.R;
+import co.blustor.passwordvault.sync.SyncManager;
+import co.blustor.passwordvault.sync.SyncManager.SyncManagerException;
+import co.blustor.passwordvault.sync.SyncManager.SyncStatus;
 
 public class SplashActivity extends AppCompatActivity {
     @Override
@@ -13,14 +20,29 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent unlockActivity = new Intent(SplashActivity.this, UnlockActivity.class);
-                startActivity(unlockActivity);
+        Promise<Boolean, SyncManagerException, SyncStatus> promise = SyncManager.exists(this);
 
+        AndroidDeferredManager dm = new AndroidDeferredManager();
+        dm.when(promise).done(new DoneCallback<Boolean>() {
+            @Override
+            public void onDone(Boolean result) {
+                Intent startupActivity;
+                if (result) {
+                    startupActivity = new Intent(SplashActivity.this, UnlockActivity.class);
+                } else {
+                    startupActivity = new Intent(SplashActivity.this, CreateActivity.class);
+                }
+
+                startActivity(startupActivity);
                 finish();
             }
-        }, 1000);
+        }).fail(new FailCallback<SyncManagerException>() {
+            @Override
+            public void onFail(SyncManagerException result) {
+                Intent unlockActivity = new Intent(SplashActivity.this, UnlockActivity.class);
+                startActivity(unlockActivity);
+                finish();
+            }
+        });
     }
 }

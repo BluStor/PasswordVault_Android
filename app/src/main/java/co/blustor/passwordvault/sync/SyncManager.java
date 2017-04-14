@@ -23,18 +23,19 @@ import de.slackspace.openkeepass.exception.KeePassDatabaseUnreadableException;
 
 public class SyncManager {
     private static final String TAG = "SyncManager";
+    private static final String CARD_NAME = "CYBERGATE";
     private static final String VAULT_PATH = "/passwordvault/db.kdbx";
     private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
     private static DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
 
-    public static synchronized Promise<VaultGroup, Exception, SyncStatus> getRoot(final Context context, final String password) {
-        final DeferredObject<VaultGroup, Exception, SyncStatus> task = new DeferredObject<>();
+    public static synchronized Promise<VaultGroup, SyncManagerException, SyncStatus> getRoot(final Context context, final String password) {
+        final DeferredObject<VaultGroup, SyncManagerException, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
             public void run() {
                 task.notify(SyncStatus.SAVING);
 
-                GKBluetoothCard card = new GKBluetoothCard("CYBERGATE", context.getCacheDir());
+                GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
 
                 try {
                     try {
@@ -90,8 +91,8 @@ public class SyncManager {
         return task.promise();
     }
 
-    public static synchronized Promise<VaultGroup, Exception, SyncStatus> setRoot(final Context context, final String password) {
-        final DeferredObject<VaultGroup, Exception, SyncStatus> task = new DeferredObject<>();
+    public static synchronized Promise<VaultGroup, SyncManagerException, SyncStatus> setRoot(final Context context, final String password) {
+        final DeferredObject<VaultGroup, SyncManagerException, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
             public void run() {
@@ -99,7 +100,7 @@ public class SyncManager {
                 syncStatus.notify(SyncStatus.ENCRYPTING);
                 lastSyncStatus = SyncStatus.ENCRYPTING;
 
-                GKBluetoothCard card = new GKBluetoothCard("CYBERGATE", context.getCacheDir());
+                GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
 
                 try {
                     try {
@@ -164,14 +165,41 @@ public class SyncManager {
         return task.promise();
     }
 
-    public static synchronized Promise<Boolean, SyncManagerException, SyncStatus> exists() {
+    public static synchronized Promise<Boolean, SyncManagerException, SyncStatus> exists(final Context context) {
         final DeferredObject<Boolean, SyncManagerException, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
             public void run() {
-                super.run();
+                GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
+
+                try {
+                    try {
+                        GKCard.Response response = card.list("/passwordvault");
+                        String[] lines = response.readDataFile().split("\\r?\\n");
+
+                        Boolean isFound = false;
+                        for (String line : lines) {
+                            if (line.endsWith(" db.kdbx")) {
+                                isFound = true;
+                            }
+                        }
+
+                        task.resolve(isFound);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        throw new SyncManagerException(e.getMessage());
+                    }
+                } catch (SyncManagerException e) {
+                    task.reject(e);
+                }
+
+                try {
+                    card.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        };
+        }.start();
         return task.promise();
     }
 
@@ -191,7 +219,7 @@ public class SyncManager {
         SAVING, ENCRYPTING, DECRYPTING, FAILED, SYNCED
     }
 
-    private static class SyncManagerException extends Exception {
+    public static class SyncManagerException extends Exception {
         SyncManagerException(String messasge) {
             super(messasge);
         }

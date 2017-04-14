@@ -22,6 +22,8 @@ import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.sync.SyncManager;
 import co.blustor.passwordvault.utils.AlertUtils;
 
+import static co.blustor.passwordvault.sync.SyncManager.*;
+
 public class SyncDialogFragment extends DialogFragment {
     private static final String TAG = "SyncDialogFragment";
 
@@ -36,14 +38,14 @@ public class SyncDialogFragment extends DialogFragment {
 
         Bundle args = getArguments();
 
-        final SyncManager.SyncType syncType = (SyncManager.SyncType) args.getSerializable("type");
+        final SyncType syncType = (SyncType) args.getSerializable("type");
         String password = args.getString("password");
 
-        Promise<VaultGroup, Exception, SyncManager.SyncStatus> promise;
-        if (syncType == SyncManager.SyncType.READ) {
-            promise = SyncManager.getRoot(getActivity(), password);
+        Promise<VaultGroup, SyncManager.SyncManagerException, SyncManager.SyncStatus> promise;
+        if (syncType == SyncType.READ) {
+            promise = getRoot(getActivity(), password);
         } else {
-            promise = SyncManager.setRoot(getActivity(), password);
+            promise = setRoot(getActivity(), password);
         }
 
         statusTextView.setText("Connecting");
@@ -56,22 +58,22 @@ public class SyncDialogFragment extends DialogFragment {
                 SyncInterface syncInterface = (SyncInterface) getActivity();
                 syncInterface.syncComplete(result.getUUID());
             }
-        }).fail(new FailCallback<Exception>() {
+        }).fail(new FailCallback<SyncManager.SyncManagerException>() {
             @Override
-            public void onFail(Exception result) {
+            public void onFail(SyncManagerException result) {
                 result.printStackTrace();
                 AlertUtils.showError(getActivity(), result.getMessage());
                 dismiss();
             }
         }).progress(new ProgressCallback<SyncManager.SyncStatus>() {
             @Override
-            public void onProgress(SyncManager.SyncStatus progress) {
+            public void onProgress(SyncStatus progress) {
                 Log.d(TAG, progress.name());
-                if (progress == SyncManager.SyncStatus.SAVING) {
+                if (progress == SyncStatus.SAVING) {
                     statusTextView.setText("Transferring");
-                } else if (progress == SyncManager.SyncStatus.DECRYPTING) {
+                } else if (progress == SyncStatus.DECRYPTING) {
                     statusTextView.setText("Decrypting");
-                } else if (progress == SyncManager.SyncStatus.ENCRYPTING) {
+                } else if (progress == SyncStatus.ENCRYPTING) {
                     statusTextView.setText("Encrypting");
                 }
             }

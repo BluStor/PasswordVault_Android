@@ -1,7 +1,6 @@
 package co.blustor.passwordvault.fragments;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,16 +13,12 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.common.base.Joiner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,13 +54,6 @@ public class SearchFragment extends Fragment {
 
     public void search(String query) {
         Vault vault = Vault.getInstance();
-
-        if (query.isEmpty()) {
-            mEmptyTextView.setText("Enter a group name or entry title.");
-        } else {
-            mEmptyTextView.setText("No results.");
-        }
-
         mSearchResultAdapter.setResults(vault.findEntriesByTitle(query, true), query);
     }
 
