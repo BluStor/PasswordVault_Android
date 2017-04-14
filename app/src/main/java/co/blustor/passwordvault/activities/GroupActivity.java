@@ -235,7 +235,12 @@ public class GroupActivity extends LockingActivity {
             if (holder.getItemViewType() == 0) {
                 VaultGroup group = mGroups.get(position);
 
-                holder.subIconImageView.setImageResource(MyApplication.getIcons().get(group.getIconId()));
+                int iconId = group.getIconId();
+                if (iconId != 49) {
+                    holder.subIconImageView.setImageResource(MyApplication.getIcons().get(group.getIconId()));
+                } else {
+                    holder.subIconImageView.setImageDrawable(null);
+                }
                 holder.titleTextView.setText(group.getName());
             } else {
                 VaultEntry entry = mEntries.get(position - mGroups.size());
