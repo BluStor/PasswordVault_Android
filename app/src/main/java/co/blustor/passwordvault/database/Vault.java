@@ -99,7 +99,7 @@ public class Vault {
     }
 
     public List<VaultEntry> findEntriesByTitle(String query, Boolean includeGroupName) {
-        if (query.length() < 2) {
+        if (query.isEmpty()) {
             return new ArrayList<>();
         }
 

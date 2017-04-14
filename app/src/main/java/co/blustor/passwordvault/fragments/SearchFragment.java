@@ -137,7 +137,7 @@ public class SearchFragment extends Fragment {
                 } else {
                     spannableStringBuilder.append(component);
                 }
-                
+
                 spannableStringBuilder.append("/");
             }
 
