@@ -32,7 +32,7 @@ public class SyncStatusFragment extends Fragment {
 
         mStatusTextView = (TextView) view.findViewById(R.id.textview_status);
 
-        setSyncStatus(SyncManager.SyncStatus.SYNCED);
+        setSyncStatus(SyncManager.getLastWriteStatus());
 
         mDeferredManager.when(SyncManager.getWriteStatusPromise()).progress(new ProgressCallback<SyncManager.SyncStatus>() {
             @Override

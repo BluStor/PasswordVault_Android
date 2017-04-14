@@ -1,10 +1,11 @@
 package co.blustor.passwordvault.database;
 
-import android.util.Log;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Vault {
@@ -33,34 +34,49 @@ public class Vault {
         mRoot = new VaultGroup(null, UUID.randomUUID(), "Password Vault");
     }
 
-    public VaultGroup getGroupByUUID(final UUID uuid) throws GroupNotFoundException {
-        Log.d(TAG, "Get group: " + uuid);
+    public VaultGroup getGroupByUUID(final UUID uuid) {
         VaultGroup root = getRoot();
 
-        if (root.getUUID().equals(uuid)) {
-            return mRoot;
-        }
-
-        Optional<VaultGroup> match = VaultGroup.traverser.preOrderTraversal(root).firstMatch(new Predicate<VaultGroup>() {
-            @Override
-            public boolean apply(VaultGroup input) {
-                return input.getUUID().equals(uuid);
+        if (root != null) {
+            if (root.getUUID().equals(uuid)) {
+                return mRoot;
             }
-        });
 
-        if (match.isPresent()) {
-            return match.get();
+            Optional<VaultGroup> match = VaultGroup.traverser.preOrderTraversal(root).firstMatch(new Predicate<VaultGroup>() {
+                @Override
+                public boolean apply(VaultGroup input) {
+                    return input.getUUID().equals(uuid);
+                }
+            });
+
+            if (match.isPresent()) {
+                return match.get();
+            } else {
+                return null;
+            }
         } else {
-            throw new GroupNotFoundException();
+            return null;
         }
     }
 
-    public VaultGroup getRoot() throws GroupNotFoundException {
-        if (mRoot == null) {
-            throw new GroupNotFoundException();
-        } else {
-            return mRoot;
+    public VaultEntry getEntryByUUID(final UUID uuid) {
+        VaultGroup root = getRoot();
+
+        if (root != null) {
+            List<VaultGroup> groups = VaultGroup.traverser.preOrderTraversal(root).toList();
+            for (VaultGroup group : groups) {
+                VaultEntry entry = group.getEntry(uuid);
+                if (entry != null) {
+                    return entry;
+                }
+            }
         }
+
+        return null;
+    }
+
+    public VaultGroup getRoot() {
+        return mRoot;
     }
 
     public void setRoot(VaultGroup group) {
@@ -75,6 +91,42 @@ public class Vault {
         mPassword = password;
     }
 
-    public static class GroupNotFoundException extends Exception {
+    public List<VaultGroup> findGroupsByName(final String query) {
+        if (query.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        final String loweredQuery = query.toLowerCase();
+
+        FluentIterable<VaultGroup> vaultGroups = VaultGroup.traverser.preOrderTraversal(mRoot).filter(new Predicate<VaultGroup>() {
+            @Override
+            public boolean apply(VaultGroup input) {
+                return input.getParentUUID() != null && input.getName().toLowerCase().contains(loweredQuery);
+            }
+        });
+
+        return vaultGroups.toList();
+    }
+
+    public List<VaultEntry> findEntriesByTitle(String query) {
+        if (query.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String loweredQuery = query.toLowerCase();
+
+        ArrayList<VaultEntry> results = new ArrayList<>();
+
+        List<VaultGroup> vaultGroups = VaultGroup.traverser.preOrderTraversal(mRoot).toList();
+
+        for (VaultGroup group : vaultGroups) {
+            for (VaultEntry entry : group.getEntries()) {
+                if (entry.getTitle().toLowerCase().contains(loweredQuery)) {
+                    results.add(entry);
+                }
+            }
+        }
+
+        return results;
     }
 }

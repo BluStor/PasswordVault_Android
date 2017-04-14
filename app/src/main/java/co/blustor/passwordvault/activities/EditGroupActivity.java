@@ -60,12 +60,12 @@ public class EditGroupActivity extends LockingActivity {
 
         UUID uuid = (UUID) getIntent().getSerializableExtra("uuid");
 
-        try {
-            Vault vault = Vault.getInstance();
-            mGroup = vault.getGroupByUUID(uuid);
+        Vault vault = Vault.getInstance();
+        mGroup = vault.getGroupByUUID(uuid);
 
+        if (mGroup != null) {
             load();
-        } catch (Vault.GroupNotFoundException e) {
+        } else {
             finish();
         }
     }

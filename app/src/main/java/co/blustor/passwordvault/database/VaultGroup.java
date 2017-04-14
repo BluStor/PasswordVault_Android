@@ -44,14 +44,14 @@ public class VaultGroup {
         return mEntries;
     }
 
-    public VaultEntry getEntry(UUID uuid) throws EntryNotFoundException {
+    public VaultEntry getEntry(UUID uuid) {
         for (VaultEntry entry : mEntries) {
             if (entry.getUUID().equals(uuid)) {
                 return entry;
             }
         }
 
-        throw new EntryNotFoundException();
+        return null;
     }
 
     public void removeEntry(final UUID uuid) {
@@ -106,8 +106,5 @@ public class VaultGroup {
 
     public void setIconId(Integer iconId) {
         mIconId = iconId;
-    }
-
-    public static class EntryNotFoundException extends Exception {
     }
 }

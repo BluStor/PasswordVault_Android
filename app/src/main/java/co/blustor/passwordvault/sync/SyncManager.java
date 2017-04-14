@@ -106,6 +106,10 @@ public class SyncManager {
                         Vault vault = Vault.getInstance();
                         VaultGroup rootGroup = vault.getRoot();
 
+                        if (rootGroup == null) {
+                            throw new SyncManagerException("Vault is empty.");
+                        }
+
                         Group group = Translator.exportKeePass(vault.getRoot());
 
                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -140,8 +144,6 @@ public class SyncManager {
                         } else {
                             throw new SyncManagerException("Card status: " + status);
                         }
-                    } catch (Vault.GroupNotFoundException e) {
-                        throw new SyncManagerException("Vault is empty.");
                     } catch (IOException e) {
                         e.printStackTrace();
                         throw new SyncManagerException(e.getMessage());

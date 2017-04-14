@@ -6,8 +6,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +36,7 @@ import co.blustor.passwordvault.constants.Intents;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
 import co.blustor.passwordvault.database.VaultGroup;
+import co.blustor.passwordvault.fragments.SearchFragment;
 import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.services.NotificationService;
 import co.blustor.passwordvault.sync.SyncManager;
@@ -43,8 +46,9 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
     private static final String TAG = "GroupActivity";
     private final ArrayList<String> mPath = new ArrayList<>();
     private VaultGroup mGroup = null;
-    private GroupEntryAdapter mGroupEntryAdapter = null;
+    private GroupEntryAdapter mGroupEntryAdapter = new GroupEntryAdapter();
     private TextView mEmptyTextView = null;
+    private SearchFragment mSearchFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,14 +61,8 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         UUID uuid = (UUID) intent.getSerializableExtra("uuid");
         ArrayList<String> paths = intent.getStringArrayListExtra("path");
 
-        try {
-            Vault vault = Vault.getInstance();
-            mGroup = vault.getGroupByUUID(uuid);
-        } catch (Vault.GroupNotFoundException e) {
-            Log.d(TAG, "Group " + uuid + " was not found");
-            finish();
-            return;
-        }
+        Vault vault = Vault.getInstance();
+        mGroup = vault.getGroupByUUID(uuid);
 
         mPath.addAll(paths);
         mPath.add(mGroup.getName());
@@ -94,8 +92,6 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-
-        mGroupEntryAdapter = new GroupEntryAdapter();
         recyclerView.setAdapter(mGroupEntryAdapter);
 
         final FloatingActionMenu fam = (FloatingActionMenu) findViewById(R.id.fam);
@@ -135,12 +131,50 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
         fam.addMenuButton(groupFloatingActionButton);
         fam.addMenuButton(entryFloatingActionButton);
         fam.setClosedOnTouchOutside(true);
+
+        // Fragments
+
+        mSearchFragment = (SearchFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_search);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        mSearchFragment.hide();
+
         getMenuInflater().inflate(R.menu.menu_group, menu);
-        return super.onCreateOptionsMenu(menu);
+
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                mSearchFragment.show();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                mSearchFragment.hide();
+                return true;
+            }
+        });
+
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mSearchFragment.search(newText);
+                return false;
+            }
+        });
+
+        return true;
     }
 
     @Override
@@ -291,7 +325,6 @@ public class GroupActivity extends LockingActivity implements SyncDialogFragment
                     VaultEntry entry = mEntries.get(position - mGroups.size());
 
                     Intent editEntryActivity = new Intent(v.getContext(), EditEntryActivity.class);
-                    editEntryActivity.putExtra("groupUUID", mGroup.getUUID());
                     editEntryActivity.putExtra("uuid", entry.getUUID());
 
                     ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(GroupActivity.this, iconImageView, "entry");

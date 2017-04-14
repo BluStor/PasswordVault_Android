@@ -19,7 +19,6 @@ import java.util.UUID;
 import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.database.VaultEntry;
-import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.sync.SyncManager;
 import co.blustor.passwordvault.utils.MyApplication;
 
@@ -78,17 +77,14 @@ public class EditEntryActivity extends LockingActivity {
 
         // Load
 
-        UUID groupUUID = (UUID) getIntent().getSerializableExtra("groupUUID");
         UUID uuid = (UUID) getIntent().getSerializableExtra("uuid");
 
-        try {
-            Vault vault = Vault.getInstance();
+        Vault vault = Vault.getInstance();
+        mEntry = vault.getEntryByUUID(uuid);
 
-            VaultGroup mGroup = vault.getGroupByUUID(groupUUID);
-            mEntry = mGroup.getEntry(uuid);
+        if (mEntry != null) {
             load();
-        } catch (Vault.GroupNotFoundException | VaultGroup.EntryNotFoundException e) {
-            e.printStackTrace();
+        } else {
             supportFinishAfterTransition();
         }
     }
