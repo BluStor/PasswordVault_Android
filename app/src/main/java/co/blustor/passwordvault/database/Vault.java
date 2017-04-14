@@ -114,7 +114,7 @@ public class Vault {
                 if (includeGroupName) {
                     Boolean titleContains = entry.getTitle().toLowerCase().contains(loweredQuery);
                     Boolean nameContains = group.getName().toLowerCase().contains(loweredQuery);
-                    if (group.getParentUUID() != null && (titleContains || nameContains)) {
+                    if (titleContains || (group.getParentUUID() != null && nameContains)) {
                         results.add(entry);
                     }
                 } else {
