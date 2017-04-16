@@ -9,7 +9,6 @@ import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.services.NotificationService;
 
 public class AppBroadcastReceiver extends BroadcastReceiver {
-    protected static final String TAG = "AppBroadcastReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {

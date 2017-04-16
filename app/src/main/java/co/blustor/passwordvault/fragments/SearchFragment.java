@@ -31,7 +31,7 @@ import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.utils.MyApplication;
 
 public class SearchFragment extends Fragment {
-    private SearchResultAdapter mSearchResultAdapter = new SearchResultAdapter();
+    private final SearchResultAdapter mSearchResultAdapter = new SearchResultAdapter();
     private TextView mEmptyTextView = null;
 
     @Nullable
@@ -72,8 +72,8 @@ public class SearchFragment extends Fragment {
     }
 
     private class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder> {
+        private final List<VaultEntry> mEntryResults = new ArrayList<>();
         private String mLoweredQuery = "";
-        private List<VaultEntry> mEntryResults = new ArrayList<>();
 
         @Override
         public SearchResultViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -157,7 +157,6 @@ public class SearchFragment extends Fragment {
         class SearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
             final ImageView iconImageView;
-            final ImageView subIconImageView;
             final TextView titleTextView;
             final TextView nameTextView;
 
@@ -167,7 +166,6 @@ public class SearchFragment extends Fragment {
                 itemView.setOnClickListener(this);
 
                 iconImageView = (ImageView) itemView.findViewById(R.id.imageview_icon);
-                subIconImageView = (ImageView) itemView.findViewById(R.id.imageview_subicon);
                 titleTextView = (TextView) itemView.findViewById(R.id.textview_title);
                 nameTextView = (TextView) itemView.findViewById(R.id.textview_name);
             }

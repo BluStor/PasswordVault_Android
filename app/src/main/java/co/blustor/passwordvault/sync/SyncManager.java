@@ -22,11 +22,10 @@ import de.slackspace.openkeepass.domain.KeePassFileBuilder;
 import de.slackspace.openkeepass.exception.KeePassDatabaseUnreadableException;
 
 public class SyncManager {
-    private static final String TAG = "SyncManager";
     private static final String CARD_NAME = "CYBERGATE";
     private static final String VAULT_PATH = "/passwordvault/db.kdbx";
+    private static final DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
     private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
-    private static DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
 
     public static synchronized Promise<VaultGroup, SyncManagerException, SyncStatus> getRoot(final Context context, final String password) {
         final DeferredObject<VaultGroup, SyncManagerException, SyncStatus> task = new DeferredObject<>();

@@ -22,7 +22,11 @@ import co.blustor.passwordvault.database.VaultGroup;
 import co.blustor.passwordvault.sync.SyncManager;
 import co.blustor.passwordvault.utils.AlertUtils;
 
-import static co.blustor.passwordvault.sync.SyncManager.*;
+import static co.blustor.passwordvault.sync.SyncManager.SyncManagerException;
+import static co.blustor.passwordvault.sync.SyncManager.SyncStatus;
+import static co.blustor.passwordvault.sync.SyncManager.SyncType;
+import static co.blustor.passwordvault.sync.SyncManager.getRoot;
+import static co.blustor.passwordvault.sync.SyncManager.setRoot;
 
 public class SyncDialogFragment extends DialogFragment {
     private static final String TAG = "SyncDialogFragment";
@@ -48,7 +52,7 @@ public class SyncDialogFragment extends DialogFragment {
             promise = setRoot(getActivity(), password);
         }
 
-        statusTextView.setText("Connecting");
+        statusTextView.setText(R.string.status_connecting);
 
         AndroidDeferredManager dm = new AndroidDeferredManager();
         dm.when(promise).done(new DoneCallback<VaultGroup>() {
@@ -70,11 +74,11 @@ public class SyncDialogFragment extends DialogFragment {
             public void onProgress(SyncStatus progress) {
                 Log.d(TAG, progress.name());
                 if (progress == SyncStatus.SAVING) {
-                    statusTextView.setText("Transferring");
+                    statusTextView.setText(R.string.status_transferring);
                 } else if (progress == SyncStatus.DECRYPTING) {
-                    statusTextView.setText("Decrypting");
+                    statusTextView.setText(R.string.status_decrypting);
                 } else if (progress == SyncStatus.ENCRYPTING) {
-                    statusTextView.setText("Encrypting");
+                    statusTextView.setText(R.string.status_encrypting);
                 }
             }
         });

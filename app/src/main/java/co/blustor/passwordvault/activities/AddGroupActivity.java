@@ -25,7 +25,7 @@ import co.blustor.passwordvault.utils.MyApplication;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class AddGroupActivity extends LockingActivity {
-    public static final int REQUEST_ICON_CODE = 0;
+    private static final int REQUEST_ICON_CODE = 0;
     private static final String TAG = "AddGroupActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup;

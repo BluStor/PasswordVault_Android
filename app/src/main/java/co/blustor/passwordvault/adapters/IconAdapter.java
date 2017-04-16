@@ -14,7 +14,7 @@ import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.utils.MyApplication;
 
 public class IconAdapter extends BaseAdapter {
-    private Context mContext;
+    private final Context mContext;
 
     public IconAdapter(Context context) {
         mContext = context;

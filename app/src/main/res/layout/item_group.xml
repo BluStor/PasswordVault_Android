@@ -2,9 +2,7 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:clickable="true"
     android:padding="5dp"
-    android:background="?attr/selectableItemBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <ImageView
@@ -29,7 +27,7 @@
         app:layout_constraintEnd_toEndOf="@id/imageview_icon" />
     <TextView
         android:id="@+id/textview_title"
-        android:text="Name"
+        android:text="@string/placeholder_title"
         android:textSize="16sp"
         android:gravity="center_vertical"
         android:layout_marginStart="10dp"

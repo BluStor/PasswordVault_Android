@@ -14,7 +14,6 @@ import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 import com.github.clans.fab.FloatingActionButton;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import co.blustor.passwordvault.R;
@@ -22,10 +21,10 @@ import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.sync.SyncManager;
 
+import static co.blustor.passwordvault.fragments.SyncDialogFragment.SyncInterface;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class CreateActivity extends AppCompatActivity implements SyncDialogFragment.SyncInterface {
-    private static final String TAG = "CreateActivity";
+public class CreateActivity extends AppCompatActivity implements SyncInterface {
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
 
     @Override

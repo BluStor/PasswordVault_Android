@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import co.blustor.passwordvault.R;
@@ -25,7 +24,7 @@ import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.sync.SyncManager;
 
 public class UnlockActivity extends AppCompatActivity implements SyncDialogFragment.SyncInterface {
-    private static final String TAG = "UnlockActivity";
+
     private EditText mPasswordEditText = null;
 
     @Override
@@ -84,13 +83,13 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
         return super.onOptionsItemSelected(item);
     }
 
-    public void submit() {
+    private void submit() {
         Editable editable = mPasswordEditText.getText();
         openVault(editable.toString());
         editable.clear();
     }
 
-    void openVault(final String password) {
+    private void openVault(final String password) {
         SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
 
         Bundle args = new Bundle();
@@ -101,7 +100,7 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
         syncDialogFragment.show(getFragmentManager(), "dialog");
     }
 
-    String getApplicationTitle() {
+    private String getApplicationTitle() {
         PackageManager packageManager = getPackageManager();
 
         String name = getApplicationInfo().loadLabel(packageManager).toString();

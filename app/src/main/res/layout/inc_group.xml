@@ -8,6 +8,7 @@
         android:id="@+id/imageview_icon"
         android:minHeight="100dp"
         android:tint="@color/iconEntry"
+        android:contentDescription="@string/content_description_group_icon"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -17,7 +18,7 @@
         android:layout_height="wrap_content">
         <android.support.design.widget.TextInputEditText
             android:id="@+id/edittext_name"
-            android:hint="Name"
+            android:hint="@string/hint_name"
             android:inputType="textCapWords"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

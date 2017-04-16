@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
     <TextView
         android:id="@+id/textview_status"
-        android:text="Test"
+        android:text="@string/placeholder_status"
         android:textStyle="bold"
         android:padding="10dp"
         android:gravity="center"

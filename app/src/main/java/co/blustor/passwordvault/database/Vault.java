@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class Vault {
-    private static final String TAG = "Vault";
 
     private static Vault instance = null;
     private String mPassword = "";

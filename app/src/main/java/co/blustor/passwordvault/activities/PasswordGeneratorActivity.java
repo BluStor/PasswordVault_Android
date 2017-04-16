@@ -27,7 +27,7 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
     private static final char[] CHARS_SPECIAL = {'!', '@', '#', '$', '%', '^', '&', '*'};
     private static final char[] CHARS_BRACKETS = {'[', ']', '{', '}', '(', ')', '<', '>'};
 
-    private ArrayList<Character> mCharacters = new ArrayList<>();
+    private final ArrayList<Character> mCharacters = new ArrayList<>();
 
     private TextView mPasswordTextView = null;
     private CheckBox mUpperCheckbox = null;
@@ -234,16 +234,16 @@ public class PasswordGeneratorActivity extends AppCompatActivity {
 
     private String generatePassword(int length) {
         Random random = new Random();
-        String password = "";
+        StringBuilder password = new StringBuilder();
 
         for (int i = 0; i < length; i++) {
             int size = mCharacters.size();
             if (size > 0) {
                 int item = random.nextInt(size);
-                password += mCharacters.get(item);
+                password.append(mCharacters.get(item));
             }
         }
 
-        return password;
+        return password.toString();
     }
 }

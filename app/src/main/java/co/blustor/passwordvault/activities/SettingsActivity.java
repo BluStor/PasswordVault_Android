@@ -17,8 +17,10 @@ import co.blustor.passwordvault.database.Vault;
 import co.blustor.passwordvault.fragments.SyncDialogFragment;
 import co.blustor.passwordvault.sync.SyncManager;
 
-public class SettingsActivity extends AppCompatActivity implements SyncDialogFragment.SyncInterface {
-    AwesomeValidation mAwesomeValidationChangePassword = new AwesomeValidation(ValidationStyle.BASIC);
+import static co.blustor.passwordvault.fragments.SyncDialogFragment.SyncInterface;
+
+public class SettingsActivity extends AppCompatActivity implements SyncInterface {
+    private final AwesomeValidation mAwesomeValidationChangePassword = new AwesomeValidation(ValidationStyle.BASIC);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +55,7 @@ public class SettingsActivity extends AppCompatActivity implements SyncDialogFra
         finish();
     }
 
-    void save() {
+    private void save() {
         Vault vault = Vault.getInstance();
 
         SyncDialogFragment syncDialogFragment = new SyncDialogFragment();

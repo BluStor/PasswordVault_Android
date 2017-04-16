@@ -1,5 +1,6 @@
 package co.blustor.passwordvault.activities;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import co.blustor.passwordvault.constants.Intents;
 import co.blustor.passwordvault.database.Vault;
 
+@SuppressLint("Registered")
 public class LockingActivity extends AppCompatActivity {
     private final BroadcastReceiver lockBroadcastReceiver = new BroadcastReceiver() {
         @Override

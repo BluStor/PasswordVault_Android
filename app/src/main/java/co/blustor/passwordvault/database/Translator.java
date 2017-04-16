@@ -10,7 +10,6 @@ import de.slackspace.openkeepass.domain.Group;
 import de.slackspace.openkeepass.domain.GroupBuilder;
 
 public class Translator {
-    private static final String TAG = "Translator";
 
     private static List<Entry> exportKeePassEntries(VaultGroup group) {
         ArrayList<Entry> entries = new ArrayList<>();

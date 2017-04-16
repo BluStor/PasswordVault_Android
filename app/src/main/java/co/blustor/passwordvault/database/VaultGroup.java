@@ -17,7 +17,6 @@ public class VaultGroup {
             return root.getGroups();
         }
     };
-    private static String TAG = "VaultGroup";
     private final UUID mParentUUID;
     private final UUID mUUID;
     private final List<VaultGroup> mGroups = new ArrayList<>();

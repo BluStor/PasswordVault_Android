@@ -1,10 +1,12 @@
 package co.blustor.passwordvault.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.util.SparseIntArray;
 
 import co.blustor.passwordvault.R;
 
+@SuppressLint("Registered")
 public class MyApplication extends Application {
     private static final SparseIntArray sIcons;
 

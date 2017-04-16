@@ -5,13 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 public class AlertUtils {
-    private static String TAG = "AlertUtils";
-
     public static void showError(Context context, String message) {
-        showMessage(context, null, message);
+        showMessage(context, message);
     }
 
-    private static void showMessage(Context context, String title, String message) {
+    private static void showMessage(Context context, String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
                 .setMessage(message)
                 .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
@@ -20,10 +18,6 @@ public class AlertUtils {
                         dialog.cancel();
                     }
                 });
-
-        if (title != null) {
-            builder.setTitle(title);
-        }
 
         builder.create().show();
     }

@@ -3,7 +3,6 @@ package co.blustor.passwordvault.database;
 import java.util.UUID;
 
 public class VaultEntry {
-    private static final String TAG = "VaultEntry";
 
     private final UUID mGroupUUID;
     private final UUID mUUID;

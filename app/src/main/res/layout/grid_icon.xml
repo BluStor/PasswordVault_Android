@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:tint="@color/iconEntry"
-        android:contentDescription="Icon" />
+        android:contentDescription="@string/content_description_icon" />
     <TextView
         android:id="@+id/textview_icon_id"
         android:gravity="center"

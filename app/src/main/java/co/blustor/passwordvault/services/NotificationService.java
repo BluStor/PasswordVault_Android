@@ -17,7 +17,6 @@ import co.blustor.passwordvault.database.Vault;
 import static android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC;
 
 public class NotificationService extends Service {
-    private static final String TAG = "NotificationService";
 
     @Nullable
     @Override

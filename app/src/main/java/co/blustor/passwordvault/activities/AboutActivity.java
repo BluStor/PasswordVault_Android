@@ -52,13 +52,13 @@ public class AboutActivity extends AppCompatActivity {
         public void onBindViewHolder(AboutAdapter.AboutViewHolder holder, int position) {
             if (position == 0) {
                 holder.iconImageView.setImageResource(R.drawable.phone);
-                holder.titleTextView.setText("+1 312 840 8250");
+                holder.titleTextView.setText(R.string.about_phone);
             } else if (position == 1) {
                 holder.iconImageView.setImageResource(R.drawable.email);
-                holder.titleTextView.setText("info@blustor.co");
+                holder.titleTextView.setText(R.string.about_email);
             } else if (position == 2) {
                 holder.iconImageView.setImageResource(R.drawable.location);
-                holder.titleTextView.setText("401 North Michigan Avenue\nChicago, IL 60611");
+                holder.titleTextView.setText(R.string.about_address);
             }
         }
 

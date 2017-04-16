@@ -6,7 +6,6 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/splash_app_version"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -29,7 +28,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/welcome_to"
                 android:textColor="@color/colorPrimary"
                 android:textSize="22sp" />
@@ -37,7 +36,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/app_name"
                 android:textColor="@color/colorPrimary"
                 android:textSize="48sp" />
@@ -48,6 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
             android:gravity="center"
+            android:contentDescription="@string/content_description_cards"
             android:src="@drawable/blustor_cards" />
 
         <ProgressBar

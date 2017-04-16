@@ -27,6 +27,7 @@ import com.google.common.base.Joiner;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import co.blustor.passwordvault.R;
@@ -43,8 +44,8 @@ import co.blustor.passwordvault.utils.MyApplication;
 
 public class GroupActivity extends LockingActivity {
     private static final String TAG = "GroupActivity";
+    private final GroupEntryAdapter mGroupEntryAdapter = new GroupEntryAdapter();
     private VaultGroup mGroup = null;
-    private GroupEntryAdapter mGroupEntryAdapter = new GroupEntryAdapter();
     private TextView mEmptyTextView = null;
     private SearchFragment mSearchFragment = null;
 
@@ -76,7 +77,8 @@ public class GroupActivity extends LockingActivity {
 
         List<String> path = mGroup.getPath();
         if (path.size() > 0) {
-            pathTextView.setText("in " + Joiner.on("/").join(path));
+            String pathStr = Joiner.on("/").join(path);
+            pathTextView.setText(String.format(Locale.getDefault(), getString(R.string.path_in), pathStr));
         } else {
             pathTextView.setVisibility(View.GONE);
         }
