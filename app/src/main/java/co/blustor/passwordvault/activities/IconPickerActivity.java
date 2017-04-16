@@ -10,7 +10,7 @@ import android.widget.GridView;
 import co.blustor.passwordvault.R;
 import co.blustor.passwordvault.adapters.IconAdapter;
 
-public class IconPickerActivity extends AppCompatActivity {
+public class IconPickerActivity extends LockingActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

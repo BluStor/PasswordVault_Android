@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import co.blustor.passwordvault.R;
 
-public class AboutActivity extends AppCompatActivity {
+public class AboutActivity extends LockingActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -3,6 +3,7 @@ package co.blustor.passwordvault.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
@@ -28,7 +29,7 @@ public class AddGroupActivity extends LockingActivity {
     private static final int REQUEST_ICON_CODE = 0;
     private static final String TAG = "AddGroupActivity";
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
-    private VaultGroup mGroup;
+    private VaultGroup mGroup = null;
     private Integer mIconId = 49;
     private ImageView mIconImageView = null;
     private EditText mNameEditText = null;

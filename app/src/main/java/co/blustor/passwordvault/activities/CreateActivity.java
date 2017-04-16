@@ -24,7 +24,7 @@ import co.blustor.passwordvault.sync.SyncManager;
 import static co.blustor.passwordvault.fragments.SyncDialogFragment.SyncInterface;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class CreateActivity extends AppCompatActivity implements SyncInterface {
+public class CreateActivity extends LockingActivity implements SyncInterface {
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
 
     @Override

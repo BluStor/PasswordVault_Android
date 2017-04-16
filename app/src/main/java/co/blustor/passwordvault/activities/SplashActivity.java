@@ -30,6 +30,10 @@ public class SplashActivity extends AppCompatActivity {
                 if (result) {
                     startupActivity = new Intent(SplashActivity.this, UnlockActivity.class);
                 } else {
+                    Intent unlockActivity = new Intent(SplashActivity.this, UnlockActivity.class);
+                    unlockActivity.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(unlockActivity);
+
                     startupActivity = new Intent(SplashActivity.this, CreateActivity.class);
                 }
 

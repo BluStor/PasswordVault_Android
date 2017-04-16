@@ -19,7 +19,7 @@ import co.blustor.passwordvault.sync.SyncManager;
 
 import static co.blustor.passwordvault.fragments.SyncDialogFragment.SyncInterface;
 
-public class SettingsActivity extends AppCompatActivity implements SyncInterface {
+public class SettingsActivity extends LockingActivity implements SyncInterface {
     private final AwesomeValidation mAwesomeValidationChangePassword = new AwesomeValidation(ValidationStyle.BASIC);
 
     @Override
