@@ -27,7 +27,7 @@ public class EditGroupActivity extends LockingActivity {
     private static final int REQUEST_ICON_CODE = 0;
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     private VaultGroup mGroup = null;
-    private Integer mIconId = 0;
+    private Integer mIconId = 49;
     private ImageView mIconImageView = null;
     private EditText mNameEditText = null;
 
@@ -119,6 +119,8 @@ public class EditGroupActivity extends LockingActivity {
 
         mNameEditText.setText(mGroup.getName());
         mNameEditText.setSelection(mNameEditText.getText().length());
+
+        mIconId = mGroup.getIconId();
     }
 
     private void save() {
