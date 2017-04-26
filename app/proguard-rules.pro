@@ -16,10 +16,36 @@
 #   public *;
 #}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+##------------------- Begin GateKeeperSDK proguard config ----------------
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# keep all native code classes
+-keep class java.awt.** { *; }
+-keep class com.sun.jna.** { *; }
+-keep class com.neurotec.** { *; }
+-keep class android.support.** { *; }
+# Gson specific classes
+-keep interface com.sun.jna.** { *; }
+-keep interface android.support.** { *; }
+
+-keep class com.google.**
+
+# (2)Simple XML
+-keep public class org.simpleframework.**{ *; }
+-keep class org.simpleframework.xml.**{ *; }
+-keep class org.simpleframework.xml.core.**{ *; }
+-keep class org.simpleframework.xml.util.**{ *; }
+
+-dontwarn java.awt.**
+-dontwarn javax.xml.stream.**
+-dontwarn com.neurotec.**
+-dontwarn com.google.**
+-dontwarn org.slf4j.**
+-dontwarn sun.misc.Unsafe
+
+# Gson uses generic type information stored in a class file when working with fields. Proguard
+# removes such information by default, so configure it to keep all of it.
+-keepattributes Signature
+
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
