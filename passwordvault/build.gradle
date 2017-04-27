@@ -7,7 +7,7 @@ android {
         applicationId "co.blustor.passwordvault"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 1
+        versionCode 0
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -32,6 +32,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
         debug {
             multiDexEnabled true
