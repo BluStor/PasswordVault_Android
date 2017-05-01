@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
@@ -23,7 +24,7 @@ import co.blustor.pwv.sync.SyncManager;
 import static co.blustor.pwv.fragments.SyncDialogFragment.SyncInterface;
 import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
-public class CreateActivity extends LockingActivity implements SyncInterface {
+public class CreateActivity extends AppCompatActivity implements SyncInterface {
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
 
     @Override
