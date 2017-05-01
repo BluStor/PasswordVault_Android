@@ -20,7 +20,7 @@
         app:layout_constraintRight_toRightOf="parent"/>
     <fragment
         android:id="@+id/fragment_syncstatus"
-        android:name="co.blustor.passwordvault.fragments.SyncStatusFragment"
+        android:name="co.blustor.pwv.fragments.SyncStatusFragment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/textview_path"
@@ -63,7 +63,7 @@
         app:layout_constraintRight_toRightOf="parent" />
     <fragment
         android:id="@+id/fragment_search"
-        android:name="co.blustor.passwordvault.fragments.SearchFragment"
+        android:name="co.blustor.pwv.fragments.SearchFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"

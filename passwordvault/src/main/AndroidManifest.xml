@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="co.blustor.passwordvault">
+    package="co.blustor.pwv">
 
     <application
         android:allowBackup="true"
@@ -43,7 +43,7 @@
             android:name=".receivers.AppBroadcastReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="co.blustor.passwordvault.lock_database" />
+                <action android:name="co.blustor.pwv.lock_database" />
             </intent-filter>
         </receiver>
         <service
