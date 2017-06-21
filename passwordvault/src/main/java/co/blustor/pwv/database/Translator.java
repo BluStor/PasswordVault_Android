@@ -2,6 +2,8 @@ package co.blustor.pwv.database;
 
 import android.support.annotation.NonNull;
 
+import com.google.common.base.MoreObjects;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,18 +37,23 @@ public class Translator {
     private static List<VaultEntry> importEntries(@NonNull Group group) {
         ArrayList<VaultEntry> entries = new ArrayList<>();
         for (Entry entry : group.getEntries()) {
-            VaultEntry vaultEntry = new VaultEntry(
-                    group.getUuid(),
-                    entry.getUuid(),
-                    entry.getTitle(),
-                    entry.getUsername(),
-                    entry.getPassword()
-            );
-            vaultEntry.setUrl(entry.getUrl());
-            vaultEntry.setNotes(entry.getNotes());
-            vaultEntry.setIconId(entry.getIconId());
-            entries.add(vaultEntry);
+            UUID groupUUID = group.getUuid();
+            if (groupUUID != null) {
+                VaultEntry vaultEntry = new VaultEntry(
+                        groupUUID,
+                        MoreObjects.firstNonNull(entry.getUuid(), UUID.randomUUID()),
+                        MoreObjects.firstNonNull(entry.getTitle(), ""),
+                        MoreObjects.firstNonNull(entry.getUsername(), ""),
+                        MoreObjects.firstNonNull(entry.getPassword(), "")
+                );
+
+                vaultEntry.setUrl(MoreObjects.firstNonNull(entry.getUrl(), ""));
+                vaultEntry.setNotes(MoreObjects.firstNonNull(entry.getNotes(), ""));
+                vaultEntry.setIconId(entry.getIconId());
+                entries.add(vaultEntry);
+            }
         }
+
         return entries;
     }
 
