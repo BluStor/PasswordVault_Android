@@ -2,6 +2,7 @@ package co.blustor.pwv.fragments;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +34,7 @@ public class SyncDialogFragment extends DialogFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialogfragment_sync, container, false);
 
         setCancelable(false);
@@ -57,21 +58,21 @@ public class SyncDialogFragment extends DialogFragment {
         AndroidDeferredManager dm = new AndroidDeferredManager();
         dm.when(promise).done(new DoneCallback<VaultGroup>() {
             @Override
-            public void onDone(VaultGroup result) {
+            public void onDone(@NonNull VaultGroup result) {
                 dismiss();
                 SyncInterface syncInterface = (SyncInterface) getActivity();
                 syncInterface.syncComplete(result.getUUID());
             }
         }).fail(new FailCallback<SyncManager.SyncManagerException>() {
             @Override
-            public void onFail(SyncManagerException result) {
+            public void onFail(@NonNull SyncManagerException result) {
                 result.printStackTrace();
                 AlertUtils.showError(getActivity(), result.getMessage());
                 dismiss();
             }
         }).progress(new ProgressCallback<SyncManager.SyncStatus>() {
             @Override
-            public void onProgress(SyncStatus progress) {
+            public void onProgress(@NonNull SyncStatus progress) {
                 Log.d(TAG, progress.name());
                 if (progress == SyncStatus.SAVING) {
                     statusTextView.setText(R.string.status_transferring);

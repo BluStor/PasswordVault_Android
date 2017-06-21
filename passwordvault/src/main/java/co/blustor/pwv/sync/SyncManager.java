@@ -1,6 +1,7 @@
 package co.blustor.pwv.sync;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import org.jdeferred.Promise;
 import org.jdeferred.impl.DeferredObject;
@@ -25,9 +26,10 @@ public class SyncManager {
     private static final String CARD_NAME = "CYBERGATE";
     private static final String VAULT_PATH = "/passwordvault/db.kdbx";
     private static final DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
+    @NonNull
     private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
 
-    public static synchronized Promise<VaultGroup, SyncManagerException, SyncStatus> getRoot(final Context context, final String password) {
+    public static synchronized Promise<VaultGroup, SyncManagerException, SyncStatus> getRoot(@NonNull final Context context, @NonNull final String password) {
         final DeferredObject<VaultGroup, SyncManagerException, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
@@ -90,7 +92,7 @@ public class SyncManager {
         return task.promise();
     }
 
-    public static synchronized Promise<VaultGroup, SyncManagerException, SyncStatus> setRoot(final Context context, final String password) {
+    public static synchronized Promise<VaultGroup, SyncManagerException, SyncStatus> setRoot(@NonNull final Context context, final String password) {
         final DeferredObject<VaultGroup, SyncManagerException, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
@@ -164,7 +166,7 @@ public class SyncManager {
         return task.promise();
     }
 
-    public static synchronized Promise<Boolean, SyncManagerException, SyncStatus> exists(final Context context) {
+    public static synchronized Promise<Boolean, SyncManagerException, SyncStatus> exists(@NonNull final Context context) {
         final DeferredObject<Boolean, SyncManagerException, SyncStatus> task = new DeferredObject<>();
         new Thread() {
             @Override
@@ -206,6 +208,7 @@ public class SyncManager {
         return syncStatus.promise();
     }
 
+    @NonNull
     public static SyncStatus getLastWriteStatus() {
         return lastSyncStatus;
     }

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.view.KeyEvent;
@@ -25,6 +27,7 @@ import co.blustor.pwv.sync.SyncManager;
 
 public class UnlockActivity extends AppCompatActivity implements SyncDialogFragment.SyncInterface {
 
+    @Nullable
     private EditText mPasswordEditText = null;
 
     @Override
@@ -73,7 +76,7 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_about) {
             Intent aboutActivity = new Intent(this, AboutActivity.class);
@@ -100,6 +103,7 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
         syncDialogFragment.show(getFragmentManager(), "dialog");
     }
 
+    @NonNull
     private String getApplicationTitle() {
         PackageManager packageManager = getPackageManager();
 

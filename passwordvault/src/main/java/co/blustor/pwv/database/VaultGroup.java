@@ -1,6 +1,7 @@
 package co.blustor.pwv.database;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.TreeTraverser;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 public class VaultGroup {
     static final TreeTraverser<VaultGroup> traverser = new TreeTraverser<VaultGroup>() {
+        @NonNull
         @Override
         public Iterable<VaultGroup> children(@NonNull VaultGroup root) {
             return root.getGroups();
@@ -36,14 +38,16 @@ public class VaultGroup {
         mEntries.add(entry);
     }
 
-    public void addEntries(List<VaultEntry> entries) {
+    public void addEntries(@NonNull List<VaultEntry> entries) {
         mEntries.addAll(entries);
     }
 
+    @NonNull
     public List<VaultEntry> getEntries() {
         return mEntries;
     }
 
+    @Nullable
     public VaultEntry getEntry(UUID uuid) {
         for (VaultEntry entry : mEntries) {
             if (entry.getUUID().equals(uuid)) {
@@ -69,6 +73,7 @@ public class VaultGroup {
         mGroups.add(group);
     }
 
+    @NonNull
     public List<VaultGroup> getGroups() {
         return mGroups;
     }

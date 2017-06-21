@@ -2,6 +2,7 @@ package co.blustor.pwv.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -18,16 +19,17 @@ import co.blustor.pwv.sync.SyncManager;
 
 public class SyncStatusFragment extends Fragment {
     private final AndroidDeferredManager mDeferredManager = new AndroidDeferredManager();
+    @Nullable
     private TextView mStatusTextView = null;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_syncstatus, container, false);
     }
 
     @Override
-    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mStatusTextView = (TextView) view.findViewById(R.id.textview_status);

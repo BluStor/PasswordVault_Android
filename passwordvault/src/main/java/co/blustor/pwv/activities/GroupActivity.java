@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -45,8 +47,11 @@ import co.blustor.pwv.utils.MyApplication;
 public class GroupActivity extends LockingActivity {
     private static final String TAG = "GroupActivity";
     private final GroupEntryAdapter mGroupEntryAdapter = new GroupEntryAdapter();
+    @Nullable
     private VaultGroup mGroup = null;
+    @Nullable
     private TextView mEmptyTextView = null;
+    @Nullable
     private SearchFragment mSearchFragment = null;
 
     @Override
@@ -100,7 +105,7 @@ public class GroupActivity extends LockingActivity {
         groupFloatingActionButton.setImageResource(R.drawable.vaultgroup_white);
         groupFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(@NonNull View v) {
                 fam.close(false);
                 Intent addGroupActivity = new Intent(v.getContext(), AddGroupActivity.class);
                 addGroupActivity.putExtra("uuid", mGroup.getUUID());
@@ -116,7 +121,7 @@ public class GroupActivity extends LockingActivity {
         entryFloatingActionButton.setImageResource(R.drawable.vaultentry_white);
         entryFloatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(@NonNull View v) {
                 fam.close(false);
                 Intent addEntryActivity = new Intent(v.getContext(), AddEntryActivity.class);
                 addEntryActivity.putExtra("uuid", mGroup.getUUID());
@@ -134,7 +139,7 @@ public class GroupActivity extends LockingActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
         menu.clear();
         mSearchFragment.hide();
 
@@ -164,7 +169,7 @@ public class GroupActivity extends LockingActivity {
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
+            public boolean onQueryTextChange(@NonNull String newText) {
                 mSearchFragment.search(newText);
                 return false;
             }
@@ -174,7 +179,7 @@ public class GroupActivity extends LockingActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             Intent settingsActivity = new Intent(this, SettingsActivity.class);
@@ -212,8 +217,9 @@ public class GroupActivity extends LockingActivity {
             updateData();
         }
 
+        @NonNull
         @Override
-        public GroupEntryAdapter.GroupEntryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public GroupEntryAdapter.GroupEntryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
             if (viewType == 0) {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_group, parent, false);
@@ -233,7 +239,7 @@ public class GroupActivity extends LockingActivity {
         }
 
         @Override
-        public void onBindViewHolder(GroupEntryAdapter.GroupEntryViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull GroupEntryAdapter.GroupEntryViewHolder holder, int position) {
             if (holder.getItemViewType() == 0) {
                 VaultGroup group = mGroups.get(position);
 
@@ -283,11 +289,14 @@ public class GroupActivity extends LockingActivity {
 
         class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
+            @NonNull
             final ImageView iconImageView;
+            @NonNull
             final ImageView subIconImageView;
+            @NonNull
             final TextView titleTextView;
 
-            GroupEntryViewHolder(View itemView) {
+            GroupEntryViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 itemView.setOnClickListener(this);
@@ -299,7 +308,7 @@ public class GroupActivity extends LockingActivity {
             }
 
             @Override
-            public void onClick(View v) {
+            public void onClick(@NonNull View v) {
                 int position = getAdapterPosition();
                 if (position < mGroups.size()) {
                     VaultGroup group = mGroups.get(position);

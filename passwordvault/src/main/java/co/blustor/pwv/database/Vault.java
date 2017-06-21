@@ -1,5 +1,8 @@
 package co.blustor.pwv.database;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
@@ -10,10 +13,13 @@ import java.util.UUID;
 
 public class Vault {
 
+    @Nullable
     private static Vault instance = null;
     private String mPassword = "";
+    @Nullable
     private VaultGroup mRoot = null;
 
+    @Nullable
     public static Vault getInstance() {
         if (instance == null) {
             instance = new Vault();
@@ -21,6 +27,7 @@ public class Vault {
         return instance;
     }
 
+    @Nullable
     public Boolean isUnlocked() {
         return mRoot != null;
     }
@@ -33,10 +40,11 @@ public class Vault {
         mRoot = new VaultGroup(null, UUID.randomUUID(), "Password Vault");
     }
 
+    @Nullable
     public VaultGroup getGroupByUUID(final UUID uuid) {
         Optional<VaultGroup> match = VaultGroup.traverser.preOrderTraversal(mRoot).firstMatch(new Predicate<VaultGroup>() {
             @Override
-            public boolean apply(VaultGroup input) {
+            public boolean apply(@NonNull VaultGroup input) {
                 return input.getUUID().equals(uuid);
             }
         });
@@ -48,6 +56,7 @@ public class Vault {
         }
     }
 
+    @Nullable
     public VaultEntry getEntryByUUID(final UUID uuid) {
         VaultGroup root = getRoot();
 
@@ -64,6 +73,7 @@ public class Vault {
         return null;
     }
 
+    @Nullable
     public VaultGroup getRoot() {
         return mRoot;
     }
@@ -80,7 +90,7 @@ public class Vault {
         mPassword = password;
     }
 
-    public List<VaultGroup> findGroupsByName(final String query) {
+    public List<VaultGroup> findGroupsByName(@NonNull final String query) {
         if (query.isEmpty()) {
             return new ArrayList<>();
         }
@@ -89,7 +99,7 @@ public class Vault {
 
         FluentIterable<VaultGroup> vaultGroups = VaultGroup.traverser.preOrderTraversal(mRoot).filter(new Predicate<VaultGroup>() {
             @Override
-            public boolean apply(VaultGroup input) {
+            public boolean apply(@NonNull VaultGroup input) {
                 return input.getParentUUID() != null && input.getName().toLowerCase().contains(loweredQuery);
             }
         });
@@ -97,7 +107,8 @@ public class Vault {
         return vaultGroups.toList();
     }
 
-    public List<VaultEntry> findEntriesByTitle(String query, Boolean includeGroupName) {
+    @NonNull
+    public List<VaultEntry> findEntriesByTitle(@NonNull String query, Boolean includeGroupName) {
         if (query.isEmpty()) {
             return new ArrayList<>();
         }

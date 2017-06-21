@@ -3,6 +3,7 @@ package co.blustor.pwv.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,8 +37,9 @@ public class AboutActivity extends LockingActivity {
 
     private class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.AboutViewHolder> {
 
+        @NonNull
         @Override
-        public AboutAdapter.AboutViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public AboutAdapter.AboutViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
             if (viewType == 0) {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_group, parent, false);
@@ -48,7 +50,7 @@ public class AboutActivity extends LockingActivity {
         }
 
         @Override
-        public void onBindViewHolder(AboutAdapter.AboutViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull AboutAdapter.AboutViewHolder holder, int position) {
             if (position == 0) {
                 holder.iconImageView.setImageResource(R.drawable.phone);
                 holder.titleTextView.setText(R.string.about_phone);
@@ -68,10 +70,12 @@ public class AboutActivity extends LockingActivity {
 
         class AboutViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+            @NonNull
             final ImageView iconImageView;
+            @NonNull
             final TextView titleTextView;
 
-            AboutViewHolder(View itemView) {
+            AboutViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 itemView.setOnClickListener(this);

@@ -3,6 +3,7 @@ package co.blustor.pwv.fragments;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
@@ -32,11 +33,12 @@ import co.blustor.pwv.utils.MyApplication;
 
 public class SearchFragment extends Fragment {
     private final SearchResultAdapter mSearchResultAdapter = new SearchResultAdapter();
+    @Nullable
     private TextView mEmptyTextView = null;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         // Views
@@ -52,7 +54,7 @@ public class SearchFragment extends Fragment {
         return view;
     }
 
-    public void search(String query) {
+    public void search(@NonNull String query) {
         Vault vault = Vault.getInstance();
         mSearchResultAdapter.setResults(vault.findEntriesByTitle(query, true), query);
     }
@@ -75,14 +77,15 @@ public class SearchFragment extends Fragment {
         private final List<VaultEntry> mEntryResults = new ArrayList<>();
         private String mLoweredQuery = "";
 
+        @NonNull
         @Override
-        public SearchResultViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public SearchResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_search, parent, false);
             return new SearchResultViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(SearchResultViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull SearchResultViewHolder holder, int position) {
             Vault vault = Vault.getInstance();
 
             VaultEntry entry = mEntryResults.get(position);
@@ -139,7 +142,7 @@ public class SearchFragment extends Fragment {
             return mEntryResults.size();
         }
 
-        void setResults(List<VaultEntry> entryResults, String loweredQuery) {
+        void setResults(@NonNull List<VaultEntry> entryResults, String loweredQuery) {
             mLoweredQuery = loweredQuery;
 
             mEntryResults.clear();
@@ -156,11 +159,14 @@ public class SearchFragment extends Fragment {
 
         class SearchResultViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+            @NonNull
             final ImageView iconImageView;
+            @NonNull
             final TextView titleTextView;
+            @NonNull
             final TextView nameTextView;
 
-            SearchResultViewHolder(View itemView) {
+            SearchResultViewHolder(@NonNull View itemView) {
                 super(itemView);
 
                 itemView.setOnClickListener(this);

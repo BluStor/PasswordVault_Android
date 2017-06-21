@@ -2,6 +2,7 @@ package co.blustor.pwv.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,14 +29,23 @@ public class PasswordGeneratorActivity extends LockingActivity {
 
     private final ArrayList<Character> mCharacters = new ArrayList<>();
 
+    @Nullable
     private TextView mPasswordTextView = null;
+    @Nullable
     private CheckBox mUpperCheckbox = null;
+    @Nullable
     private CheckBox mLowerCheckbox = null;
+    @Nullable
     private CheckBox mDigitsCheckbox = null;
+    @Nullable
     private CheckBox mDashCheckbox = null;
+    @Nullable
     private CheckBox mUnderscoreCheckbox = null;
+    @Nullable
     private CheckBox mSpaceCheckbox = null;
+    @Nullable
     private CheckBox mSpecialCheckbox = null;
+    @Nullable
     private CheckBox mBracketsCheckbox = null;
 
     @Override
@@ -68,7 +78,7 @@ public class PasswordGeneratorActivity extends LockingActivity {
         final SeekBar seekBarLength = (SeekBar) findViewById(R.id.seekbar_length);
         seekBarLength.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            public void onProgressChanged(@NonNull SeekBar seekBar, int progress, boolean fromUser) {
                 if (progress < 10) {
                     seekBar.setProgress(10);
                 } else if (progress > 200) {
@@ -189,7 +199,7 @@ public class PasswordGeneratorActivity extends LockingActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.action_save) {

@@ -3,6 +3,8 @@ package co.blustor.pwv.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,13 +30,20 @@ public class EditEntryActivity extends LockingActivity {
     private static final int REQUEST_ICON_CODE = 0;
     private static final int REQUEST_PASSWORD = 1;
     private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
+    @Nullable
     private VaultEntry mEntry = null;
     private Integer mIconId = 0;
+    @Nullable
     private ImageView mIconImageView = null;
+    @Nullable
     private EditText mTitleEditText = null;
+    @Nullable
     private EditText mUsernameEditText = null;
+    @Nullable
     private EditText mPasswordEditText = null;
+    @Nullable
     private EditText mUrlEditText = null;
+    @Nullable
     private EditText mNotesEditText = null;
 
     @Override
@@ -59,7 +68,7 @@ public class EditEntryActivity extends LockingActivity {
 
         mIconImageView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(@NonNull View v) {
                 Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
                 startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
             }
@@ -68,7 +77,7 @@ public class EditEntryActivity extends LockingActivity {
         Button generateButton = (Button) findViewById(R.id.button_generate);
         generateButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(@NonNull View v) {
                 Intent passswordGeneratorActivity = new Intent(v.getContext(), PasswordGeneratorActivity.class);
                 startActivityForResult(passswordGeneratorActivity, REQUEST_PASSWORD);
             }
@@ -95,7 +104,7 @@ public class EditEntryActivity extends LockingActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.action_save) {
@@ -125,7 +134,7 @@ public class EditEntryActivity extends LockingActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         if (requestCode == REQUEST_ICON_CODE) {
             if (resultCode == RESULT_OK) {
                 mIconId = data.getIntExtra("icon", 0);

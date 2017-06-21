@@ -1,6 +1,7 @@
 package co.blustor.pwv.adapters;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +36,9 @@ public class IconAdapter extends BaseAdapter {
         return 0;
     }
 
+    @Nullable
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, @Nullable View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View view;

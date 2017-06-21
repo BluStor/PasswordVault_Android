@@ -3,6 +3,7 @@ package co.blustor.pwv.utils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 
 public class AlertUtils {
     public static void showError(Context context, String message) {
@@ -14,7 +15,7 @@ public class AlertUtils {
                 .setMessage(message)
                 .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(@NonNull DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });

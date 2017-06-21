@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import co.blustor.pwv.constants.Intents;
@@ -14,7 +15,7 @@ import co.blustor.pwv.database.Vault;
 public class LockingActivity extends AppCompatActivity {
     private final BroadcastReceiver lockBroadcastReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, @NonNull Intent intent) {
             String action = intent.getAction();
             if (action.equals(Intents.LOCK_DATABASE)) {
                 finish();

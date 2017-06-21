@@ -2,12 +2,14 @@ package co.blustor.pwv.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
+import android.support.annotation.NonNull;
 import android.util.SparseIntArray;
 
 import co.blustor.pwv.R;
 
 @SuppressLint("Registered")
 public class MyApplication extends Application {
+    @NonNull
     private static final SparseIntArray sIcons;
 
     static {
@@ -83,6 +85,7 @@ public class MyApplication extends Application {
         sIcons.append(68, R.drawable.ic_68);
     }
 
+    @NonNull
     public static SparseIntArray getIcons() {
         return sIcons;
     }
