@@ -268,25 +268,25 @@ public class GroupActivity extends LockingActivity {
         }
 
         void updateData() {
-            assert mGroup != null;
+            if (mGroup != null) {
+                mGroups.clear();
+                mGroups.addAll(mGroup.getGroups());
+                mEntries.clear();
+                mEntries.addAll(mGroup.getEntries());
 
-            mGroups.clear();
-            mGroups.addAll(mGroup.getGroups());
-            mEntries.clear();
-            mEntries.addAll(mGroup.getEntries());
+                Collections.sort(mGroups, new VaultGroupComparator());
+                Collections.sort(mEntries, new VaultEntryComparator());
 
-            Collections.sort(mGroups, new VaultGroupComparator());
-            Collections.sort(mEntries, new VaultEntryComparator());
+                if (mGroups.size() > 0 || mEntries.size() > 0) {
+                    mEmptyTextView.setVisibility(View.INVISIBLE);
+                } else {
+                    mEmptyTextView.setVisibility(View.VISIBLE);
+                }
 
-            if (mGroups.size() > 0 || mEntries.size() > 0) {
-                mEmptyTextView.setVisibility(View.INVISIBLE);
-            } else {
-                mEmptyTextView.setVisibility(View.VISIBLE);
+                setTitle(mGroup.getName());
+
+                notifyDataSetChanged();
             }
-
-            setTitle(mGroup.getName());
-
-            notifyDataSetChanged();
         }
 
         class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {

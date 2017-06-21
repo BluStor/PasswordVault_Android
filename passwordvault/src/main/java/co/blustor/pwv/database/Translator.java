@@ -37,21 +37,17 @@ public class Translator {
     private static List<VaultEntry> importEntries(@NonNull Group group) {
         ArrayList<VaultEntry> entries = new ArrayList<>();
         for (Entry entry : group.getEntries()) {
-            UUID groupUUID = group.getUuid();
-            if (groupUUID != null) {
-                VaultEntry vaultEntry = new VaultEntry(
-                        groupUUID,
-                        MoreObjects.firstNonNull(entry.getUuid(), UUID.randomUUID()),
-                        MoreObjects.firstNonNull(entry.getTitle(), ""),
-                        MoreObjects.firstNonNull(entry.getUsername(), ""),
-                        MoreObjects.firstNonNull(entry.getPassword(), "")
-                );
-
-                vaultEntry.setUrl(MoreObjects.firstNonNull(entry.getUrl(), ""));
-                vaultEntry.setNotes(MoreObjects.firstNonNull(entry.getNotes(), ""));
-                vaultEntry.setIconId(entry.getIconId());
-                entries.add(vaultEntry);
-            }
+            VaultEntry vaultEntry = new VaultEntry(
+                    group.getUuid(),
+                    entry.getUuid(),
+                    MoreObjects.firstNonNull(entry.getTitle(), ""),
+                    MoreObjects.firstNonNull(entry.getUsername(), ""),
+                    MoreObjects.firstNonNull(entry.getPassword(), "")
+            );
+            vaultEntry.setUrl(MoreObjects.firstNonNull(entry.getUrl(), ""));
+            vaultEntry.setNotes(MoreObjects.firstNonNull(entry.getNotes(), ""));
+            vaultEntry.setIconId(entry.getIconId());
+            entries.add(vaultEntry);
         }
 
         return entries;
