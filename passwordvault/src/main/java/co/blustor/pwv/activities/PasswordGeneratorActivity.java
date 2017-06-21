@@ -29,23 +29,14 @@ public class PasswordGeneratorActivity extends LockingActivity {
 
     private final ArrayList<Character> mCharacters = new ArrayList<>();
 
-    @Nullable
     private TextView mPasswordTextView = null;
-    @Nullable
     private CheckBox mUpperCheckbox = null;
-    @Nullable
     private CheckBox mLowerCheckbox = null;
-    @Nullable
     private CheckBox mDigitsCheckbox = null;
-    @Nullable
     private CheckBox mDashCheckbox = null;
-    @Nullable
     private CheckBox mUnderscoreCheckbox = null;
-    @Nullable
     private CheckBox mSpaceCheckbox = null;
-    @Nullable
     private CheckBox mSpecialCheckbox = null;
-    @Nullable
     private CheckBox mBracketsCheckbox = null;
 
     @Override

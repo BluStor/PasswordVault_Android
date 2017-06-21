@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.common.base.MoreObjects;
+
 import org.jdeferred.DoneCallback;
 import org.jdeferred.FailCallback;
 import org.jdeferred.ProgressCallback;
@@ -44,7 +46,7 @@ public class SyncDialogFragment extends DialogFragment {
         Bundle args = getArguments();
 
         final SyncType syncType = (SyncType) args.getSerializable("type");
-        String password = args.getString("password");
+        String password = MoreObjects.firstNonNull(args.getString("password"), "");
 
         Promise<VaultGroup, SyncManager.SyncManagerException, SyncManager.SyncStatus> promise;
         if (syncType == SyncType.READ) {

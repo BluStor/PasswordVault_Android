@@ -34,15 +34,10 @@ public class AddEntryActivity extends LockingActivity {
     @Nullable
     private VaultGroup mGroup;
     private Integer mIconId = 0;
-    @Nullable
     private ImageView mIconImageView = null;
-    @Nullable
     private EditText mTitleEditText = null;
-    @Nullable
     private EditText mUsernameEditText = null;
-    @Nullable
     private EditText mPasswordEditText = null;
-    @Nullable
     private EditText mUrlEditText = null;
 
     @Override
@@ -143,6 +138,8 @@ public class AddEntryActivity extends LockingActivity {
 
     private void save() {
         if (mAwesomeValidation.validate()) {
+            assert mGroup != null;
+
             VaultEntry entry = new VaultEntry(
                     mGroup.getUUID(),
                     UUID.randomUUID(),

@@ -33,9 +33,7 @@ public class AddGroupActivity extends LockingActivity {
     @Nullable
     private VaultGroup mGroup = null;
     private Integer mIconId = 49;
-    @Nullable
     private ImageView mIconImageView = null;
-    @Nullable
     private EditText mNameEditText = null;
 
     @Override
@@ -122,6 +120,8 @@ public class AddGroupActivity extends LockingActivity {
 
     private void save() {
         if (mAwesomeValidation.validate()) {
+            assert mGroup != null;
+
             VaultGroup group = new VaultGroup(
                     mGroup.getUUID(),
                     UUID.randomUUID(),

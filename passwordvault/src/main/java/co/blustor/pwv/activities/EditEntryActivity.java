@@ -33,17 +33,11 @@ public class EditEntryActivity extends LockingActivity {
     @Nullable
     private VaultEntry mEntry = null;
     private Integer mIconId = 0;
-    @Nullable
     private ImageView mIconImageView = null;
-    @Nullable
     private EditText mTitleEditText = null;
-    @Nullable
     private EditText mUsernameEditText = null;
-    @Nullable
     private EditText mPasswordEditText = null;
-    @Nullable
     private EditText mUrlEditText = null;
-    @Nullable
     private EditText mNotesEditText = null;
 
     @Override
@@ -148,6 +142,8 @@ public class EditEntryActivity extends LockingActivity {
     }
 
     private void load() {
+        assert mEntry != null;
+
         mTitleEditText.setText(mEntry.getTitle());
         mUsernameEditText.setText(mEntry.getUsername());
         mPasswordEditText.setText(mEntry.getPassword());
@@ -163,6 +159,8 @@ public class EditEntryActivity extends LockingActivity {
     private void save() {
         if (mAwesomeValidation.validate()) {
             if (hasBeenEdited()) {
+                assert mEntry != null;
+
                 mEntry.setTitle(mTitleEditText.getText().toString());
                 mEntry.setUsername(mUsernameEditText.getText().toString());
                 mEntry.setPassword(mPasswordEditText.getText().toString());
@@ -180,6 +178,8 @@ public class EditEntryActivity extends LockingActivity {
     }
 
     private Boolean hasBeenEdited() {
+        assert mEntry != null;
+
         return !(mEntry.getTitle().equals(mTitleEditText.getText().toString())
                 && mEntry.getUsername().equals(mUsernameEditText.getText().toString())
                 && mEntry.getPassword().equals(mPasswordEditText.getText().toString())

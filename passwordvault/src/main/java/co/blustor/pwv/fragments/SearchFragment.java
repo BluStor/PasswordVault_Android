@@ -61,16 +61,16 @@ public class SearchFragment extends Fragment {
 
     public void show() {
         View view = getView();
-        if (view != null) {
-            view.setVisibility(View.VISIBLE);
-        }
+        assert view != null;
+
+        view.setVisibility(View.VISIBLE);
     }
 
     public void hide() {
         View view = getView();
-        if (view != null) {
-            view.setVisibility(View.INVISIBLE);
-        }
+        assert view != null;
+
+        view.setVisibility(View.INVISIBLE);
     }
 
     private class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder> {
@@ -86,10 +86,7 @@ public class SearchFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull SearchResultViewHolder holder, int position) {
-            Vault vault = Vault.getInstance();
-
             VaultEntry entry = mEntryResults.get(position);
-            VaultGroup group = vault.getGroupByUUID(entry.getGroupUUID());
 
             Drawable drawable = ContextCompat.getDrawable(getActivity(), MyApplication.getIcons().get(entry.getIconId()));
             holder.iconImageView.setImageDrawable(drawable);
@@ -109,32 +106,37 @@ public class SearchFragment extends Fragment {
 
             holder.titleTextView.setText(titleSpannable, TextView.BufferType.SPANNABLE);
 
-            List<String> path = group.getPath();
-            path.add(group.getName());
+            Vault vault = Vault.getInstance();
+            VaultGroup group = vault.getGroupByUUID(entry.getGroupUUID());
 
-            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-            spannableStringBuilder.append("in ");
+            if (group != null) {
+                List<String> path = group.getPath();
+                path.add(group.getName());
 
-            for (String component : path) {
-                String loweredComponent = component.toLowerCase();
+                SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+                spannableStringBuilder.append("in ");
 
-                if (loweredComponent.contains(mLoweredQuery)) {
-                    int start = spannableStringBuilder.length() + loweredComponent.indexOf(mLoweredQuery);
-                    int end = start + mLoweredQuery.length();
+                for (String component : path) {
+                    String loweredComponent = component.toLowerCase();
 
-                    spannableStringBuilder.append(component);
-                    spannableStringBuilder.setSpan(foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    if (loweredComponent.contains(mLoweredQuery)) {
+                        int start = spannableStringBuilder.length() + loweredComponent.indexOf(mLoweredQuery);
+                        int end = start + mLoweredQuery.length();
 
-                } else {
-                    spannableStringBuilder.append(component);
+                        spannableStringBuilder.append(component);
+                        spannableStringBuilder.setSpan(foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    } else {
+                        spannableStringBuilder.append(component);
+                    }
+
+                    spannableStringBuilder.append("/");
                 }
 
-                spannableStringBuilder.append("/");
+                spannableStringBuilder.delete(spannableStringBuilder.length() - 1, spannableStringBuilder.length());
+
+                holder.nameTextView.setText(spannableStringBuilder, TextView.BufferType.SPANNABLE);
             }
-
-            spannableStringBuilder.delete(spannableStringBuilder.length() - 1, spannableStringBuilder.length());
-
-            holder.nameTextView.setText(spannableStringBuilder, TextView.BufferType.SPANNABLE);
         }
 
         @Override
@@ -148,10 +150,12 @@ public class SearchFragment extends Fragment {
             mEntryResults.clear();
             mEntryResults.addAll(entryResults);
 
-            if (mEntryResults.size() > 0) {
-                mEmptyTextView.setVisibility(View.INVISIBLE);
-            } else {
-                mEmptyTextView.setVisibility(View.VISIBLE);
+            if (mEmptyTextView != null) {
+                if (mEntryResults.size() > 0) {
+                    mEmptyTextView.setVisibility(View.INVISIBLE);
+                } else {
+                    mEmptyTextView.setVisibility(View.VISIBLE);
+                }
             }
 
             notifyDataSetChanged();

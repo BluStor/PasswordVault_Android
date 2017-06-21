@@ -31,9 +31,7 @@ public class EditGroupActivity extends LockingActivity {
     @Nullable
     private VaultGroup mGroup = null;
     private Integer mIconId = 49;
-    @Nullable
     private ImageView mIconImageView = null;
-    @Nullable
     private EditText mNameEditText = null;
 
     @Override
@@ -120,6 +118,8 @@ public class EditGroupActivity extends LockingActivity {
     }
 
     private void load() {
+        assert mGroup != null;
+
         mIconImageView.setImageResource(MyApplication.getIcons().get(mGroup.getIconId()));
 
         mNameEditText.setText(mGroup.getName());
@@ -131,6 +131,8 @@ public class EditGroupActivity extends LockingActivity {
     private void save() {
         if (mAwesomeValidation.validate()) {
             if (hasBeenEdited()) {
+                assert mGroup != null;
+
                 mGroup.setName(mNameEditText.getText().toString());
                 mGroup.setIconId(mIconId);
 
@@ -143,6 +145,8 @@ public class EditGroupActivity extends LockingActivity {
     }
 
     private boolean hasBeenEdited() {
+        assert mGroup != null;
+
         return !(mGroup.getName().equals(mNameEditText.getText().toString())
                 && mGroup.getIconId().equals(mIconId));
     }

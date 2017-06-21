@@ -1,6 +1,5 @@
 package co.blustor.pwv.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,7 +18,6 @@ import co.blustor.pwv.sync.SyncManager;
 
 public class SyncStatusFragment extends Fragment {
     private final AndroidDeferredManager mDeferredManager = new AndroidDeferredManager();
-    @Nullable
     private TextView mStatusTextView = null;
 
     @Nullable
@@ -45,21 +43,18 @@ public class SyncStatusFragment extends Fragment {
     }
 
     private void setSyncStatus(SyncManager.SyncStatus syncStatus) {
-        Context context = getContext();
-        if (context != null) {
-            if (syncStatus == SyncManager.SyncStatus.ENCRYPTING) {
-                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.statusEncrypting));
-                mStatusTextView.setText(R.string.status_encrypting);
-            } else if (syncStatus == SyncManager.SyncStatus.SAVING) {
-                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.statusSaving));
-                mStatusTextView.setText(R.string.status_saving);
-            } else if (syncStatus == SyncManager.SyncStatus.FAILED) {
-                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.statusFailed));
-                mStatusTextView.setText(R.string.status_failed);
-            } else if (syncStatus == SyncManager.SyncStatus.SYNCED) {
-                mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.statusSynced));
-                mStatusTextView.setText(R.string.status_synced);
-            }
+        if (syncStatus == SyncManager.SyncStatus.ENCRYPTING) {
+            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.statusEncrypting));
+            mStatusTextView.setText(R.string.status_encrypting);
+        } else if (syncStatus == SyncManager.SyncStatus.SAVING) {
+            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.statusSaving));
+            mStatusTextView.setText(R.string.status_saving);
+        } else if (syncStatus == SyncManager.SyncStatus.FAILED) {
+            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.statusFailed));
+            mStatusTextView.setText(R.string.status_failed);
+        } else if (syncStatus == SyncManager.SyncStatus.SYNCED) {
+            mStatusTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.statusSynced));
+            mStatusTextView.setText(R.string.status_synced);
         }
     }
 }

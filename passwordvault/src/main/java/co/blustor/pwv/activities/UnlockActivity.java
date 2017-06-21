@@ -27,7 +27,6 @@ import co.blustor.pwv.sync.SyncManager;
 
 public class UnlockActivity extends AppCompatActivity implements SyncDialogFragment.SyncInterface {
 
-    @Nullable
     private EditText mPasswordEditText = null;
 
     @Override
@@ -40,6 +39,7 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
         // Views
 
         mPasswordEditText = (EditText) findViewById(R.id.edittext_password);
+
         mPasswordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

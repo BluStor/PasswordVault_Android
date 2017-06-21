@@ -93,10 +93,13 @@ public class VaultGroup {
         List<String> reversePath = new ArrayList<>();
 
         UUID uuid;
+
         VaultGroup g = this;
-        while ((uuid = g.getParentUUID()) != null) {
+        while ((uuid = g != null ? g.getParentUUID() : null) != null) {
             g = vault.getGroupByUUID(uuid);
-            reversePath.add(g.getName());
+            if (g != null) {
+                reversePath.add(g.getName());
+            }
         }
 
         return Lists.reverse(reversePath);

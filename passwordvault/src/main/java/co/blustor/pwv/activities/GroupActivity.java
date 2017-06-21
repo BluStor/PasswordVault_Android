@@ -49,9 +49,7 @@ public class GroupActivity extends LockingActivity {
     private final GroupEntryAdapter mGroupEntryAdapter = new GroupEntryAdapter();
     @Nullable
     private VaultGroup mGroup = null;
-    @Nullable
     private TextView mEmptyTextView = null;
-    @Nullable
     private SearchFragment mSearchFragment = null;
 
     @Override
@@ -66,6 +64,8 @@ public class GroupActivity extends LockingActivity {
 
         Vault vault = Vault.getInstance();
         mGroup = vault.getGroupByUUID(uuid);
+
+        assert mGroup != null;
 
         // Start notification service if necessary
 
@@ -194,6 +194,8 @@ public class GroupActivity extends LockingActivity {
 
     @Override
     public void onBackPressed() {
+        assert mGroup != null;
+
         if (mGroup.getParentUUID() == null) {
             Intent lockDatabase = new Intent(Intents.LOCK_DATABASE);
             sendBroadcast(lockDatabase);
@@ -266,25 +268,25 @@ public class GroupActivity extends LockingActivity {
         }
 
         void updateData() {
-            if (mGroup != null) {
-                mGroups.clear();
-                mGroups.addAll(mGroup.getGroups());
-                mEntries.clear();
-                mEntries.addAll(mGroup.getEntries());
+            assert mGroup != null;
 
-                Collections.sort(mGroups, new VaultGroupComparator());
-                Collections.sort(mEntries, new VaultEntryComparator());
+            mGroups.clear();
+            mGroups.addAll(mGroup.getGroups());
+            mEntries.clear();
+            mEntries.addAll(mGroup.getEntries());
 
-                if (mGroups.size() > 0 || mEntries.size() > 0) {
-                    mEmptyTextView.setVisibility(View.INVISIBLE);
-                } else {
-                    mEmptyTextView.setVisibility(View.VISIBLE);
-                }
+            Collections.sort(mGroups, new VaultGroupComparator());
+            Collections.sort(mEntries, new VaultEntryComparator());
 
-                setTitle(mGroup.getName());
-
-                notifyDataSetChanged();
+            if (mGroups.size() > 0 || mEntries.size() > 0) {
+                mEmptyTextView.setVisibility(View.INVISIBLE);
+            } else {
+                mEmptyTextView.setVisibility(View.VISIBLE);
             }
+
+            setTitle(mGroup.getName());
+
+            notifyDataSetChanged();
         }
 
         class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -330,6 +332,8 @@ public class GroupActivity extends LockingActivity {
 
             @Override
             public boolean onLongClick(View v) {
+                assert mGroup != null;
+
                 int position = getAdapterPosition();
                 if (position < mGroups.size()) {
                     final VaultGroup group = mGroups.get(position);
