@@ -41,7 +41,7 @@ public class SyncDialogFragment extends DialogFragment {
 
         setCancelable(false);
 
-        final TextView statusTextView = (TextView) view.findViewById(R.id.textview_status);
+        final TextView statusTextView = view.findViewById(R.id.textview_status);
 
         Bundle args = getArguments();
 

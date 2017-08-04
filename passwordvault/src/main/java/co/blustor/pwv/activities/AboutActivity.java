@@ -26,7 +26,7 @@ public class AboutActivity extends LockingActivity {
 
         // Views
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -80,8 +80,8 @@ public class AboutActivity extends LockingActivity {
 
                 itemView.setOnClickListener(this);
 
-                iconImageView = (ImageView) itemView.findViewById(R.id.imageview_icon);
-                titleTextView = (TextView) itemView.findViewById(R.id.textview_title);
+                iconImageView = itemView.findViewById(R.id.imageview_icon);
+                titleTextView = itemView.findViewById(R.id.textview_title);
             }
 
             @Override

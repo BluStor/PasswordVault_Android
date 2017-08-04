@@ -5,7 +5,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.view.KeyEvent;
@@ -38,7 +37,7 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
 
         // Views
 
-        mPasswordEditText = (EditText) findViewById(R.id.edittext_password);
+        mPasswordEditText = findViewById(R.id.edittext_password);
 
         mPasswordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -51,7 +50,7 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
             }
         });
 
-        Button newButton = (Button) findViewById(R.id.button_new);
+        Button newButton = findViewById(R.id.button_new);
         newButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +59,7 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
             }
         });
 
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton floatingActionButton = findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

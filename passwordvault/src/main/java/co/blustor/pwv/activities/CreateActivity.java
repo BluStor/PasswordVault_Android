@@ -42,11 +42,11 @@ public class CreateActivity extends AppCompatActivity implements SyncInterface {
 
         // Views
 
-        final EditText passwordTextView = (EditText) findViewById(R.id.edittext_password);
+        final EditText passwordTextView = findViewById(R.id.edittext_password);
 
         final Context context = this;
 
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton floatingActionButton = findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {

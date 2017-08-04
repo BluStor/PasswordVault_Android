@@ -17,8 +17,10 @@ public class LockingActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, @NonNull Intent intent) {
             String action = intent.getAction();
-            if (action.equals(Intents.LOCK_DATABASE)) {
-                finish();
+            if (action != null) {
+                if (action.equals(Intents.LOCK_DATABASE)) {
+                    finish();
+                }
             }
         }
     };

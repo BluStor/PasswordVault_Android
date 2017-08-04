@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -76,9 +75,9 @@ public class GroupActivity extends LockingActivity {
 
         // Views
 
-        mEmptyTextView = (TextView) findViewById(R.id.textview_empty);
+        mEmptyTextView = findViewById(R.id.textview_empty);
 
-        TextView pathTextView = (TextView) findViewById(R.id.textview_path);
+        TextView pathTextView = findViewById(R.id.textview_path);
 
         List<String> path = mGroup.getPath();
         if (path.size() > 0) {
@@ -88,14 +87,14 @@ public class GroupActivity extends LockingActivity {
             pathTextView.setVisibility(View.GONE);
         }
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(mGroupEntryAdapter);
 
-        final FloatingActionMenu fam = (FloatingActionMenu) findViewById(R.id.fam);
+        final FloatingActionMenu fam = findViewById(R.id.fam);
 
         FloatingActionButton groupFloatingActionButton = new FloatingActionButton(this);
         groupFloatingActionButton.setButtonSize(FloatingActionButton.SIZE_MINI);
@@ -146,21 +145,21 @@ public class GroupActivity extends LockingActivity {
         getMenuInflater().inflate(R.menu.menu_group, menu);
 
         final MenuItem menuItem = menu.findItem(R.id.action_search);
-        MenuItemCompat.setOnActionExpandListener(menuItem, new MenuItemCompat.OnActionExpandListener() {
+        menuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 mSearchFragment.show();
                 return true;
             }
 
             @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
                 mSearchFragment.hide();
                 return true;
             }
         });
 
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -304,9 +303,9 @@ public class GroupActivity extends LockingActivity {
                 itemView.setOnClickListener(this);
                 itemView.setOnLongClickListener(this);
 
-                iconImageView = (ImageView) itemView.findViewById(R.id.imageview_icon);
-                subIconImageView = (ImageView) itemView.findViewById(R.id.imageview_subicon);
-                titleTextView = (TextView) itemView.findViewById(R.id.textview_title);
+                iconImageView = itemView.findViewById(R.id.imageview_icon);
+                subIconImageView = itemView.findViewById(R.id.imageview_subicon);
+                titleTextView = itemView.findViewById(R.id.textview_title);
             }
 
             @Override

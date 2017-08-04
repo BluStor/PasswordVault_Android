@@ -40,20 +40,23 @@ public class IconAdapter extends BaseAdapter {
     @Override
     public View getView(int position, @Nullable View convertView, ViewGroup parent) {
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (layoutInflater != null) {
+            View view;
+            if (convertView == null) {
+                view = layoutInflater.inflate(R.layout.grid_icon, parent, false);
+            } else {
+                view = convertView;
+            }
 
-        View view;
-        if (convertView == null) {
-            view = layoutInflater.inflate(R.layout.grid_icon, parent, false);
-        } else {
-            view = convertView;
+            ImageView iconImageView = view.findViewById(R.id.imageview_icon);
+            iconImageView.setImageResource(MyApplication.getIcons().get(position));
+
+            TextView iconIdTextView = view.findViewById(R.id.textview_icon_id);
+            iconIdTextView.setText(String.format(Locale.getDefault(), "%02d", position));
+
+            return view;
         }
 
-        ImageView iconImageView = (ImageView) view.findViewById(R.id.imageview_icon);
-        iconImageView.setImageResource(MyApplication.getIcons().get(position));
-
-        TextView iconIdTextView = (TextView) view.findViewById(R.id.textview_icon_id);
-        iconIdTextView.setText(String.format(Locale.getDefault(), "%02d", position));
-
-        return view;
+        return null;
     }
 }

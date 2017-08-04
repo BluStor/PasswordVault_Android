@@ -48,15 +48,15 @@ public class PasswordGeneratorActivity extends LockingActivity {
 
         // Views
 
-        mPasswordTextView = (TextView) findViewById(R.id.textview_password);
-        mUpperCheckbox = (CheckBox) findViewById(R.id.checkbox_upper);
-        mLowerCheckbox = (CheckBox) findViewById(R.id.checkbox_lower);
-        mDigitsCheckbox = (CheckBox) findViewById(R.id.checkbox_digits);
-        mDashCheckbox = (CheckBox) findViewById(R.id.checkbox_dash);
-        mUnderscoreCheckbox = (CheckBox) findViewById(R.id.checkbox_underscore);
-        mSpaceCheckbox = (CheckBox) findViewById(R.id.checkbox_space);
-        mSpecialCheckbox = (CheckBox) findViewById(R.id.checkbox_special);
-        mBracketsCheckbox = (CheckBox) findViewById(R.id.checkbox_brackets);
+        mPasswordTextView = findViewById(R.id.textview_password);
+        mUpperCheckbox = findViewById(R.id.checkbox_upper);
+        mLowerCheckbox = findViewById(R.id.checkbox_lower);
+        mDigitsCheckbox = findViewById(R.id.checkbox_digits);
+        mDashCheckbox = findViewById(R.id.checkbox_dash);
+        mUnderscoreCheckbox = findViewById(R.id.checkbox_underscore);
+        mSpaceCheckbox = findViewById(R.id.checkbox_space);
+        mSpecialCheckbox = findViewById(R.id.checkbox_special);
+        mBracketsCheckbox = findViewById(R.id.checkbox_brackets);
 
         mUpperCheckbox.setChecked(true);
         mLowerCheckbox.setChecked(true);
@@ -64,9 +64,9 @@ public class PasswordGeneratorActivity extends LockingActivity {
 
         generateCharacters();
 
-        final TextView lengthTextView = (TextView) findViewById(R.id.textview_length);
+        final TextView lengthTextView = findViewById(R.id.textview_length);
 
-        final SeekBar seekBarLength = (SeekBar) findViewById(R.id.seekbar_length);
+        final SeekBar seekBarLength = findViewById(R.id.seekbar_length);
         seekBarLength.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(@NonNull SeekBar seekBar, int progress, boolean fromUser) {
@@ -119,56 +119,56 @@ public class PasswordGeneratorActivity extends LockingActivity {
         mSpecialCheckbox.setOnCheckedChangeListener(checkedChangeListener);
         mBracketsCheckbox.setOnCheckedChangeListener(checkedChangeListener);
 
-        TextView upperTextView = (TextView) findViewById(R.id.textview_upper);
+        TextView upperTextView = findViewById(R.id.textview_upper);
         upperTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mUpperCheckbox.toggle();
             }
         });
-        TextView lowerTextView = (TextView) findViewById(R.id.textview_lower);
+        TextView lowerTextView = findViewById(R.id.textview_lower);
         lowerTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mLowerCheckbox.toggle();
             }
         });
-        TextView digitsTextView = (TextView) findViewById(R.id.textview_digits);
+        TextView digitsTextView = findViewById(R.id.textview_digits);
         digitsTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mDigitsCheckbox.toggle();
             }
         });
-        TextView dashTextView = (TextView) findViewById(R.id.textview_dash);
+        TextView dashTextView = findViewById(R.id.textview_dash);
         dashTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mDashCheckbox.toggle();
             }
         });
-        TextView underscoreTextView = (TextView) findViewById(R.id.textview_underscore);
+        TextView underscoreTextView = findViewById(R.id.textview_underscore);
         underscoreTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mUnderscoreCheckbox.toggle();
             }
         });
-        TextView spaceTextView = (TextView) findViewById(R.id.textview_space);
+        TextView spaceTextView = findViewById(R.id.textview_space);
         spaceTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSpaceCheckbox.toggle();
             }
         });
-        TextView specialTextView = (TextView) findViewById(R.id.textview_special);
+        TextView specialTextView = findViewById(R.id.textview_special);
         specialTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSpecialCheckbox.toggle();
             }
         });
-        TextView bracketsTextView = (TextView) findViewById(R.id.textview_brackets);
+        TextView bracketsTextView = findViewById(R.id.textview_brackets);
         bracketsTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

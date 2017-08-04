@@ -56,8 +56,7 @@ public class NotificationService extends Service {
                 "Lock database",
                 getLockDatabaseIntent()
         ).build();
-
-        return new NotificationCompat.Builder(this)
+        return new NotificationCompat.Builder(this, Notifications.CHANNEL_STANDARD)
                 .setOngoing(true)
                 .setVisibility(VISIBILITY_PUBLIC)
                 .setContentTitle("BluStor KeePassDatabase")

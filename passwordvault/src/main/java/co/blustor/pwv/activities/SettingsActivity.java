@@ -33,9 +33,9 @@ public class SettingsActivity extends LockingActivity implements SyncInterface {
 
         // Views
 
-        final EditText passwordEditText = (EditText) findViewById(R.id.edittext_password);
+        final EditText passwordEditText = findViewById(R.id.edittext_password);
 
-        Button changePasswordButton = (Button) findViewById(R.id.button_change_password);
+        Button changePasswordButton = findViewById(R.id.button_change_password);
         changePasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

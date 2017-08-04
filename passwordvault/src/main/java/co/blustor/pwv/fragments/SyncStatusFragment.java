@@ -30,7 +30,7 @@ public class SyncStatusFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mStatusTextView = (TextView) view.findViewById(R.id.textview_status);
+        mStatusTextView = view.findViewById(R.id.textview_status);
 
         setSyncStatus(SyncManager.getLastWriteStatus());
 

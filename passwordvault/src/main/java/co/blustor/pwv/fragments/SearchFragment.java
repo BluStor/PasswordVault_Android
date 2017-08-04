@@ -45,11 +45,11 @@ public class SearchFragment extends Fragment {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(mSearchResultAdapter);
 
-        mEmptyTextView = (TextView) view.findViewById(R.id.textview_empty);
+        mEmptyTextView = view.findViewById(R.id.textview_empty);
 
         return view;
     }
@@ -175,9 +175,9 @@ public class SearchFragment extends Fragment {
 
                 itemView.setOnClickListener(this);
 
-                iconImageView = (ImageView) itemView.findViewById(R.id.imageview_icon);
-                titleTextView = (TextView) itemView.findViewById(R.id.textview_title);
-                nameTextView = (TextView) itemView.findViewById(R.id.textview_name);
+                iconImageView = itemView.findViewById(R.id.imageview_icon);
+                titleTextView = itemView.findViewById(R.id.textview_title);
+                nameTextView = itemView.findViewById(R.id.textview_name);
             }
 
             @Override

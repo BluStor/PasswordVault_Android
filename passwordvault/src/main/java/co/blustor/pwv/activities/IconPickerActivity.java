@@ -17,7 +17,7 @@ public class IconPickerActivity extends LockingActivity {
 
         setTitle("Select icon");
 
-        GridView mGridView = (GridView) findViewById(R.id.gridview);
+        GridView mGridView = findViewById(R.id.gridview);
         mGridView.setAdapter(new IconAdapter(this));
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

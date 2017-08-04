@@ -47,8 +47,8 @@ public class EditGroupActivity extends LockingActivity {
 
         // Views
 
-        mIconImageView = (ImageView) findViewById(R.id.imageview_icon);
-        mNameEditText = (EditText) findViewById(R.id.edittext_name);
+        mIconImageView = findViewById(R.id.imageview_icon);
+        mNameEditText = findViewById(R.id.edittext_name);
 
         mIconImageView.setOnClickListener(new View.OnClickListener() {
             @Override

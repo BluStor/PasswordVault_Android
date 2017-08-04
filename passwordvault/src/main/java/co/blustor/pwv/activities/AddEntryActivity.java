@@ -52,11 +52,11 @@ public class AddEntryActivity extends LockingActivity {
         // Views
 
         setTitle("Add entry");
-        mIconImageView = (ImageView) findViewById(R.id.imageview_icon);
-        mTitleEditText = (EditText) findViewById(R.id.edittext_title);
-        mUsernameEditText = (EditText) findViewById(R.id.edittext_username);
-        mPasswordEditText = (EditText) findViewById(R.id.edittext_password);
-        mUrlEditText = (EditText) findViewById(R.id.edittext_url);
+        mIconImageView = findViewById(R.id.imageview_icon);
+        mTitleEditText = findViewById(R.id.edittext_title);
+        mUsernameEditText = findViewById(R.id.edittext_username);
+        mPasswordEditText = findViewById(R.id.edittext_password);
+        mUrlEditText = findViewById(R.id.edittext_url);
 
         mIconImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,7 +66,7 @@ public class AddEntryActivity extends LockingActivity {
             }
         });
 
-        Button generateButton = (Button) findViewById(R.id.button_generate);
+        Button generateButton = findViewById(R.id.button_generate);
         generateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(@NonNull View v) {
