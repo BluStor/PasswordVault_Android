@@ -40,12 +40,7 @@ public class AboutActivity extends LockingActivity {
         @NonNull
         @Override
         public AboutAdapter.AboutViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view;
-            if (viewType == 0) {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_group, parent, false);
-            } else {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_entry, parent, false);
-            }
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_about, parent, false);
             return new AboutAdapter.AboutViewHolder(view);
         }
 

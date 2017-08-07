@@ -11,7 +11,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,10 +19,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.cocosw.bottomsheet.BottomSheet;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.common.base.Joiner;
+import com.kennyc.bottomsheet.BottomSheet;
+import com.kennyc.bottomsheet.BottomSheetListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -244,12 +244,7 @@ public class GroupActivity extends LockingActivity {
             if (holder.getItemViewType() == 0) {
                 VaultGroup group = mGroups.get(position);
 
-                int iconId = group.getIconId();
-                if (iconId != 49) {
-                    holder.subIconImageView.setImageResource(MyApplication.getIcons().get(group.getIconId()));
-                } else {
-                    holder.subIconImageView.setImageDrawable(null);
-                }
+                holder.iconImageView.setImageResource(MyApplication.getIcons().get(group.getIconId()));
                 holder.titleTextView.setText(group.getName());
             } else {
                 VaultEntry entry = mEntries.get(position - mGroups.size());
@@ -293,8 +288,6 @@ public class GroupActivity extends LockingActivity {
             @NonNull
             final ImageView iconImageView;
             @NonNull
-            final ImageView subIconImageView;
-            @NonNull
             final TextView titleTextView;
 
             GroupEntryViewHolder(@NonNull View itemView) {
@@ -304,7 +297,6 @@ public class GroupActivity extends LockingActivity {
                 itemView.setOnLongClickListener(this);
 
                 iconImageView = itemView.findViewById(R.id.imageview_icon);
-                subIconImageView = itemView.findViewById(R.id.imageview_subicon);
                 titleTextView = itemView.findViewById(R.id.textview_title);
             }
 
@@ -337,17 +329,23 @@ public class GroupActivity extends LockingActivity {
                 if (position < mGroups.size()) {
                     final VaultGroup group = mGroups.get(position);
                     new BottomSheet.Builder(GroupActivity.this)
-                            .title(group.getName())
-                            .sheet(R.menu.menu_bottom_group)
-                            .listener(new DialogInterface.OnClickListener() {
+                            .setTitle(group.getName())
+                            .setSheet(R.menu.menu_bottom_group)
+                            .setListener(new BottomSheetListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Log.d(TAG, "which = " + which);
-                                    if (which == R.id.action_edit) {
+                                public void onSheetShown(@NonNull BottomSheet bottomSheet) {
+
+                                }
+
+                                @Override
+                                public void onSheetItemSelected(@NonNull BottomSheet bottomSheet, MenuItem menuItem) {
+                                    int itemId = menuItem.getItemId();
+
+                                    if (itemId == R.id.action_edit) {
                                         Intent editGroupActivity = new Intent(GroupActivity.this, EditGroupActivity.class);
                                         editGroupActivity.putExtra("uuid", group.getUUID());
                                         startActivity(editGroupActivity);
-                                    } else if (which == R.id.action_delete) {
+                                    } else if (itemId == R.id.action_delete) {
                                         mGroup.removeGroup(group.getUUID());
                                         updateData();
 
@@ -355,16 +353,28 @@ public class GroupActivity extends LockingActivity {
                                         SyncManager.setRoot(GroupActivity.this, vault.getPassword());
                                     }
                                 }
-                            }).show();
+
+                                @Override
+                                public void onSheetDismissed(@NonNull BottomSheet bottomSheet, int i) {
+
+                                }
+                            })
+                            .show();
                 } else {
                     final VaultEntry entry = mEntries.get(position - mGroups.size());
                     new BottomSheet.Builder(GroupActivity.this)
-                            .title(entry.getTitle())
-                            .sheet(R.menu.menu_bottom_entry)
-                            .listener(new DialogInterface.OnClickListener() {
+                            .setTitle(entry.getTitle())
+                            .setSheet(R.menu.menu_bottom_entry)
+                            .setListener(new BottomSheetListener() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    if (which == R.id.action_delete) {
+                                public void onSheetShown(@NonNull BottomSheet bottomSheet) {
+
+                                }
+
+                                @Override
+                                public void onSheetItemSelected(@NonNull BottomSheet bottomSheet, MenuItem menuItem) {
+                                    int itemId = menuItem.getItemId();
+                                    if (itemId == R.id.action_delete) {
                                         mGroup.removeEntry(entry.getUUID());
                                         updateData();
 
@@ -372,7 +382,13 @@ public class GroupActivity extends LockingActivity {
                                         SyncManager.setRoot(GroupActivity.this, vault.getPassword());
                                     }
                                 }
-                            }).show();
+
+                                @Override
+                                public void onSheetDismissed(@NonNull BottomSheet bottomSheet, int i) {
+
+                                }
+                            })
+                            .show();
                 }
 
                 return true;

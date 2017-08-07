@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="10dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
     <ImageView
         android:id="@+id/imageview_icon"
-        android:foregroundGravity="center"
-        android:tint="@color/iconEntry"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:adjustViewBounds="true"
         android:contentDescription="@string/imageview_icon_content_description"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        android:foregroundGravity="center"
+        android:tint="@color/iconEntry"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@+id/imageview_icon"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@id/imageview_icon"
-        app:layout_constraintStart_toEndOf="@id/imageview_icon"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imageview_icon"
+        app:layout_constraintTop_toTopOf="@+id/imageview_icon"
         tools:layout_editor_absoluteX="8dp">
+
         <TextView
             android:id="@+id/textview_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:text="@string/placeholder_title"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginStart="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/textview_name"
-            android:text="@string/placeholder_name"
-            android:textSize="16sp"
-            android:gravity="center_vertical"
-            android:layout_marginStart="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/placeholder_name"
+            android:textSize="16sp" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

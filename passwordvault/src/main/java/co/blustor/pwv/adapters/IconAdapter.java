@@ -51,9 +51,6 @@ public class IconAdapter extends BaseAdapter {
             ImageView iconImageView = view.findViewById(R.id.imageview_icon);
             iconImageView.setImageResource(MyApplication.getIcons().get(position));
 
-            TextView iconIdTextView = view.findViewById(R.id.textview_icon_id);
-            iconIdTextView.setText(String.format(Locale.getDefault(), "%02d", position));
-
             return view;
         }
 

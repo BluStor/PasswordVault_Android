@@ -43,14 +43,17 @@
     <string name="placeholder_status">Status</string>
     <string name="placeholder_text">Text</string>\
     <string name="placeholder_title">Title</string>
-    <string name="status_connecting">Connecting</string>
-    <string name="status_decrypting">Decrypting</string>
-    <string name="status_encrypting">Encrypting</string>
-    <string name="status_failed">Unable to Sync</string>
-    <string name="status_saving">Saving</string>
+    <string name="status_connecting">Connecting …</string>
+    <string name="status_decrypting">Decrypting …</string>
+    <string name="status_encrypting">Encrypting …</string>
+    <string name="status_failed">Failed</string>
+    <string name="status_saving">Saving …</string>
     <string name="status_synced">Synced</string>
     <string name="status_transferring">Transferring</string>
     <string name="textview_empty">Empty</string>
     <string name="textview_no_results">No results.</string>
     <string name="welcome_to">Welcome to</string>
+    <string name="menu_new_database">New database</string>
+    <string name="menu_open_existing_database">Open existing database</string>
+    <string name="button_copy">Copy</string>
 </resources>

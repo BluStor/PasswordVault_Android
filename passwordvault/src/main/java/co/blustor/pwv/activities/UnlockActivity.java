@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -50,15 +49,6 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
             }
         });
 
-        Button newButton = findViewById(R.id.button_new);
-        newButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent createActivity = new Intent(getApplicationContext(), CreateActivity.class);
-                startActivity(createActivity);
-            }
-        });
-
         FloatingActionButton floatingActionButton = findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,6 +70,10 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
         if (id == R.id.action_about) {
             Intent aboutActivity = new Intent(this, AboutActivity.class);
             startActivity(aboutActivity);
+        } else if (id == R.id.action_new) {
+            Intent createActivity = new Intent(getApplicationContext(), CreateActivity.class);
+            startActivity(createActivity);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -110,7 +104,7 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
         String version;
         try {
             PackageInfo packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
-            version = packageInfo.versionName + "." + packageInfo.versionCode;
+            version = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             version = "?.?";
         }

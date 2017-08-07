@@ -1,5 +1,8 @@
 package co.blustor.pwv.activities;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.basgeekball.awesomevalidation.utility.RegexTemplate;
@@ -65,6 +69,18 @@ public class EditEntryActivity extends LockingActivity {
             public void onClick(@NonNull View v) {
                 Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
                 startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
+            }
+        });
+
+        Button copyButton = findViewById(R.id.button_copy);
+        copyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                if (clipboardManager != null) {
+                    clipboardManager.setPrimaryClip(ClipData.newPlainText("text", mPasswordEditText.getText()));
+                    Toast.makeText(EditEntryActivity.this, "Password copied", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

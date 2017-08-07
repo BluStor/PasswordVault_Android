@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import co.blustor.pwv.R;
 import co.blustor.pwv.activities.CloseActivity;
@@ -51,19 +52,14 @@ public class NotificationService extends Service {
     }
 
     private Notification getUnlockedNotification() {
-        NotificationCompat.Action lockAction = new NotificationCompat.Action.Builder(
-                R.drawable.ic_00,
-                "Lock database",
-                getLockDatabaseIntent()
-        ).build();
+        Log.i("NotificationService", "getUnlockedNotification()");
         return new NotificationCompat.Builder(this, Notifications.CHANNEL_STANDARD)
                 .setOngoing(true)
                 .setVisibility(VISIBILITY_PUBLIC)
                 .setContentTitle("BluStor KeePassDatabase")
                 .setContentText("Database is unlocked.")
                 .setContentIntent(getSwitchToAppPendingIntent())
-                .setSmallIcon(R.drawable.ic_stat_locked)
-                .addAction(lockAction)
+                .setSmallIcon(R.drawable.ic_00)
                 .build();
     }
 }
