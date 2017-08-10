@@ -56,4 +56,8 @@
     <string name="menu_new_database">New database</string>
     <string name="menu_open_existing_database">Open existing database</string>
     <string name="button_copy">Copy</string>
+    <string name="error_name_is_required">Name is required.</string>
+    <string name="error_title_is_required">Title is required.</string>
+    <string name="error_password_is_required">Password is required.</string>
+    <string name="error_passwords_do_not_match">Passwords do not match.</string>
 </resources>

@@ -5,15 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-
-import com.basgeekball.awesomevalidation.AwesomeValidation;
-import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 
 import java.util.UUID;
 
@@ -23,15 +21,15 @@ import co.blustor.pwv.database.VaultGroup;
 import co.blustor.pwv.sync.SyncManager;
 import co.blustor.pwv.utils.MyApplication;
 
-import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class EditGroupActivity extends LockingActivity {
     private static final int REQUEST_ICON_CODE = 0;
-    private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
+
     @Nullable
     private VaultGroup mGroup = null;
     private Integer mIconId = 49;
     private ImageView mIconImageView = null;
+    private TextInputLayout mNameTextInputLayout = null;
     private EditText mNameEditText = null;
 
     @Override
@@ -41,13 +39,10 @@ public class EditGroupActivity extends LockingActivity {
 
         setTitle("Edit group");
 
-        // Validation
-
-        mAwesomeValidation.addValidation(this, R.id.edittext_name, RegexTemplate.NOT_EMPTY, R.string.error_empty);
-
         // Views
 
         mIconImageView = findViewById(R.id.imageview_icon);
+        mNameTextInputLayout = findViewById(R.id.textinputlayout_name);
         mNameEditText = findViewById(R.id.edittext_name);
 
         mIconImageView.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +124,7 @@ public class EditGroupActivity extends LockingActivity {
     }
 
     private void save() {
-        if (mAwesomeValidation.validate()) {
+        if (validate()) {
             if (hasBeenEdited()) {
                 assert mGroup != null;
 
@@ -149,5 +144,17 @@ public class EditGroupActivity extends LockingActivity {
 
         return !(mGroup.getName().equals(mNameEditText.getText().toString())
                 && mGroup.getIconId().equals(mIconId));
+    }
+
+    private boolean validate() {
+        boolean hasName = mNameEditText.getText().toString().length() > 0;
+
+        if (hasName) {
+            mNameTextInputLayout.setError(null);
+        } else {
+            mNameTextInputLayout.setError(getString(R.string.error_name_is_required));
+        }
+
+        return hasName;
     }
 }

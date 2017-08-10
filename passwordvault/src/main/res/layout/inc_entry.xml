@@ -3,9 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginTop="10dp"
+    android:layout_margin="10dp"
     android:orientation="vertical">
 
     <ImageView
@@ -17,6 +15,7 @@
         android:tint="@color/iconEntry" />
 
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/textinputlayout_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -57,16 +56,12 @@
         android:id="@+id/button_copy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:text="@string/button_copy" />
 
     <Button
         android:id="@+id/button_generate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:text="@string/button_generate" />
 
     <android.support.design.widget.TextInputLayout
@@ -89,7 +84,6 @@
             android:id="@+id/edittext_notes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
             android:hint="@string/hint_notes"
             android:inputType="textNoSuggestions" />
     </android.support.design.widget.TextInputLayout>

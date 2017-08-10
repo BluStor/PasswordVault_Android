@@ -1,13 +1,12 @@
 package co.blustor.pwv.activities;
 
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
-import com.basgeekball.awesomevalidation.AwesomeValidation;
-import com.basgeekball.awesomevalidation.ValidationStyle;
-import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 
 import java.util.UUID;
 
@@ -19,32 +18,48 @@ import co.blustor.pwv.sync.SyncManager;
 import static co.blustor.pwv.fragments.SyncDialogFragment.SyncInterface;
 
 public class SettingsActivity extends LockingActivity implements SyncInterface {
-    private final AwesomeValidation mAwesomeValidationChangePassword = new AwesomeValidation(ValidationStyle.BASIC);
+
+    private TextInputLayout mPasswordTextInputLayout = null;
+    private EditText mPasswordEditText = null;
+    private TextInputLayout mPasswordRepeatTextInputLayout = null;
+    private EditText mPasswordRepeatEditText = null;
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            validatePassword();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        // Validation
-
-        mAwesomeValidationChangePassword.addValidation(this, R.id.edittext_password, RegexTemplate.NOT_EMPTY, R.string.error_empty);
-        mAwesomeValidationChangePassword.addValidation(this, R.id.edittext_password, R.id.edittext_password_repeat, R.string.error_match);
-
         // Views
 
-        final EditText passwordEditText = findViewById(R.id.edittext_password);
+        mPasswordTextInputLayout = findViewById(R.id.textinputlayout_password);
+        mPasswordEditText = findViewById(R.id.edittext_password);
+        mPasswordEditText.addTextChangedListener(mTextWatcher);
+        mPasswordRepeatTextInputLayout = findViewById(R.id.textinputlayout_password_repeat);
+        mPasswordRepeatEditText = findViewById(R.id.edittext_password_repeat);
+        mPasswordRepeatEditText.addTextChangedListener(mTextWatcher);
 
         Button changePasswordButton = findViewById(R.id.button_change_password);
         changePasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mAwesomeValidationChangePassword.validate()) {
-                    Vault vault = Vault.getInstance();
-                    vault.setPassword(passwordEditText.getText().toString());
-
-                    save();
-                }
+                savePassword();
             }
         });
     }
@@ -52,6 +67,17 @@ public class SettingsActivity extends LockingActivity implements SyncInterface {
     @Override
     public void syncComplete(UUID uuid) {
         finish();
+    }
+
+    private void savePassword() {
+        if (validatePassword()) {
+            String password = mPasswordEditText.getText().toString();
+
+            Vault vault = Vault.getInstance();
+            vault.setPassword(password);
+
+            save();
+        }
     }
 
     private void save() {
@@ -65,5 +91,27 @@ public class SettingsActivity extends LockingActivity implements SyncInterface {
 
         syncDialogFragment.setArguments(args);
         syncDialogFragment.show(getFragmentManager(), "dialog");
+    }
+
+    private boolean validatePassword() {
+        String password = mPasswordEditText.getText().toString();
+        String passwordRepeat = mPasswordRepeatEditText.getText().toString();
+
+        boolean hasPassword = password.length() > 0;
+        boolean passwordsMatch = password.equals(passwordRepeat);
+
+        if (hasPassword) {
+            mPasswordTextInputLayout.setError(null);
+        } else {
+            mPasswordTextInputLayout.setError(getString(R.string.error_password_is_required));
+        }
+
+        if (passwordsMatch) {
+            mPasswordRepeatTextInputLayout.setError(null);
+        } else {
+            mPasswordRepeatTextInputLayout.setError(getString(R.string.error_passwords_do_not_match));
+        }
+
+        return hasPassword && passwordsMatch;
     }
 }

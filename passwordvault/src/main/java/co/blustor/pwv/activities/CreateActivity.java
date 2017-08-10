@@ -1,20 +1,20 @@
 package co.blustor.pwv.activities;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-import com.basgeekball.awesomevalidation.AwesomeValidation;
-import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 import com.github.clans.fab.FloatingActionButton;
 
 import java.util.UUID;
@@ -25,10 +25,29 @@ import co.blustor.pwv.fragments.SyncDialogFragment;
 import co.blustor.pwv.sync.SyncManager;
 
 import static co.blustor.pwv.fragments.SyncDialogFragment.SyncInterface;
-import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 public class CreateActivity extends AppCompatActivity implements SyncInterface {
-    private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
+    private TextInputLayout mPasswordTextInputLayout = null;
+    private EditText mPasswordEditText = null;
+    private TextInputLayout mPasswordRepeatTextInputLayout = null;
+    private EditText mPasswordRepeatEditText = null;
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            validate();
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,51 +56,20 @@ public class CreateActivity extends AppCompatActivity implements SyncInterface {
 
         setTitle("New database");
 
-        // Validation
-
-        mAwesomeValidation.addValidation(this, R.id.edittext_password, RegexTemplate.NOT_EMPTY, R.string.error_empty);
-        mAwesomeValidation.addValidation(this, R.id.edittext_password, R.id.edittext_password_repeat, R.string.error_match);
-
         // Views
 
-        final EditText passwordTextView = findViewById(R.id.edittext_password);
-
-        final Context context = this;
+        mPasswordTextInputLayout = findViewById(R.id.textinputlayout_password);
+        mPasswordEditText = findViewById(R.id.edittext_password);
+        mPasswordEditText.addTextChangedListener(mTextWatcher);
+        mPasswordRepeatTextInputLayout = findViewById(R.id.textinputlayout_password_repeat);
+        mPasswordRepeatEditText = findViewById(R.id.edittext_password_repeat);
+        mPasswordRepeatEditText.addTextChangedListener(mTextWatcher);
 
         FloatingActionButton floatingActionButton = findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                if (mAwesomeValidation.validate()) {
-                    new AlertDialog.Builder(context)
-                            .setTitle("Replace database?")
-                            .setMessage("This will replace the password database on your card, potentially destroying data.  Are you sure?")
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(@NonNull DialogInterface dialog, int which) {
-                                    dialog.cancel();
-
-                                    Vault vault = Vault.getInstance();
-                                    vault.create();
-
-                                    SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
-
-                                    Bundle args = new Bundle();
-                                    args.putSerializable("type", SyncManager.SyncType.WRITE);
-                                    args.putSerializable("password", passwordTextView.getText().toString());
-
-                                    syncDialogFragment.setArguments(args);
-                                    syncDialogFragment.show(getFragmentManager(), "dialog");
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(@NonNull DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                }
-                            })
-                            .show();
-                }
+                create();
             }
         });
     }
@@ -113,5 +101,60 @@ public class CreateActivity extends AppCompatActivity implements SyncInterface {
         startActivity(groupActivity);
 
         finish();
+    }
+
+    private void create() {
+        if (validate()) {
+            new AlertDialog.Builder(CreateActivity.this)
+                    .setTitle("Replace database?")
+                    .setMessage("This will replace the password database on your card, potentially destroying data.  Are you sure?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(@NonNull DialogInterface dialog, int which) {
+                            dialog.cancel();
+
+                            Vault vault = Vault.getInstance();
+                            vault.create();
+
+                            SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
+
+                            Bundle args = new Bundle();
+                            args.putSerializable("type", SyncManager.SyncType.WRITE);
+                            args.putSerializable("password", mPasswordEditText.getText().toString());
+
+                            syncDialogFragment.setArguments(args);
+                            syncDialogFragment.show(getFragmentManager(), "dialog");
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(@NonNull DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    private boolean validate() {
+        String password = mPasswordEditText.getText().toString();
+        String passwordRepeat = mPasswordRepeatEditText.getText().toString();
+
+        boolean hasPassword = password.length() > 0;
+        boolean passwordsMatch = password.equals(passwordRepeat);
+
+        if (hasPassword) {
+            mPasswordTextInputLayout.setError(null);
+        } else {
+            mPasswordTextInputLayout.setError(getString(R.string.error_password_is_required));
+        }
+
+        if (passwordsMatch) {
+            mPasswordRepeatTextInputLayout.setError(null);
+        } else {
+            mPasswordRepeatTextInputLayout.setError(getString(R.string.error_passwords_do_not_match));
+        }
+
+        return hasPassword && passwordsMatch;
     }
 }

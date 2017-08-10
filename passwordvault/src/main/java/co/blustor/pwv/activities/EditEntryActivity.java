@@ -2,12 +2,12 @@ package co.blustor.pwv.activities;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,9 +17,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.basgeekball.awesomevalidation.AwesomeValidation;
-import com.basgeekball.awesomevalidation.utility.RegexTemplate;
-
 import java.util.UUID;
 
 import co.blustor.pwv.R;
@@ -28,16 +25,15 @@ import co.blustor.pwv.database.VaultEntry;
 import co.blustor.pwv.sync.SyncManager;
 import co.blustor.pwv.utils.MyApplication;
 
-import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
-
 public class EditEntryActivity extends LockingActivity {
     private static final int REQUEST_ICON_CODE = 0;
     private static final int REQUEST_PASSWORD = 1;
-    private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
+
     @Nullable
     private VaultEntry mEntry = null;
     private Integer mIconId = 0;
     private ImageView mIconImageView = null;
+    private TextInputLayout mTitleTextInputLayout = null;
     private EditText mTitleEditText = null;
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
@@ -51,13 +47,10 @@ public class EditEntryActivity extends LockingActivity {
 
         setTitle("Edit entry");
 
-        // Validation
-
-        mAwesomeValidation.addValidation(this, R.id.edittext_title, RegexTemplate.NOT_EMPTY, R.string.error_empty);
-
         // Views
 
         mIconImageView = findViewById(R.id.imageview_icon);
+        mTitleTextInputLayout = findViewById(R.id.textinputlayout_title);
         mTitleEditText = findViewById(R.id.edittext_title);
         mUsernameEditText = findViewById(R.id.edittext_username);
         mPasswordEditText = findViewById(R.id.edittext_password);
@@ -173,7 +166,7 @@ public class EditEntryActivity extends LockingActivity {
     }
 
     private void save() {
-        if (mAwesomeValidation.validate()) {
+        if (validate()) {
             if (hasBeenEdited()) {
                 assert mEntry != null;
 
@@ -193,7 +186,7 @@ public class EditEntryActivity extends LockingActivity {
         }
     }
 
-    private Boolean hasBeenEdited() {
+    private boolean hasBeenEdited() {
         assert mEntry != null;
 
         return !(mEntry.getTitle().equals(mTitleEditText.getText().toString())
@@ -202,5 +195,17 @@ public class EditEntryActivity extends LockingActivity {
                 && mEntry.getUrl().equals(mUrlEditText.getText().toString())
                 && mEntry.getNotes().equals(mNotesEditText.getText().toString())
                 && mEntry.getIconId().equals(mIconId));
+    }
+
+    private boolean validate() {
+        boolean hasTitle = mTitleEditText.getText().length() > 0;
+
+        if (hasTitle) {
+            mTitleTextInputLayout.setError(null);
+        } else {
+            mTitleTextInputLayout.setError(getString(R.string.error_title_is_required));
+        }
+
+        return hasTitle;
     }
 }

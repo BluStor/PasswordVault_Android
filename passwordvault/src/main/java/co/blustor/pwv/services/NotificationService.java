@@ -52,14 +52,14 @@ public class NotificationService extends Service {
     }
 
     private Notification getUnlockedNotification() {
-        Log.i("NotificationService", "getUnlockedNotification()");
         return new NotificationCompat.Builder(this, Notifications.CHANNEL_STANDARD)
                 .setOngoing(true)
                 .setVisibility(VISIBILITY_PUBLIC)
                 .setContentTitle("BluStor KeePassDatabase")
                 .setContentText("Database is unlocked.")
                 .setContentIntent(getSwitchToAppPendingIntent())
-                .setSmallIcon(R.drawable.ic_00)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .addAction(android.R.drawable.ic_lock_lock, "Lock database", getLockDatabaseIntent())
                 .build();
     }
 }

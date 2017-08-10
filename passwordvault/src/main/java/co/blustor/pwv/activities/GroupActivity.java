@@ -1,6 +1,5 @@
 package co.blustor.pwv.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -44,7 +43,6 @@ import co.blustor.pwv.sync.SyncManager;
 import co.blustor.pwv.utils.MyApplication;
 
 public class GroupActivity extends LockingActivity {
-    private static final String TAG = "GroupActivity";
     private final GroupEntryAdapter mGroupEntryAdapter = new GroupEntryAdapter();
     @Nullable
     private VaultGroup mGroup = null;

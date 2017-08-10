@@ -5,16 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-
-import com.basgeekball.awesomevalidation.AwesomeValidation;
-import com.basgeekball.awesomevalidation.utility.RegexTemplate;
 
 import java.util.UUID;
 
@@ -25,38 +25,52 @@ import co.blustor.pwv.database.VaultGroup;
 import co.blustor.pwv.sync.SyncManager;
 import co.blustor.pwv.utils.MyApplication;
 
-import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
-
 public class AddEntryActivity extends LockingActivity {
     private static final int REQUEST_ICON_CODE = 0;
     private static final int REQUEST_PASSWORD = 1;
-    private final AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
     @Nullable
     private VaultGroup mGroup;
     private Integer mIconId = 0;
     private ImageView mIconImageView = null;
+    private TextInputLayout mTitleTextInputLayout = null;
     private EditText mTitleEditText = null;
     private EditText mUsernameEditText = null;
     private EditText mPasswordEditText = null;
     private EditText mUrlEditText = null;
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            validate();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addentry);
 
-        // Validation
-
-        mAwesomeValidation.addValidation(this, R.id.edittext_title, RegexTemplate.NOT_EMPTY, R.string.error_empty);
-
         // Views
 
         setTitle("Add entry");
         mIconImageView = findViewById(R.id.imageview_icon);
+        mTitleTextInputLayout = findViewById(R.id.textinputlayout_title);
         mTitleEditText = findViewById(R.id.edittext_title);
         mUsernameEditText = findViewById(R.id.edittext_username);
         mPasswordEditText = findViewById(R.id.edittext_password);
         mUrlEditText = findViewById(R.id.edittext_url);
+
+        mTitleEditText.addTextChangedListener(mTextWatcher);
 
         mIconImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,7 +151,7 @@ public class AddEntryActivity extends LockingActivity {
     }
 
     private void save() {
-        if (mAwesomeValidation.validate()) {
+        if (validate()) {
             assert mGroup != null;
 
             VaultEntry entry = new VaultEntry(
@@ -156,5 +170,16 @@ public class AddEntryActivity extends LockingActivity {
             SyncManager.setRoot(this, vault.getPassword());
             finish();
         }
+    }
+
+    private boolean validate() {
+        boolean hasTitle = mTitleEditText.getText().toString().length() > 0;
+        if (hasTitle) {
+            mTitleTextInputLayout.setError(null);
+        } else {
+            mTitleTextInputLayout.setError(getString(R.string.error_title_is_required));
+        }
+
+        return hasTitle;
     }
 }
