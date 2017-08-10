@@ -12,7 +12,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
@@ -113,29 +112,18 @@ public class SearchFragment extends Fragment {
                 List<String> path = group.getPath();
                 path.add(group.getName());
 
-                SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-                spannableStringBuilder.append("in ");
+                StringBuilder stringBuilder = new StringBuilder("in ");
 
+                int i = 0;
                 for (String component : path) {
-                    String loweredComponent = component.toLowerCase();
-
-                    if (loweredComponent.contains(mLoweredQuery)) {
-                        int start = spannableStringBuilder.length() + loweredComponent.indexOf(mLoweredQuery);
-                        int end = start + mLoweredQuery.length();
-
-                        spannableStringBuilder.append(component);
-                        spannableStringBuilder.setSpan(foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    } else {
-                        spannableStringBuilder.append(component);
+                    stringBuilder.append(component);
+                    if (i < path.size() - 1) {
+                        stringBuilder.append("/");
                     }
-
-                    spannableStringBuilder.append("/");
+                    i += 1;
                 }
 
-                spannableStringBuilder.delete(spannableStringBuilder.length() - 1, spannableStringBuilder.length());
-
-                holder.nameTextView.setText(spannableStringBuilder, TextView.BufferType.SPANNABLE);
+                holder.nameTextView.setText(stringBuilder.toString());
             }
         }
 
