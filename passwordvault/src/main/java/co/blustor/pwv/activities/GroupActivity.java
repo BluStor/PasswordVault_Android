@@ -339,16 +339,16 @@ public class GroupActivity extends LockingActivity {
                                 public void onSheetItemSelected(@NonNull BottomSheet bottomSheet, MenuItem menuItem) {
                                     int itemId = menuItem.getItemId();
 
-                                    if (itemId == R.id.action_edit) {
-                                        Intent editGroupActivity = new Intent(GroupActivity.this, EditGroupActivity.class);
-                                        editGroupActivity.putExtra("uuid", group.getUUID());
-                                        startActivity(editGroupActivity);
-                                    } else if (itemId == R.id.action_delete) {
+                                    if (itemId == R.id.action_delete) {
                                         mGroup.removeGroup(group.getUUID());
                                         updateData();
 
                                         Vault vault = Vault.getInstance();
                                         SyncManager.setRoot(GroupActivity.this, vault.getPassword());
+                                    } else if (itemId == R.id.action_edit) {
+                                        Intent editGroupActivity = new Intent(GroupActivity.this, EditGroupActivity.class);
+                                        editGroupActivity.putExtra("uuid", group.getUUID());
+                                        startActivity(editGroupActivity);
                                     }
                                 }
 
@@ -378,6 +378,10 @@ public class GroupActivity extends LockingActivity {
 
                                         Vault vault = Vault.getInstance();
                                         SyncManager.setRoot(GroupActivity.this, vault.getPassword());
+                                    } else if (itemId == R.id.action_edit) {
+                                        Intent editEntryActivity = new Intent(GroupActivity.this, EditEntryActivity.class);
+                                        editEntryActivity.putExtra("uuid", entry.getUUID());
+                                        startActivity(editEntryActivity);
                                     }
                                 }
 
