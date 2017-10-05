@@ -2,11 +2,9 @@ package co.blustor.pwv.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
@@ -69,10 +67,10 @@ public class PasswordGeneratorActivity extends LockingActivity {
         final SeekBar seekBarLength = findViewById(R.id.seekbar_length);
         seekBarLength.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(@NonNull SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress < 10) {
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if (i < 10) {
                     seekBar.setProgress(10);
-                } else if (progress > 200) {
+                } else if (i > 200) {
                     seekBar.setProgress(200);
                 }
 
@@ -93,21 +91,15 @@ public class PasswordGeneratorActivity extends LockingActivity {
         });
         seekBarLength.setProgress(32);
 
-        mPasswordTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String password = generatePassword(seekBarLength.getProgress());
-                mPasswordTextView.setText(password);
-            }
+        mPasswordTextView.setOnClickListener(v -> {
+            String password = generatePassword(seekBarLength.getProgress());
+            mPasswordTextView.setText(password);
         });
 
-        CompoundButton.OnCheckedChangeListener checkedChangeListener = new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                generateCharacters();
-                String passsword = generatePassword(seekBarLength.getProgress());
-                mPasswordTextView.setText(passsword);
-            }
+        CompoundButton.OnCheckedChangeListener checkedChangeListener = (buttonView, isChecked) -> {
+            generateCharacters();
+            String passsword = generatePassword(seekBarLength.getProgress());
+            mPasswordTextView.setText(passsword);
         };
 
         mUpperCheckbox.setOnCheckedChangeListener(checkedChangeListener);
@@ -120,61 +112,21 @@ public class PasswordGeneratorActivity extends LockingActivity {
         mBracketsCheckbox.setOnCheckedChangeListener(checkedChangeListener);
 
         TextView upperTextView = findViewById(R.id.textview_upper);
-        upperTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mUpperCheckbox.toggle();
-            }
-        });
+        upperTextView.setOnClickListener(v -> mUpperCheckbox.toggle());
         TextView lowerTextView = findViewById(R.id.textview_lower);
-        lowerTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLowerCheckbox.toggle();
-            }
-        });
+        lowerTextView.setOnClickListener(v -> mLowerCheckbox.toggle());
         TextView digitsTextView = findViewById(R.id.textview_digits);
-        digitsTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDigitsCheckbox.toggle();
-            }
-        });
+        digitsTextView.setOnClickListener(v -> mDigitsCheckbox.toggle());
         TextView dashTextView = findViewById(R.id.textview_dash);
-        dashTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDashCheckbox.toggle();
-            }
-        });
+        dashTextView.setOnClickListener(v -> mDashCheckbox.toggle());
         TextView underscoreTextView = findViewById(R.id.textview_underscore);
-        underscoreTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mUnderscoreCheckbox.toggle();
-            }
-        });
+        underscoreTextView.setOnClickListener(v -> mUnderscoreCheckbox.toggle());
         TextView spaceTextView = findViewById(R.id.textview_space);
-        spaceTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSpaceCheckbox.toggle();
-            }
-        });
+        spaceTextView.setOnClickListener(v -> mSpaceCheckbox.toggle());
         TextView specialTextView = findViewById(R.id.textview_special);
-        specialTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSpecialCheckbox.toggle();
-            }
-        });
+        specialTextView.setOnClickListener(v -> mSpecialCheckbox.toggle());
         TextView bracketsTextView = findViewById(R.id.textview_brackets);
-        bracketsTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBracketsCheckbox.toggle();
-            }
-        });
+        bracketsTextView.setOnClickListener(v -> mBracketsCheckbox.toggle());
     }
 
     @Override
@@ -190,7 +142,7 @@ public class PasswordGeneratorActivity extends LockingActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.action_save) {

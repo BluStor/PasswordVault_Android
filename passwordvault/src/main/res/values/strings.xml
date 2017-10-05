@@ -5,14 +5,11 @@
     <string name="app_name">PasswordVault</string>
     <string name="button_change_password">Change password</string>
     <string name="button_generate">Generate</string>
-    <string name="button_new_database">New database</string>
     <string name="content_description_cards">Cards</string>
     <string name="content_description_entry_icon">Entry icon</string>
     <string name="content_description_group_icon">Group icon</string>
     <string name="content_description_icon">Icon</string>
     <string name="content_description_vault">Vault</string>
-    <string name="error_empty">Cannot be empty</string>
-    <string name="error_match">Passwords do not match</string>
     <string name="hint_name">Name</string>
     <string name="hint_notes">Notes</string>
     <string name="hint_password">Password</string>
@@ -47,7 +44,6 @@
     <string name="status_decrypting">Decrypting …</string>
     <string name="status_encrypting">Encrypting …</string>
     <string name="status_failed">Failed</string>
-    <string name="status_saving">Saving …</string>
     <string name="status_synced">Synced</string>
     <string name="status_transferring">Transferring</string>
     <string name="textview_empty">Empty</string>
@@ -60,4 +56,9 @@
     <string name="error_title_is_required">Title is required.</string>
     <string name="error_password_is_required">Password is required.</string>
     <string name="error_passwords_do_not_match">Passwords do not match.</string>
+    <string name="title_choose_card">Choose your card</string>
+    <string name="togglebutton_scanning">Scanning</string>
+    <string name="togglebutton_not_scanning">Not scanning</string>
+    <string name="error_permission_location_scan">We need location permission to scan for your card.</string>
+    <string name="menu_choose_card">Choose card</string>
 </resources>

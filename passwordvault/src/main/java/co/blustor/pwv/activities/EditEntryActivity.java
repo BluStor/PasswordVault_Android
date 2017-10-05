@@ -2,16 +2,13 @@ package co.blustor.pwv.activities;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -41,7 +38,7 @@ public class EditEntryActivity extends LockingActivity {
     private EditText mNotesEditText = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editentry);
 
@@ -57,33 +54,24 @@ public class EditEntryActivity extends LockingActivity {
         mUrlEditText = findViewById(R.id.edittext_url);
         mNotesEditText = findViewById(R.id.edittext_notes);
 
-        mIconImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(@NonNull View v) {
-                Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
-                startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
-            }
+        mIconImageView.setOnClickListener(v -> {
+            Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
+            startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
         });
 
         Button copyButton = findViewById(R.id.button_copy);
-        copyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                if (clipboardManager != null) {
-                    clipboardManager.setPrimaryClip(ClipData.newPlainText("text", mPasswordEditText.getText()));
-                    Toast.makeText(EditEntryActivity.this, "Password copied", Toast.LENGTH_SHORT).show();
-                }
+        copyButton.setOnClickListener(view -> {
+            ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            if (clipboardManager != null) {
+                clipboardManager.setPrimaryClip(ClipData.newPlainText("text", mPasswordEditText.getText()));
+                Toast.makeText(EditEntryActivity.this, "Password copied", Toast.LENGTH_SHORT).show();
             }
         });
 
         Button generateButton = findViewById(R.id.button_generate);
-        generateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(@NonNull View v) {
-                Intent passswordGeneratorActivity = new Intent(v.getContext(), PasswordGeneratorActivity.class);
-                startActivityForResult(passswordGeneratorActivity, REQUEST_PASSWORD);
-            }
+        generateButton.setOnClickListener(v -> {
+            Intent passswordGeneratorActivity = new Intent(v.getContext(), PasswordGeneratorActivity.class);
+            startActivityForResult(passswordGeneratorActivity, REQUEST_PASSWORD);
         });
 
         // Load
@@ -107,7 +95,7 @@ public class EditEntryActivity extends LockingActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.action_save) {
@@ -122,13 +110,7 @@ public class EditEntryActivity extends LockingActivity {
         if (hasBeenEdited()) {
             new AlertDialog.Builder(this)
                     .setMessage("Close without saving?")
-                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            supportFinishAfterTransition();
-                        }
-
-                    })
+                    .setPositiveButton("Close", (dialog, which) -> supportFinishAfterTransition())
                     .setNegativeButton("Cancel", null)
                     .show();
         } else {
@@ -137,7 +119,7 @@ public class EditEntryActivity extends LockingActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ICON_CODE) {
             if (resultCode == RESULT_OK) {
                 mIconId = data.getIntExtra("icon", 0);

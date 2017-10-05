@@ -1,23 +1,24 @@
 package co.blustor.pwv.database;
 
-import android.support.annotation.NonNull;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class Vault {
-
+    public static final String DB_PATH = "/passwordvault/db.kdbx";
     private static Vault instance = null;
+
     private String mPassword = "";
     @Nullable
     private VaultGroup mRoot = null;
 
-    @NonNull
     public static Vault getInstance() {
         if (instance == null) {
             instance = new Vault();
@@ -25,12 +26,24 @@ public class Vault {
         return instance;
     }
 
-    @NonNull
+    @Nullable
+    public static String getCardMacAddress(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getString("cardMacAddress", null);
+    }
+
+    public static void setCardMacAddress(Context context, String cardMacAddress) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("cardMacAddress", cardMacAddress);
+        editor.apply();
+    }
+
     public Boolean isUnlocked() {
         return mRoot != null;
     }
 
-    public void lock() {
+    public void close() {
         mRoot = null;
     }
 
@@ -41,12 +54,7 @@ public class Vault {
     @Nullable
     public VaultGroup getGroupByUUID(final UUID uuid) {
         if (mRoot != null) {
-            Optional<VaultGroup> match = VaultGroup.traverser.preOrderTraversal(mRoot).firstMatch(new Predicate<VaultGroup>() {
-                @Override
-                public boolean apply(@Nullable VaultGroup input) {
-                    return input != null && input.getUUID().equals(uuid);
-                }
-            });
+            Optional<VaultGroup> match = VaultGroup.traverser.preOrderTraversal(mRoot).firstMatch(input -> input != null && input.getUUID().equals(uuid));
 
             if (match.isPresent()) {
                 return match.get();
@@ -92,8 +100,7 @@ public class Vault {
         mPassword = password;
     }
 
-    @NonNull
-    public List<VaultEntry> findEntriesByTitle(@NonNull String query, Boolean includeGroupName) {
+    public List<VaultEntry> findEntriesByTitle(String query) {
         if (query.isEmpty()) {
             return new ArrayList<>();
         }
@@ -107,16 +114,8 @@ public class Vault {
 
             for (VaultGroup group : vaultGroups) {
                 for (VaultEntry entry : group.getEntries()) {
-                    if (includeGroupName) {
-                        Boolean titleContains = entry.getTitle().toLowerCase().contains(loweredQuery);
-                        Boolean nameContains = group.getName().toLowerCase().contains(loweredQuery);
-                        if (titleContains || (group.getParentUUID() != null && nameContains)) {
-                            results.add(entry);
-                        }
-                    } else {
-                        if (entry.getTitle().toLowerCase().contains(loweredQuery)) {
-                            results.add(entry);
-                        }
+                    if (entry.getTitle().toLowerCase().contains(loweredQuery)) {
+                        results.add(entry);
                     }
                 }
             }

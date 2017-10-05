@@ -1,15 +1,12 @@
 package co.blustor.pwv.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -33,7 +30,7 @@ public class EditGroupActivity extends LockingActivity {
     private EditText mNameEditText = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editgroup);
 
@@ -45,12 +42,9 @@ public class EditGroupActivity extends LockingActivity {
         mNameTextInputLayout = findViewById(R.id.textinputlayout_name);
         mNameEditText = findViewById(R.id.edittext_name);
 
-        mIconImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(@NonNull View v) {
-                Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
-                startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
-            }
+        mIconImageView.setOnClickListener(v -> {
+            Intent iconPickerActivity = new Intent(v.getContext(), IconPickerActivity.class);
+            startActivityForResult(iconPickerActivity, REQUEST_ICON_CODE);
         });
 
         // Load
@@ -68,7 +62,7 @@ public class EditGroupActivity extends LockingActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ICON_CODE) {
             if (resultCode == RESULT_OK) {
                 mIconId = data.getIntExtra("icon", 49);
@@ -84,7 +78,7 @@ public class EditGroupActivity extends LockingActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_save) {
             save();
@@ -98,13 +92,7 @@ public class EditGroupActivity extends LockingActivity {
         if (hasBeenEdited()) {
             new AlertDialog.Builder(this)
                     .setMessage("Close without saving?")
-                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-
-                    })
+                    .setPositiveButton("Close", (dialog, which) -> finish())
                     .setNegativeButton("Cancel", null)
                     .show();
         } else {

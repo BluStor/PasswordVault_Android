@@ -2,13 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_existing"
+        android:id="@+id/action_choose"
         android:orderInCategory="101"
+        android:title="@string/menu_choose_card"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_existing"
+        android:orderInCategory="102"
         android:title="@string/menu_open_existing_database"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_about"
-        android:orderInCategory="102"
+        android:orderInCategory="103"
         android:title="@string/menu_about"
         app:showAsAction="never" />
 </menu>

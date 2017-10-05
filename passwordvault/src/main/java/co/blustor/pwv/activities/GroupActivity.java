@@ -3,7 +3,6 @@ package co.blustor.pwv.activities;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
@@ -50,7 +49,7 @@ public class GroupActivity extends LockingActivity {
     private SearchFragment mSearchFragment = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group);
 
@@ -100,14 +99,11 @@ public class GroupActivity extends LockingActivity {
         groupFloatingActionButton.setColorNormalResId(R.color.colorPrimaryDark);
         groupFloatingActionButton.setColorPressedResId(R.color.colorPrimaryDark);
         groupFloatingActionButton.setImageResource(R.drawable.vaultgroup_white);
-        groupFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(@NonNull View v) {
-                fam.close(false);
-                Intent addGroupActivity = new Intent(v.getContext(), AddGroupActivity.class);
-                addGroupActivity.putExtra("uuid", mGroup.getUUID());
-                startActivity(addGroupActivity);
-            }
+        groupFloatingActionButton.setOnClickListener(view -> {
+            fam.close(false);
+            Intent addGroupActivity = new Intent(view.getContext(), AddGroupActivity.class);
+            addGroupActivity.putExtra("uuid", mGroup.getUUID());
+            startActivity(addGroupActivity);
         });
 
         final FloatingActionButton entryFloatingActionButton = new FloatingActionButton(this);
@@ -116,14 +112,11 @@ public class GroupActivity extends LockingActivity {
         entryFloatingActionButton.setColorNormalResId(R.color.colorPrimaryDark);
         entryFloatingActionButton.setColorPressedResId(R.color.colorPrimaryDark);
         entryFloatingActionButton.setImageResource(R.drawable.vaultentry_white);
-        entryFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(@NonNull View v) {
-                fam.close(false);
-                Intent addEntryActivity = new Intent(v.getContext(), AddEntryActivity.class);
-                addEntryActivity.putExtra("uuid", mGroup.getUUID());
-                startActivity(addEntryActivity);
-            }
+        entryFloatingActionButton.setOnClickListener(view -> {
+            fam.close(false);
+            Intent addEntryActivity = new Intent(view.getContext(), AddEntryActivity.class);
+            addEntryActivity.putExtra("uuid", mGroup.getUUID());
+            startActivity(addEntryActivity);
         });
 
         fam.addMenuButton(groupFloatingActionButton);
@@ -136,7 +129,7 @@ public class GroupActivity extends LockingActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(@NonNull Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
         mSearchFragment.hide();
 
@@ -166,7 +159,7 @@ public class GroupActivity extends LockingActivity {
             }
 
             @Override
-            public boolean onQueryTextChange(@NonNull String newText) {
+            public boolean onQueryTextChange(String newText) {
                 mSearchFragment.search(newText);
                 return false;
             }
@@ -176,7 +169,7 @@ public class GroupActivity extends LockingActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             Intent settingsActivity = new Intent(this, SettingsActivity.class);
@@ -216,9 +209,8 @@ public class GroupActivity extends LockingActivity {
             updateData();
         }
 
-        @NonNull
         @Override
-        public GroupEntryAdapter.GroupEntryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public GroupEntryAdapter.GroupEntryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view;
             if (viewType == 0) {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_group, parent, false);
@@ -238,7 +230,7 @@ public class GroupActivity extends LockingActivity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull GroupEntryAdapter.GroupEntryViewHolder holder, int position) {
+        public void onBindViewHolder(GroupEntryAdapter.GroupEntryViewHolder holder, int position) {
             if (holder.getItemViewType() == 0) {
                 VaultGroup group = mGroups.get(position);
 
@@ -283,12 +275,10 @@ public class GroupActivity extends LockingActivity {
 
         class GroupEntryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-            @NonNull
             final ImageView iconImageView;
-            @NonNull
             final TextView titleTextView;
 
-            GroupEntryViewHolder(@NonNull View itemView) {
+            GroupEntryViewHolder(View itemView) {
                 super(itemView);
 
                 itemView.setOnClickListener(this);
@@ -299,19 +289,19 @@ public class GroupActivity extends LockingActivity {
             }
 
             @Override
-            public void onClick(@NonNull View v) {
+            public void onClick(View view) {
                 int position = getAdapterPosition();
                 if (position < mGroups.size()) {
                     VaultGroup group = mGroups.get(position);
 
-                    Intent groupActivity = new Intent(v.getContext(), GroupActivity.class);
+                    Intent groupActivity = new Intent(view.getContext(), GroupActivity.class);
                     groupActivity.putExtra("uuid", group.getUUID());
 
                     startActivity(groupActivity);
                 } else {
                     VaultEntry entry = mEntries.get(position - mGroups.size());
 
-                    Intent editEntryActivity = new Intent(v.getContext(), EditEntryActivity.class);
+                    Intent editEntryActivity = new Intent(view.getContext(), EditEntryActivity.class);
                     editEntryActivity.putExtra("uuid", entry.getUUID());
 
                     ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(GroupActivity.this, iconImageView, "entry");
@@ -331,12 +321,12 @@ public class GroupActivity extends LockingActivity {
                             .setSheet(R.menu.menu_bottom_group)
                             .setListener(new BottomSheetListener() {
                                 @Override
-                                public void onSheetShown(@NonNull BottomSheet bottomSheet) {
+                                public void onSheetShown(BottomSheet bottomSheet) {
 
                                 }
 
                                 @Override
-                                public void onSheetItemSelected(@NonNull BottomSheet bottomSheet, MenuItem menuItem) {
+                                public void onSheetItemSelected(BottomSheet bottomSheet, MenuItem menuItem) {
                                     int itemId = menuItem.getItemId();
 
                                     if (itemId == R.id.action_delete) {
@@ -353,7 +343,7 @@ public class GroupActivity extends LockingActivity {
                                 }
 
                                 @Override
-                                public void onSheetDismissed(@NonNull BottomSheet bottomSheet, int i) {
+                                public void onSheetDismissed(BottomSheet bottomSheet, int i) {
 
                                 }
                             })
@@ -365,12 +355,12 @@ public class GroupActivity extends LockingActivity {
                             .setSheet(R.menu.menu_bottom_entry)
                             .setListener(new BottomSheetListener() {
                                 @Override
-                                public void onSheetShown(@NonNull BottomSheet bottomSheet) {
+                                public void onSheetShown(BottomSheet bottomSheet) {
 
                                 }
 
                                 @Override
-                                public void onSheetItemSelected(@NonNull BottomSheet bottomSheet, MenuItem menuItem) {
+                                public void onSheetItemSelected(BottomSheet bottomSheet, MenuItem menuItem) {
                                     int itemId = menuItem.getItemId();
                                     if (itemId == R.id.action_delete) {
                                         mGroup.removeEntry(entry.getUUID());
@@ -386,7 +376,7 @@ public class GroupActivity extends LockingActivity {
                                 }
 
                                 @Override
-                                public void onSheetDismissed(@NonNull BottomSheet bottomSheet, int i) {
+                                public void onSheetDismissed(BottomSheet bottomSheet, int i) {
 
                                 }
                             })

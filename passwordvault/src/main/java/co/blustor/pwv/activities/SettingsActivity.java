@@ -1,10 +1,10 @@
 package co.blustor.pwv.activities;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -13,18 +13,15 @@ import java.util.UUID;
 import co.blustor.pwv.R;
 import co.blustor.pwv.database.Vault;
 import co.blustor.pwv.fragments.SyncDialogFragment;
-import co.blustor.pwv.sync.SyncManager;
 
-import static co.blustor.pwv.fragments.SyncDialogFragment.SyncInterface;
-
-public class SettingsActivity extends LockingActivity implements SyncInterface {
+public class SettingsActivity extends LockingActivity implements SyncDialogFragment.SyncListener {
 
     private TextInputLayout mPasswordTextInputLayout = null;
     private EditText mPasswordEditText = null;
     private TextInputLayout mPasswordRepeatTextInputLayout = null;
     private EditText mPasswordRepeatEditText = null;
 
-    private TextWatcher mTextWatcher = new TextWatcher() {
+    private final TextWatcher mTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -42,7 +39,7 @@ public class SettingsActivity extends LockingActivity implements SyncInterface {
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
@@ -56,12 +53,7 @@ public class SettingsActivity extends LockingActivity implements SyncInterface {
         mPasswordRepeatEditText.addTextChangedListener(mTextWatcher);
 
         Button changePasswordButton = findViewById(R.id.button_change_password);
-        changePasswordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                savePassword();
-            }
-        });
+        changePasswordButton.setOnClickListener(v -> savePassword());
     }
 
     @Override
@@ -86,7 +78,7 @@ public class SettingsActivity extends LockingActivity implements SyncInterface {
         SyncDialogFragment syncDialogFragment = new SyncDialogFragment();
 
         Bundle args = new Bundle();
-        args.putSerializable("type", SyncManager.SyncType.WRITE);
+        args.putSerializable("type", "write");
         args.putSerializable("password", vault.getPassword());
 
         syncDialogFragment.setArguments(args);

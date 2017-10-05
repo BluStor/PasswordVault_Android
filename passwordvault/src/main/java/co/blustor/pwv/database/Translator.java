@@ -1,7 +1,5 @@
 package co.blustor.pwv.database;
 
-import android.support.annotation.NonNull;
-
 import com.google.common.base.MoreObjects;
 
 import java.util.ArrayList;
@@ -15,8 +13,7 @@ import de.slackspace.openkeepass.domain.GroupBuilder;
 
 public class Translator {
 
-    @NonNull
-    private static List<Entry> exportKeePassEntries(@NonNull VaultGroup group) {
+    private static List<Entry> exportKeePassEntries(VaultGroup group) {
         ArrayList<Entry> entries = new ArrayList<>();
         for (VaultEntry vaultEntry : group.getEntries()) {
             Entry entry = new EntryBuilder(vaultEntry.getTitle())
@@ -33,8 +30,7 @@ public class Translator {
         return entries;
     }
 
-    @NonNull
-    private static List<VaultEntry> importEntries(@NonNull Group group) {
+    private static List<VaultEntry> importEntries(Group group) {
         ArrayList<VaultEntry> entries = new ArrayList<>();
         for (Entry entry : group.getEntries()) {
             VaultEntry vaultEntry = new VaultEntry(
@@ -53,8 +49,7 @@ public class Translator {
         return entries;
     }
 
-    @NonNull
-    private static VaultGroup importGroup(UUID parentUUID, @NonNull Group keePassGroup) {
+    private static VaultGroup importGroup(UUID parentUUID, Group keePassGroup) {
         VaultGroup group = new VaultGroup(parentUUID, keePassGroup.getUuid(), keePassGroup.getName());
         group.setIconId(keePassGroup.getIconId());
 
@@ -67,8 +62,7 @@ public class Translator {
         return group;
     }
 
-    @NonNull
-    public static VaultGroup importKeePass(@NonNull Group keePassGroup) {
+    public static VaultGroup importKeePass(Group keePassGroup) {
         VaultGroup rootGroup = new VaultGroup(null, keePassGroup.getUuid(), keePassGroup.getName());
         rootGroup.addEntries(importEntries(keePassGroup));
         rootGroup.setIconId(keePassGroup.getIconId());
@@ -80,7 +74,7 @@ public class Translator {
         return rootGroup;
     }
 
-    public static Group exportKeePass(@NonNull VaultGroup group) {
+    public static Group exportKeePass(VaultGroup group) {
         GroupBuilder groupBuilder = new GroupBuilder(group.getName());
         groupBuilder.iconId(group.getIconId());
         groupBuilder.addEntries(exportKeePassEntries(group));

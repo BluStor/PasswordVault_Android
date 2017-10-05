@@ -2,7 +2,6 @@ package co.blustor.pwv.fragments;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,84 +11,166 @@ import android.widget.TextView;
 
 import com.google.common.base.MoreObjects;
 
-import org.jdeferred.DoneCallback;
-import org.jdeferred.FailCallback;
-import org.jdeferred.ProgressCallback;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.jdeferred.Promise;
-import org.jdeferred.android.AndroidDeferredManager;
 
 import java.util.UUID;
 
 import co.blustor.pwv.R;
 import co.blustor.pwv.database.VaultGroup;
+import co.blustor.pwv.gatekeeper.GKBLECard;
 import co.blustor.pwv.sync.SyncManager;
+import co.blustor.pwv.sync.SyncStatus;
 import co.blustor.pwv.utils.AlertUtils;
 
-import static co.blustor.pwv.sync.SyncManager.SyncManagerException;
-import static co.blustor.pwv.sync.SyncManager.SyncStatus;
-import static co.blustor.pwv.sync.SyncManager.SyncType;
 import static co.blustor.pwv.sync.SyncManager.getRoot;
 import static co.blustor.pwv.sync.SyncManager.setRoot;
 
 public class SyncDialogFragment extends DialogFragment {
     private static final String TAG = "SyncDialogFragment";
 
+    private TextView mStatusTextView;
+    @Nullable
+    private SyncListener mSyncListener;
+
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialogfragment_sync, container, false);
 
         setCancelable(false);
 
-        final TextView statusTextView = view.findViewById(R.id.textview_status);
+        mStatusTextView = view.findViewById(R.id.textview_status);
+
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
 
         Bundle args = getArguments();
 
-        final SyncType syncType = (SyncType) args.getSerializable("type");
+        String type = MoreObjects.firstNonNull(args.getString("type"), "read");
         String password = MoreObjects.firstNonNull(args.getString("password"), "");
 
-        Promise<VaultGroup, SyncManager.SyncManagerException, SyncManager.SyncStatus> promise;
-        if (syncType == SyncType.READ) {
+        Promise<VaultGroup, Exception, Void> promise;
+        if (type.equals("read")) {
             promise = getRoot(getActivity(), password);
         } else {
             promise = setRoot(getActivity(), password);
         }
 
-        statusTextView.setText(R.string.status_connecting);
-
-        AndroidDeferredManager dm = new AndroidDeferredManager();
-        dm.when(promise).done(new DoneCallback<VaultGroup>() {
-            @Override
-            public void onDone(@NonNull VaultGroup result) {
-                dismiss();
-                SyncInterface syncInterface = (SyncInterface) getActivity();
-                syncInterface.syncComplete(result.getUUID());
+        promise.done(result -> {
+            Log.i(TAG, "done");
+            if (mSyncListener != null) {
+                Log.i(TAG, "syncComplete");
+                mSyncListener.syncComplete(result.getUUID());
+            } else {
+                Log.i(TAG, "no sync listener");
             }
-        }).fail(new FailCallback<SyncManager.SyncManagerException>() {
-            @Override
-            public void onFail(@NonNull SyncManagerException result) {
-                result.printStackTrace();
-                AlertUtils.showError(getActivity(), result.getMessage());
-                dismiss();
-            }
-        }).progress(new ProgressCallback<SyncManager.SyncStatus>() {
-            @Override
-            public void onProgress(@NonNull SyncStatus progress) {
-                Log.d(TAG, progress.name());
-                if (progress == SyncStatus.SAVING) {
-                    statusTextView.setText(R.string.status_transferring);
-                } else if (progress == SyncStatus.DECRYPTING) {
-                    statusTextView.setText(R.string.status_decrypting);
-                } else if (progress == SyncStatus.ENCRYPTING) {
-                    statusTextView.setText(R.string.status_encrypting);
+        }).always((state, resolved, rejected) ->
+                dismiss()
+        ).fail(result -> {
+            Log.i(TAG, "fail");
+            if (result instanceof SyncManager.SyncException) {
+                SyncManager.SyncException syncException = (SyncManager.SyncException) result;
+                switch (syncException.getError()) {
+                    case CARD_NOT_CHOSEN:
+                        AlertUtils.showError(getActivity(), "Card not chosen.");
+                        break;
+                    case DATABASE_UNREADABLE:
+                        AlertUtils.showError(getActivity(), "Invalid password.");
+                        break;
+                    case VAULT_EMPTY:
+                        AlertUtils.showError(getActivity(), "Vault is empty.");
+                        break;
+                }
+            } else if (result instanceof GKBLECard.CardException) {
+                GKBLECard.CardException cardException = (GKBLECard.CardException) result;
+                switch (cardException.getError()) {
+                    case ARGUMENT_INVALID:
+                        AlertUtils.showError(getActivity(), "Invalid argument.");
+                        break;
+                    case BLUETOOTH_NOT_AVAILABLE:
+                        AlertUtils.showError(getActivity(), "Bluetooth not available.");
+                        break;
+                    case BLUETOOTH_NOT_ENABLED:
+                        AlertUtils.showError(getActivity(), "Bluetooth not enabled.");
+                        break;
+                    case CARD_NOT_PAIRED:
+                        AlertUtils.showError(getActivity(), "Card is not paired.");
+                        break;
+                    case CONNECTION_FAILED:
+                        AlertUtils.showError(getActivity(), "Connection failed.");
+                        break;
+                    case CONNECTION_REQUIRED:
+                        AlertUtils.showError(getActivity(), "Not connected.");
+                        break;
+                    case CONNECTION_TIMEOUT:
+                        AlertUtils.showError(getActivity(), "Connection timed out.");
+                        break;
+                    case CHARACTERISTIC_WRITE_FAILURE:
+                        AlertUtils.showError(getActivity(), "Card write failure.");
+                        break;
+                    case FILE_NOT_FOUND:
+                        AlertUtils.showError(getActivity(), "File not found.");
+                        break;
+                    case FILE_READ_FAILED:
+                        AlertUtils.showError(getActivity(), "File read failed.");
+                        break;
+                    case FILE_WRITE_FAILED:
+                        AlertUtils.showError(getActivity(), "File write failed.");
+                        break;
+                    case MAKE_COMMAND_DATA_FAILED:
+                        AlertUtils.showError(getActivity(), "Card command failure.");
+                        break;
+                    case INVALID_RESPONSE:
+                        AlertUtils.showError(getActivity(), "Invalid response.");
+                        break;
                 }
             }
         });
-
-        return view;
     }
 
-    public interface SyncInterface {
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onSyncStatus(SyncStatus syncStatus) {
+        switch (syncStatus) {
+            case SYNCED:
+                mStatusTextView.setText(R.string.status_synced);
+                break;
+            case CONNECTING:
+                mStatusTextView.setText(R.string.status_connecting);
+                break;
+            case DECRYPTING:
+                mStatusTextView.setText(R.string.status_decrypting);
+                break;
+            case ENCRYPTING:
+                mStatusTextView.setText(R.string.status_encrypting);
+                break;
+            case TRANSFERRING:
+                mStatusTextView.setText(R.string.status_transferring);
+                break;
+            case FAILED:
+                mStatusTextView.setText(R.string.status_failed);
+                break;
+        }
+    }
+
+    public void setSyncListener(SyncListener syncListener) {
+        mSyncListener = syncListener;
+    }
+
+    public interface SyncListener {
         void syncComplete(UUID uuid);
     }
 }

@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
-import co.blustor.pwv.R;
 import co.blustor.pwv.activities.CloseActivity;
 import co.blustor.pwv.constants.Intents;
 import co.blustor.pwv.constants.Notifications;

@@ -7,8 +7,7 @@
     <color name="horizontalLine">#EEEEEE</color>
     <color name="iconEntry">#DADADA</color>
     <color name="iconGroup">#FFCC80</color>
-    <color name="statusEncrypting">#FFCC80</color>
-    <color name="statusSaving">#FFCC80</color>
+    <color name="statusBusy">#FFCC80</color>
     <color name="statusFailed">#D50000</color>
     <color name="statusSynced">#80CBC4</color>
     <color name="white">#FFFFFF</color>

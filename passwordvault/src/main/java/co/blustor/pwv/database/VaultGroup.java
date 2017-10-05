@@ -13,7 +13,6 @@ import java.util.UUID;
 
 public class VaultGroup {
     static final TreeTraverser<VaultGroup> traverser = new TreeTraverser<VaultGroup>() {
-        @NonNull
         @Override
         public Iterable<VaultGroup> children(@NonNull VaultGroup root) {
             return root.getGroups();
@@ -26,7 +25,7 @@ public class VaultGroup {
     private String mName = "";
     private Integer mIconId = 49;
 
-    public VaultGroup(UUID parentUUID, UUID uuid, String name) {
+    public VaultGroup(@Nullable UUID parentUUID, UUID uuid, String name) {
         mParentUUID = parentUUID;
         mUUID = uuid;
         mName = name;
@@ -38,11 +37,10 @@ public class VaultGroup {
         mEntries.add(entry);
     }
 
-    public void addEntries(@NonNull List<VaultEntry> entries) {
+    public void addEntries(List<VaultEntry> entries) {
         mEntries.addAll(entries);
     }
 
-    @NonNull
     public List<VaultEntry> getEntries() {
         return mEntries;
     }
@@ -73,7 +71,6 @@ public class VaultGroup {
         mGroups.add(group);
     }
 
-    @NonNull
     public List<VaultGroup> getGroups() {
         return mGroups;
     }

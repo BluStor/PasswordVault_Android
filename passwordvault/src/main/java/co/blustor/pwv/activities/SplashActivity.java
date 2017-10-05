@@ -2,51 +2,63 @@ package co.blustor.pwv.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import org.jdeferred.DoneCallback;
-import org.jdeferred.FailCallback;
-import org.jdeferred.Promise;
+import org.jdeferred.DonePipe;
 import org.jdeferred.android.AndroidDeferredManager;
 
 import co.blustor.pwv.R;
-import co.blustor.pwv.sync.SyncManager;
-import co.blustor.pwv.sync.SyncManager.SyncManagerException;
-import co.blustor.pwv.sync.SyncManager.SyncStatus;
+import co.blustor.pwv.database.Vault;
+import co.blustor.pwv.gatekeeper.GKBLECard;
 
 public class SplashActivity extends AppCompatActivity {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        Promise<Boolean, SyncManagerException, SyncStatus> promise = SyncManager.exists(this);
+        checkIfDatabaseExists();
+    }
 
-        AndroidDeferredManager dm = new AndroidDeferredManager();
-        dm.when(promise).done(new DoneCallback<Boolean>() {
-            @Override
-            public void onDone(Boolean result) {
-                Intent startupActivity;
-                if (result) {
-                    startupActivity = new Intent(SplashActivity.this, UnlockActivity.class);
-                } else {
-                    Intent unlockActivity = new Intent(SplashActivity.this, UnlockActivity.class);
-                    unlockActivity.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    startActivity(unlockActivity);
-
-                    startupActivity = new Intent(SplashActivity.this, CreateActivity.class);
-                }
-
-                startActivity(startupActivity);
-                finish();
+    public void checkIfDatabaseExists() {
+        String macAddress = Vault.getCardMacAddress(this);
+        if (macAddress != null) {
+            try {
+                GKBLECard card = new GKBLECard(this, macAddress);
+                AndroidDeferredManager androidDeferredManager = new AndroidDeferredManager();
+                androidDeferredManager.when(card.checkBluetoothState()).then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result ->
+                        card.connect()
+                ).then((DonePipe<Void, Boolean, GKBLECard.CardException, Void>) result ->
+                        card.exists(Vault.DB_PATH)
+                ).then(result -> {
+                    if (result) {
+                        unlock();
+                    } else {
+                        create();
+                    }
+                }).always((state, resolved, rejected) ->
+                        card.disconnect()
+                ).fail(result ->
+                        unlock()
+                );
+            } catch (GKBLECard.CardException e) {
+                unlock();
             }
-        }).fail(new FailCallback<SyncManagerException>() {
-            @Override
-            public void onFail(SyncManagerException result) {
-                Intent unlockActivity = new Intent(SplashActivity.this, UnlockActivity.class);
-                startActivity(unlockActivity);
-                finish();
-            }
-        });
+        } else {
+            unlock();
+        }
+    }
+
+    public void create() {
+        Intent createActivity = new Intent(this, CreateActivity.class);
+        startActivity(createActivity);
+        finish();
+    }
+
+    public void unlock() {
+        Intent unlockActivity = new Intent(this, UnlockActivity.class);
+        startActivity(unlockActivity);
+        finish();
     }
 }

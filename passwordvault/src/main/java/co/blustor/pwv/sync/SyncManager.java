@@ -1,21 +1,19 @@
 package co.blustor.pwv.sync;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
+import org.greenrobot.eventbus.EventBus;
+import org.jdeferred.DonePipe;
 import org.jdeferred.Promise;
 import org.jdeferred.impl.DeferredObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 
-import co.blustor.gatekeepersdk.devices.GKBluetoothCard;
-import co.blustor.gatekeepersdk.devices.GKCard;
 import co.blustor.pwv.database.Translator;
 import co.blustor.pwv.database.Vault;
 import co.blustor.pwv.database.VaultGroup;
+import co.blustor.pwv.gatekeeper.GKBLECard;
 import de.slackspace.openkeepass.KeePassDatabase;
 import de.slackspace.openkeepass.domain.Group;
 import de.slackspace.openkeepass.domain.KeePassFile;
@@ -23,207 +21,129 @@ import de.slackspace.openkeepass.domain.KeePassFileBuilder;
 import de.slackspace.openkeepass.exception.KeePassDatabaseUnreadableException;
 
 public class SyncManager {
-    private static final String CARD_NAME = "CYBERGATE";
+    private static final String TAG = "SyncManager";
     private static final String VAULT_PATH = "/passwordvault/db.kdbx";
-    private static final DeferredObject<Void, Exception, SyncStatus> syncStatus = new DeferredObject<>();
-    @NonNull
-    private static SyncStatus lastSyncStatus = SyncStatus.SYNCED;
+    private static final EventBus EVENT_BUS = EventBus.getDefault();
 
-    public static synchronized Promise<VaultGroup, SyncManagerException, SyncStatus> getRoot(@NonNull final Context context, @NonNull final String password) {
-        final DeferredObject<VaultGroup, SyncManagerException, SyncStatus> task = new DeferredObject<>();
-        new Thread() {
-            @Override
-            public void run() {
-                task.notify(SyncStatus.SAVING);
-
-                GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
-
+    public static synchronized Promise<VaultGroup, Exception, Void> getRoot(Context context, String password) {
+        final DeferredObject<VaultGroup, Exception, Void> deferredObject = new DeferredObject<>();
+        Runnable runnable = () -> {
+            String macAddress = Vault.getCardMacAddress(context);
+            if (macAddress != null) {
                 try {
-                    try {
-                        card.connect();
+                    GKBLECard card = new GKBLECard(context, macAddress);
+                    card.checkBluetoothState().then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result -> {
+                        EVENT_BUS.postSticky(SyncStatus.CONNECTING);
+                        return card.connect();
+                    }).then((DonePipe<Void, byte[], GKBLECard.CardException, Void>) result -> {
+                        EVENT_BUS.postSticky(SyncStatus.TRANSFERRING);
+                        return card.get(Vault.DB_PATH);
+                    }).then(result -> {
+                        EVENT_BUS.postSticky(SyncStatus.DECRYPTING);
+                        try {
+                            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(result);
+                            KeePassFile keePassFile = KeePassDatabase.getInstance(byteArrayInputStream).openDatabase(password);
 
-                        if (card.getConnectionState() == GKCard.ConnectionState.CARD_NOT_PAIRED) {
-                            throw new SyncManagerException("Card is not paired. Please pair your card with your phone.");
-                        } else if (card.getConnectionState() == GKCard.ConnectionState.BLUETOOTH_DISABLED) {
-                            throw new SyncManagerException("Bluetooth is not enabled. Please enable bluetooth under settings.");
-                        }
+                            Group keePassRoot = keePassFile.getRoot().getGroups().get(0);
+                            VaultGroup group = Translator.importKeePass(keePassRoot);
 
-                        GKCard.Response response = card.get(VAULT_PATH);
-                        int status = response.getStatus();
-
-                        if (status == 226) {
-                            File file = response.getDataFile();
-
-                            try {
-                                task.notify(SyncStatus.DECRYPTING);
-                                KeePassFile keePassFile = KeePassDatabase.getInstance(file).openDatabase(password);
-
-                                Group keePassRoot = keePassFile.getRoot().getGroups().get(0);
-                                VaultGroup group = Translator.importKeePass(keePassRoot);
-
-                                Vault vault = Vault.getInstance();
-                                vault.setRoot(group);
-                                vault.setPassword(password);
-
-                                task.resolve(group);
-                            } catch (KeePassDatabaseUnreadableException e) {
-                                task.reject(new SyncManagerException("Database password invalid."));
-                            }
-                        } else if (status == 550) {
-                            throw new SyncManagerException("Database not found on card.");
-                        } else {
-                            throw new SyncManagerException("Card status: " + status);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        throw new SyncManagerException("Unable to connect to card.");
-                    }
-                } catch (SyncManagerException e) {
-                    task.reject(e);
-                }
-
-                try {
-                    card.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-        return task.promise();
-    }
-
-    public static synchronized Promise<VaultGroup, SyncManagerException, SyncStatus> setRoot(@NonNull final Context context, final String password) {
-        final DeferredObject<VaultGroup, SyncManagerException, SyncStatus> task = new DeferredObject<>();
-        new Thread() {
-            @Override
-            public void run() {
-                task.notify(SyncStatus.ENCRYPTING);
-                syncStatus.notify(SyncStatus.ENCRYPTING);
-                lastSyncStatus = SyncStatus.ENCRYPTING;
-
-                GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
-
-                try {
-                    try {
-                        Vault vault = Vault.getInstance();
-                        VaultGroup rootGroup = vault.getRoot();
-
-                        if (rootGroup == null) {
-                            throw new SyncManagerException("Vault is empty.");
-                        }
-
-                        Group group = Translator.exportKeePass(vault.getRoot());
-
-                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-                        KeePassFile keePassFile = new KeePassFileBuilder("passwords").addTopGroups(group).build();
-                        KeePassDatabase.write(keePassFile, password, byteArrayOutputStream);
-                        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-
-                        task.notify(SyncStatus.SAVING);
-                        syncStatus.notify(SyncStatus.SAVING);
-                        lastSyncStatus = SyncStatus.SAVING;
-
-                        card.connect();
-
-                        if (card.getConnectionState() == GKCard.ConnectionState.CARD_NOT_PAIRED) {
-                            throw new SyncManagerException("Card is not paired.");
-                        } else if (card.getConnectionState() == GKCard.ConnectionState.BLUETOOTH_DISABLED) {
-                            throw new SyncManagerException("Bluetooth is not enabled.");
-                        }
-
-                        GKCard.Response response = card.put(VAULT_PATH, byteArrayInputStream);
-
-                        int status = response.getStatus();
-                        if (status == 226) {
+                            Vault vault = Vault.getInstance();
+                            vault.setRoot(group);
                             vault.setPassword(password);
 
-                            card.finalize(VAULT_PATH);
-
-                            task.resolve(rootGroup);
-                            syncStatus.notify(SyncStatus.SYNCED);
-                            lastSyncStatus = SyncStatus.SYNCED;
-                        } else {
-                            throw new SyncManagerException("Card status: " + status);
+                            EVENT_BUS.postSticky(SyncStatus.SYNCED);
+                            deferredObject.resolve(group);
+                        } catch (KeePassDatabaseUnreadableException e) {
+                            EVENT_BUS.postSticky(SyncStatus.FAILED);
+                            deferredObject.reject(new SyncException(SyncError.DATABASE_UNREADABLE));
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        throw new SyncManagerException(e.getMessage());
-                    }
-                } catch (SyncManagerException e) {
-                    syncStatus.notify(SyncStatus.FAILED);
-                    lastSyncStatus = SyncStatus.FAILED;
-                    task.reject(e);
+                    }).always((state, resolved, rejected) ->
+                            card.disconnect()
+                    ).fail(result -> {
+                        EVENT_BUS.postSticky(SyncStatus.FAILED);
+                        deferredObject.reject(result);
+                    });
+                } catch (GKBLECard.CardException e) {
+                    EVENT_BUS.postSticky(SyncStatus.FAILED);
+                    deferredObject.reject(e);
                 }
-
-                try {
-                    card.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            } else {
+                EVENT_BUS.postSticky(SyncStatus.FAILED);
+                deferredObject.reject(new SyncException(SyncError.CARD_NOT_CHOSEN));
             }
-        }.start();
-        return task.promise();
+        };
+        new Thread(runnable).run();
+
+        return deferredObject.promise();
     }
 
-    public static synchronized Promise<Boolean, SyncManagerException, SyncStatus> exists(@NonNull final Context context) {
-        final DeferredObject<Boolean, SyncManagerException, SyncStatus> task = new DeferredObject<>();
-        new Thread() {
-            @Override
-            public void run() {
-                GKBluetoothCard card = new GKBluetoothCard(CARD_NAME, context.getCacheDir());
+    public static synchronized Promise<VaultGroup, Exception, Void> setRoot(Context context, String password) {
+        final DeferredObject<VaultGroup, Exception, Void> deferredObject = new DeferredObject<>();
+        Runnable runnable = () -> {
+            Vault vault = Vault.getInstance();
+            VaultGroup rootGroup = vault.getRoot();
 
-                try {
+            if (rootGroup != null) {
+                Group group = Translator.exportKeePass(vault.getRoot());
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+                KeePassFile keePassFile = new KeePassFileBuilder("passwords").addTopGroups(group).build();
+                KeePassDatabase.write(keePassFile, password, byteArrayOutputStream);
+
+                byte[] bytes = byteArrayOutputStream.toByteArray();
+
+                String macAddress = Vault.getCardMacAddress(context);
+                if (macAddress != null) {
                     try {
-                        GKCard.Response response = card.list("/passwordvault");
-                        String[] lines = response.readDataFile().split("\\r?\\n");
-
-                        Boolean isFound = false;
-                        for (String line : lines) {
-                            if (line.endsWith(" db.kdbx")) {
-                                isFound = true;
-                            }
-                        }
-
-                        task.resolve(isFound);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        throw new SyncManagerException(e.getMessage());
+                        GKBLECard card = new GKBLECard(context, macAddress);
+                        card.checkBluetoothState().then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result -> {
+                            EVENT_BUS.postSticky(SyncStatus.CONNECTING);
+                            return card.connect();
+                        }).then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result -> {
+                            EVENT_BUS.postSticky(SyncStatus.TRANSFERRING);
+                            return card.put(VAULT_PATH, bytes);
+                        }).then(result -> {
+                            EVENT_BUS.postSticky(SyncStatus.SYNCED);
+                            deferredObject.resolve(rootGroup);
+                        }).always((state, resolved, rejected) ->
+                                card.disconnect()
+                        ).fail(result -> {
+                            EVENT_BUS.postSticky(SyncStatus.FAILED);
+                            deferredObject.reject(null);
+                        });
+                    } catch (GKBLECard.CardException e) {
+                        EVENT_BUS.postSticky(SyncStatus.FAILED);
+                        deferredObject.reject(e);
                     }
-                } catch (SyncManagerException e) {
-                    task.reject(e);
+                } else {
+                    EVENT_BUS.postSticky(SyncStatus.FAILED);
+                    deferredObject.reject(new SyncException(SyncError.CARD_NOT_CHOSEN));
                 }
-
-                try {
-                    card.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            } else {
+                EVENT_BUS.postSticky(SyncStatus.FAILED);
+                deferredObject.reject(new SyncException(SyncError.VAULT_EMPTY));
             }
-        }.start();
-        return task.promise();
+        };
+        new Thread(runnable).run();
+        return deferredObject.promise();
     }
 
-    public static Promise<Void, Exception, SyncStatus> getWriteStatusPromise() {
-        return syncStatus.promise();
+    public enum SyncError {
+        CARD_NOT_CHOSEN,
+        DATABASE_UNREADABLE,
+        VAULT_EMPTY
     }
 
-    @NonNull
-    public static SyncStatus getLastWriteStatus() {
-        return lastSyncStatus;
-    }
+    public static class SyncException extends Exception {
+        final SyncError mError;
 
-    public enum SyncType {
-        READ, WRITE
-    }
+        SyncException(SyncError error) {
+            mError = error;
+        }
 
-    public enum SyncStatus {
-        SAVING, ENCRYPTING, DECRYPTING, FAILED, SYNCED
-    }
-
-    public static class SyncManagerException extends Exception {
-        SyncManagerException(String messasge) {
-            super(messasge);
+        public SyncError getError() {
+            return mError;
         }
     }
 }
