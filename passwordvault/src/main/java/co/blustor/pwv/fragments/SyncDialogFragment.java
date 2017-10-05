@@ -75,63 +75,70 @@ public class SyncDialogFragment extends DialogFragment {
         }).always((state, resolved, rejected) ->
                 dismiss()
         ).fail(result -> {
-            Log.i(TAG, "fail");
             if (result instanceof SyncManager.SyncException) {
                 SyncManager.SyncException syncException = (SyncManager.SyncException) result;
-                switch (syncException.getError()) {
-                    case CARD_NOT_CHOSEN:
-                        AlertUtils.showError(getActivity(), "Card not chosen.");
-                        break;
-                    case DATABASE_UNREADABLE:
-                        AlertUtils.showError(getActivity(), "Invalid password.");
-                        break;
-                    case VAULT_EMPTY:
-                        AlertUtils.showError(getActivity(), "Vault is empty.");
-                        break;
-                }
+                Log.i(TAG, "sync exception");
+                Log.i(TAG, syncException.getError().toString());
+                getActivity().runOnUiThread(() -> {
+                    switch (syncException.getError()) {
+                        case CARD_NOT_CHOSEN:
+                            AlertUtils.showError(getActivity(), "Card not chosen.");
+                            break;
+                        case DATABASE_UNREADABLE:
+                            AlertUtils.showError(getActivity(), "Invalid password.");
+                            break;
+                        case VAULT_EMPTY:
+                            AlertUtils.showError(getActivity(), "Vault is empty.");
+                            break;
+                    }
+                });
             } else if (result instanceof GKBLECard.CardException) {
                 GKBLECard.CardException cardException = (GKBLECard.CardException) result;
-                switch (cardException.getError()) {
-                    case ARGUMENT_INVALID:
-                        AlertUtils.showError(getActivity(), "Invalid argument.");
-                        break;
-                    case BLUETOOTH_NOT_AVAILABLE:
-                        AlertUtils.showError(getActivity(), "Bluetooth not available.");
-                        break;
-                    case BLUETOOTH_NOT_ENABLED:
-                        AlertUtils.showError(getActivity(), "Bluetooth not enabled.");
-                        break;
-                    case CARD_NOT_PAIRED:
-                        AlertUtils.showError(getActivity(), "Card is not paired.");
-                        break;
-                    case CONNECTION_FAILED:
-                        AlertUtils.showError(getActivity(), "Connection failed.");
-                        break;
-                    case CONNECTION_REQUIRED:
-                        AlertUtils.showError(getActivity(), "Not connected.");
-                        break;
-                    case CONNECTION_TIMEOUT:
-                        AlertUtils.showError(getActivity(), "Connection timed out.");
-                        break;
-                    case CHARACTERISTIC_WRITE_FAILURE:
-                        AlertUtils.showError(getActivity(), "Card write failure.");
-                        break;
-                    case FILE_NOT_FOUND:
-                        AlertUtils.showError(getActivity(), "File not found.");
-                        break;
-                    case FILE_READ_FAILED:
-                        AlertUtils.showError(getActivity(), "File read failed.");
-                        break;
-                    case FILE_WRITE_FAILED:
-                        AlertUtils.showError(getActivity(), "File write failed.");
-                        break;
-                    case MAKE_COMMAND_DATA_FAILED:
-                        AlertUtils.showError(getActivity(), "Card command failure.");
-                        break;
-                    case INVALID_RESPONSE:
-                        AlertUtils.showError(getActivity(), "Invalid response.");
-                        break;
-                }
+                Log.i(TAG, "card exception");
+                Log.i(TAG, cardException.getError().toString());
+                getActivity().runOnUiThread(() -> {
+                    switch (cardException.getError()) {
+                        case ARGUMENT_INVALID:
+                            AlertUtils.showError(getActivity(), "Invalid argument.");
+                            break;
+                        case BLUETOOTH_NOT_AVAILABLE:
+                            AlertUtils.showError(getActivity(), "Bluetooth not available.");
+                            break;
+                        case BLUETOOTH_NOT_ENABLED:
+                            AlertUtils.showError(getActivity(), "Bluetooth not enabled.");
+                            break;
+                        case CARD_NOT_PAIRED:
+                            AlertUtils.showError(getActivity(), "Card is not paired.");
+                            break;
+                        case CONNECTION_FAILED:
+                            AlertUtils.showError(getActivity(), "Connection failed.");
+                            break;
+                        case CONNECTION_REQUIRED:
+                            AlertUtils.showError(getActivity(), "Not connected.");
+                            break;
+                        case CONNECTION_TIMEOUT:
+                            AlertUtils.showError(getActivity(), "Connection timed out.");
+                            break;
+                        case CHARACTERISTIC_WRITE_FAILURE:
+                            AlertUtils.showError(getActivity(), "Card write failure.");
+                            break;
+                        case FILE_NOT_FOUND:
+                            AlertUtils.showError(getActivity(), "File not found.");
+                            break;
+                        case FILE_READ_FAILED:
+                            AlertUtils.showError(getActivity(), "File read failed.");
+                            break;
+                        case FILE_WRITE_FAILED:
+                            AlertUtils.showError(getActivity(), "File write failed.");
+                            break;
+                        case MAKE_COMMAND_DATA_FAILED:
+                            AlertUtils.showError(getActivity(), "Card command failure.");
+                            break;
+                        case INVALID_RESPONSE:
+                            AlertUtils.showError(getActivity(), "Invalid response.");
+                            break;
+                    }
+                });
             }
         });
     }
