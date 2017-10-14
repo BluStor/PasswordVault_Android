@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import co.blustor.pwv.R;
 import co.blustor.pwv.activities.EditEntryActivity;
@@ -92,7 +93,7 @@ public class SearchFragment extends Fragment {
             ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(highlightColor);
 
             String title = entry.getTitle();
-            String loweredTitle = title.toLowerCase();
+            String loweredTitle = title.toLowerCase(Locale.getDefault());
 
             Spannable titleSpannable = new SpannableString(title);
             if (loweredTitle.contains(mLoweredQuery)) {

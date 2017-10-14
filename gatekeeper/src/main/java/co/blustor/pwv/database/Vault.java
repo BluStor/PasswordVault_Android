@@ -9,6 +9,7 @@ import com.google.common.base.Optional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class Vault {
@@ -106,7 +107,7 @@ public class Vault {
         }
 
         if (mRoot != null) {
-            String loweredQuery = query.toLowerCase();
+            String loweredQuery = query.toLowerCase(Locale.getDefault());
 
             List<VaultEntry> results = new ArrayList<>();
 
@@ -114,7 +115,7 @@ public class Vault {
 
             for (VaultGroup group : vaultGroups) {
                 for (VaultEntry entry : group.getEntries()) {
-                    if (entry.getTitle().toLowerCase().contains(loweredQuery)) {
+                    if (entry.getTitle().toLowerCase(Locale.getDefault()).contains(loweredQuery)) {
                         results.add(entry);
                     }
                 }

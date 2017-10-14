@@ -56,6 +56,7 @@ public class GKBLECard {
     private BluetoothGattCharacteristic mControlPointCharacteristic;
     @Nullable
     private BluetoothGattDescriptor mControlPointCharacteristicConfigurationDescriptor;
+
     public GKBLECard(Context context, String macAddress) throws CardException {
         Log.i(TAG, "init");
         mContext = context;
@@ -208,10 +209,7 @@ public class GKBLECard {
 
             try {
                 bluetoothCard.put(path, new ByteArrayInputStream(data));
-                bluetoothCard.disconnect();
-
                 deferredObject.resolve(null);
-
             } catch (IOException e) {
                 e.printStackTrace();
                 deferredObject.reject(new CardException(CardError.FILE_WRITE_FAILED));
@@ -496,10 +494,9 @@ public class GKBLECard {
                 ).then(result -> {
                             deferredObject.resolve(null);
                         }
-                ).fail(result -> {
-                    Log.i(TAG, result.getError().name());
-                    deferredObject.reject(result);
-                });
+                ).fail(
+                        deferredObject::reject
+                );
             } else {
                 deferredObject.reject(new CardException(CardError.ARGUMENT_INVALID));
             }

@@ -21,7 +21,19 @@ public class SplashActivity extends AppCompatActivity {
         checkIfDatabaseExists();
     }
 
-    public void checkIfDatabaseExists() {
+    private void startCreate() {
+        Intent createActivity = new Intent(this, CreateActivity.class);
+        startActivity(createActivity);
+        finish();
+    }
+
+    private void startUnlock() {
+        Intent unlockActivity = new Intent(this, UnlockActivity.class);
+        startActivity(unlockActivity);
+        finish();
+    }
+
+    private void checkIfDatabaseExists() {
         String macAddress = Vault.getCardMacAddress(this);
         if (macAddress != null) {
             try {
@@ -33,32 +45,20 @@ public class SplashActivity extends AppCompatActivity {
                         card.exists(Vault.DB_PATH)
                 ).then(result -> {
                     if (result) {
-                        unlock();
+                        startUnlock();
                     } else {
-                        create();
+                        startCreate();
                     }
                 }).always((state, resolved, rejected) ->
                         card.disconnect()
                 ).fail(result ->
-                        unlock()
+                        startUnlock()
                 );
             } catch (GKBLECard.CardException e) {
-                unlock();
+                startUnlock();
             }
         } else {
-            unlock();
+            startUnlock();
         }
-    }
-
-    public void create() {
-        Intent createActivity = new Intent(this, CreateActivity.class);
-        startActivity(createActivity);
-        finish();
-    }
-
-    public void unlock() {
-        Intent unlockActivity = new Intent(this, UnlockActivity.class);
-        startActivity(unlockActivity);
-        finish();
     }
 }
