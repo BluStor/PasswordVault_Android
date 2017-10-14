@@ -110,7 +110,7 @@ public class SyncManager {
                                 card.disconnect()
                         ).fail(result -> {
                             EVENT_BUS.postSticky(SyncStatus.FAILED);
-                            deferredObject.reject(null);
+                            deferredObject.reject(result);
                         });
                     } catch (GKBLECard.CardException e) {
                         EVENT_BUS.postSticky(SyncStatus.FAILED);
