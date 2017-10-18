@@ -29,7 +29,7 @@ import com.polidea.rxandroidble.scan.ScanSettings;
 
 import co.blustor.identity.R;
 import co.blustor.identity.adapters.ScanResultAdapter;
-import co.blustor.identity.database.Vault;
+import co.blustor.identity.vault.Vault;
 import co.blustor.identity.gatekeeper.GKBLECard;
 import co.blustor.identity.utils.MyApplication;
 import rx.Subscription;

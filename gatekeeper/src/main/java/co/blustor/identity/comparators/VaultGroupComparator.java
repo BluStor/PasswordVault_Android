@@ -2,7 +2,7 @@ package co.blustor.identity.comparators;
 
 import java.util.Comparator;
 
-import co.blustor.identity.database.VaultGroup;
+import co.blustor.identity.vault.VaultGroup;
 
 public class VaultGroupComparator implements Comparator<VaultGroup> {
     @Override

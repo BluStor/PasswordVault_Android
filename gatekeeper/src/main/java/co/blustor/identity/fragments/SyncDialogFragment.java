@@ -19,7 +19,7 @@ import org.jdeferred.Promise;
 import java.util.UUID;
 
 import co.blustor.identity.R;
-import co.blustor.identity.database.VaultGroup;
+import co.blustor.identity.vault.VaultGroup;
 import co.blustor.identity.gatekeeper.GKBLECard;
 import co.blustor.identity.sync.SyncManager;
 import co.blustor.identity.sync.SyncStatus;

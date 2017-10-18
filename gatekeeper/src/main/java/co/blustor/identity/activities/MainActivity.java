@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import co.blustor.identity.database.Vault;
+import co.blustor.identity.vault.Vault;
 
 public class MainActivity extends AppCompatActivity {
     @Override

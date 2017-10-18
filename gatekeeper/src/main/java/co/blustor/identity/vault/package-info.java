@@ -1,4 +1,4 @@
 @ParametersAreNonnullByDefault
-package co.blustor.identity.database;
+package co.blustor.identity.vault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

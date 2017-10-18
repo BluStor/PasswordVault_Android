@@ -11,7 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import co.blustor.identity.activities.CloseActivity;
 import co.blustor.identity.constants.Intents;
 import co.blustor.identity.constants.Notifications;
-import co.blustor.identity.database.Vault;
+import co.blustor.identity.vault.Vault;
 
 import static android.support.v4.app.NotificationCompat.VISIBILITY_PUBLIC;
 

@@ -17,8 +17,8 @@ import android.widget.Toast;
 import java.util.UUID;
 
 import co.blustor.identity.R;
-import co.blustor.identity.database.Vault;
-import co.blustor.identity.database.VaultEntry;
+import co.blustor.identity.vault.Vault;
+import co.blustor.identity.vault.VaultEntry;
 import co.blustor.identity.sync.SyncManager;
 import co.blustor.identity.utils.MyApplication;
 

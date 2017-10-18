@@ -14,8 +14,8 @@ import android.widget.ImageView;
 import java.util.UUID;
 
 import co.blustor.identity.R;
-import co.blustor.identity.database.Vault;
-import co.blustor.identity.database.VaultGroup;
+import co.blustor.identity.vault.Vault;
+import co.blustor.identity.vault.VaultGroup;
 import co.blustor.identity.sync.SyncManager;
 import co.blustor.identity.utils.MyApplication;
 

@@ -10,9 +10,9 @@ import org.jdeferred.impl.DeferredObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import co.blustor.identity.database.Translator;
-import co.blustor.identity.database.Vault;
-import co.blustor.identity.database.VaultGroup;
+import co.blustor.identity.vault.Translator;
+import co.blustor.identity.vault.Vault;
+import co.blustor.identity.vault.VaultGroup;
 import co.blustor.identity.gatekeeper.GKBLECard;
 import de.slackspace.openkeepass.KeePassDatabase;
 import de.slackspace.openkeepass.domain.Group;

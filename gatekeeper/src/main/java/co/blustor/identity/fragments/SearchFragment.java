@@ -25,9 +25,9 @@ import java.util.Locale;
 
 import co.blustor.identity.R;
 import co.blustor.identity.activities.EditEntryActivity;
-import co.blustor.identity.database.Vault;
-import co.blustor.identity.database.VaultEntry;
-import co.blustor.identity.database.VaultGroup;
+import co.blustor.identity.vault.Vault;
+import co.blustor.identity.vault.VaultEntry;
+import co.blustor.identity.vault.VaultGroup;
 import co.blustor.identity.utils.MyApplication;
 
 public class SearchFragment extends Fragment {

@@ -2,7 +2,7 @@ package co.blustor.identity.comparators;
 
 import java.util.Comparator;
 
-import co.blustor.identity.database.VaultEntry;
+import co.blustor.identity.vault.VaultEntry;
 
 public class VaultEntryComparator implements Comparator<VaultEntry> {
     @Override

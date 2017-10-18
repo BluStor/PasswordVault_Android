@@ -1,4 +1,4 @@
-package co.blustor.identity.database;
+package co.blustor.identity.vault;
 
 import android.content.Context;
 import android.content.SharedPreferences;

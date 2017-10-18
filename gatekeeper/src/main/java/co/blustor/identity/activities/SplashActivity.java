@@ -9,7 +9,7 @@ import org.jdeferred.DonePipe;
 import org.jdeferred.android.AndroidDeferredManager;
 
 import co.blustor.identity.R;
-import co.blustor.identity.database.Vault;
+import co.blustor.identity.vault.Vault;
 import co.blustor.identity.gatekeeper.GKBLECard;
 
 public class SplashActivity extends AppCompatActivity {

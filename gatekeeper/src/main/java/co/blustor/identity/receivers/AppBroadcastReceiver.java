@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import co.blustor.identity.constants.Intents;
-import co.blustor.identity.database.Vault;
+import co.blustor.identity.vault.Vault;
 import co.blustor.identity.services.NotificationService;
 
 public class AppBroadcastReceiver extends BroadcastReceiver {

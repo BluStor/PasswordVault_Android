@@ -8,7 +8,7 @@ import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 
 import co.blustor.identity.constants.Intents;
-import co.blustor.identity.database.Vault;
+import co.blustor.identity.vault.Vault;
 
 @SuppressLint("Registered")
 public class LockingActivity extends AppCompatActivity {

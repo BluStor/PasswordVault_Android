@@ -1,4 +1,4 @@
-package co.blustor.identity.database;
+package co.blustor.identity.vault;
 
 import com.google.common.base.MoreObjects;
 

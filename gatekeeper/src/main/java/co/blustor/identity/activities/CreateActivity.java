@@ -18,7 +18,7 @@ import com.github.clans.fab.FloatingActionButton;
 import java.util.UUID;
 
 import co.blustor.identity.R;
-import co.blustor.identity.database.Vault;
+import co.blustor.identity.vault.Vault;
 import co.blustor.identity.fragments.SyncDialogFragment;
 
 public class CreateActivity extends AppCompatActivity implements SyncDialogFragment.SyncListener {
