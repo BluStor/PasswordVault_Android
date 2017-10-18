@@ -41,13 +41,14 @@ public class GKBLECard {
     private static final UUID CONTROL_POINT_UUID = UUID.fromString("423AD87A-0001-4F14-9EAA-5EB5839F2A54");
     private static final UUID CLIENT_CHARACTERISTIC_CONFIGURATION_UUID = UUID.fromString("00002902-0000-1000-8000-00805F9B34FB");
     private static final String TAG = "GKBLECard";
-    private static final String BLUETOOTH_CARD_NAME = "CYBERGATE";
     private final Context mContext;
     private final List<Byte> mControlPointBuffer = new ArrayList<>();
     private final BluetoothManager mBluetoothManager;
     private final BluetoothDevice mBluetoothDevice;
+    private final String mBluetoothCardName;
     private int mConnectionState = BluetoothProfile.STATE_DISCONNECTED;
     private Queue<OnCompleteListener> mControlPointWriteListeners = new LinkedList<>();
+
     @Nullable
     private BluetoothGatt mBluetoothGatt;
     @Nullable
@@ -67,6 +68,7 @@ public class GKBLECard {
         } else {
             BluetoothAdapter bluetoothAdapter = mBluetoothManager.getAdapter();
             mBluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
+            mBluetoothCardName = mBluetoothDevice.getName().replace("ID-", "CG-");
         }
     }
 
@@ -128,7 +130,7 @@ public class GKBLECard {
         Log.i(TAG, "fileRead: " + path);
         DeferredObject<byte[], CardException, Void> deferredObject = new DeferredObject<>();
         Runnable runnable = () -> {
-            GKBluetoothCard bluetoothCard = new GKBluetoothCard(BLUETOOTH_CARD_NAME, mContext.getCacheDir());
+            GKBluetoothCard bluetoothCard = new GKBluetoothCard(mBluetoothCardName, mContext.getCacheDir());
             try {
                 bluetoothCard.connect();
             } catch (IOException e) {
@@ -179,7 +181,7 @@ public class GKBLECard {
         Log.i(TAG, "fileWrite: " + data.length + " bytes to " + path);
         DeferredObject<Void, CardException, Void> deferredObject = new DeferredObject<>();
         Runnable runnable = () -> {
-            GKBluetoothCard bluetoothCard = new GKBluetoothCard(BLUETOOTH_CARD_NAME, mContext.getCacheDir());
+            GKBluetoothCard bluetoothCard = new GKBluetoothCard(mBluetoothCardName, mContext.getCacheDir());
             try {
                 bluetoothCard.connect();
             } catch (IOException e) {
