@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/fragment_syncstatus"
-        android:name="co.blustor.pwv.fragments.SyncStatusFragment"
+        android:name="co.blustor.identity.fragments.SyncStatusFragment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -68,7 +68,7 @@
 
     <fragment
         android:id="@+id/fragment_search"
-        android:name="co.blustor.pwv.fragments.SearchFragment"
+        android:name="co.blustor.identity.fragments.SearchFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

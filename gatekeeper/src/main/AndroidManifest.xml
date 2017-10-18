@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="co.blustor.pwv">
+    package="co.blustor.identity">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -11,46 +11,45 @@
     <application
         android:allowBackup="true"
         android:fullBackupContent="false"
-        android:icon="@mipmap/ic_launcher_round"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name=".activities.AboutActivity" />
+        <activity android:name="co.blustor.identity.activities.AboutActivity" />
         <activity
-            android:name=".activities.CreateActivity"
+            android:name="co.blustor.identity.activities.CreateActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name=".activities.AddEntryActivity"
+            android:name="co.blustor.identity.activities.AddEntryActivity"
             android:windowSoftInputMode="stateVisible" />
         <activity
-            android:name=".activities.AddGroupActivity"
+            android:name="co.blustor.identity.activities.AddGroupActivity"
             android:windowSoftInputMode="stateVisible" />
-        <activity android:name=".activities.ChooseActivity" />
-        <activity android:name=".activities.CloseActivity" />
-        <activity android:name=".activities.EditEntryActivity" />
+        <activity android:name="co.blustor.identity.activities.ChooseActivity" />
+        <activity android:name="co.blustor.identity.activities.CloseActivity" />
+        <activity android:name="co.blustor.identity.activities.EditEntryActivity" />
         <activity
-            android:name=".activities.EditGroupActivity"
+            android:name="co.blustor.identity.activities.EditGroupActivity"
             android:windowSoftInputMode="stateVisible" />
-        <activity android:name=".activities.GroupActivity" />
-        <activity android:name=".activities.IconPickerActivity" />
-        <activity android:name=".activities.MainActivity">
+        <activity android:name="co.blustor.identity.activities.GroupActivity" />
+        <activity android:name="co.blustor.identity.activities.IconPickerActivity" />
+        <activity android:name="co.blustor.identity.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.PasswordGeneratorActivity" />
-        <activity android:name=".activities.SettingsActivity" />
-        <activity android:name=".activities.SplashActivity" />
+        <activity android:name="co.blustor.identity.activities.PasswordGeneratorActivity" />
+        <activity android:name="co.blustor.identity.activities.SettingsActivity" />
+        <activity android:name="co.blustor.identity.activities.SplashActivity" android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activities.UnlockActivity"
+            android:name="co.blustor.identity.activities.UnlockActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <receiver
-            android:name=".receivers.AppBroadcastReceiver"
+            android:name="co.blustor.identity.receivers.AppBroadcastReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="co.blustor.pwv.lock_database" />
@@ -58,7 +57,7 @@
         </receiver>
 
         <service
-            android:name=".services.NotificationService"
+            android:name="co.blustor.identity.services.NotificationService"
             android:exported="false" />
 
     </application>
