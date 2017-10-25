@@ -94,7 +94,6 @@ public class SyncDialogFragment extends DialogFragment {
                 });
             } else if (result instanceof GKBLECard.CardException) {
                 GKBLECard.CardException cardException = (GKBLECard.CardException) result;
-                Log.i(TAG, "card exception");
                 Log.i(TAG, cardException.getError().toString());
                 getActivity().runOnUiThread(() -> {
                     switch (cardException.getError()) {

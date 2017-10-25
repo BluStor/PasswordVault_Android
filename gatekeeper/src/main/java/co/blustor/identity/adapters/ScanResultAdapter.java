@@ -17,9 +17,7 @@ import co.blustor.identity.R;
 
 public class ScanResultAdapter extends RecyclerView.Adapter<ScanResultAdapter.ViewHolder> {
 
-    private final Comparator<ScanResult> SORTING_COMPARATOR = (lhs, rhs) -> {
-        return lhs.getRssi() - rhs.getRssi();
-    };
+    private final Comparator<ScanResult> SORTING_COMPARATOR = (lhs, rhs) -> lhs.getRssi() - rhs.getRssi();
     private List<ScanResult> scanResults = new ArrayList<>();
     private OnAdapterItemClickListener onAdapterItemClickListener;
     private final View.OnClickListener onClickListener = new View.OnClickListener() {

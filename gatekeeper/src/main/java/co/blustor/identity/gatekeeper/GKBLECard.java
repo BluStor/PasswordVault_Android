@@ -10,6 +10,8 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -28,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.UUID;
 
@@ -40,26 +43,137 @@ public class GKBLECard {
     public static final UUID SERVICE_UUID = UUID.fromString("423AD87A-B100-4F14-9EAA-5EB5839F2A54");
     private static final UUID CONTROL_POINT_UUID = UUID.fromString("423AD87A-0001-4F14-9EAA-5EB5839F2A54");
     private static final UUID CLIENT_CHARACTERISTIC_CONFIGURATION_UUID = UUID.fromString("00002902-0000-1000-8000-00805F9B34FB");
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
     private static final String TAG = "GKBLECard";
+
     private final Context mContext;
     private final List<Byte> mControlPointBuffer = new ArrayList<>();
     private final BluetoothManager mBluetoothManager;
     private final BluetoothDevice mBluetoothDevice;
     private final String mBluetoothCardName;
+    private final Queue<OnCompleteListener> mControlPointWriteListeners = new LinkedList<>();
+    private final Queue<OnCompleteListener> mClientCharacteristicConfigurationDescriptorWriteListeners = new LinkedList<>();
+    private final Queue<OnCompleteListener> mMtuChangedListeners = new LinkedList<>();
+    private final BluetoothGattCallback mBluetoothGattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            Log.i(TAG, "onConnectionStateChange: " + status + " (status) " + newState + " (newState)");
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    if (mConnectionState == BluetoothProfile.STATE_DISCONNECTED) {
+                        Log.i(TAG, "(1/3) Discover services ...");
+                        gatt.discoverServices();
+                    }
+                }
+
+                mConnectionState = newState;
+            }
+        }
+
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            Log.i(TAG, "onServicesDiscovered");
+            @Nullable
+            BluetoothGattService service = gatt.getService(SERVICE_UUID);
+            if (service != null) {
+                mControlPointCharacteristic = service.getCharacteristic(CONTROL_POINT_UUID);
+                mControlPointCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+
+                Log.i(TAG, "(2/3) Enable characteristic notification (control point) ...");
+                gatt.setCharacteristicNotification(mControlPointCharacteristic, true);
+
+                mClientCharacteristicConfigurationDescriptorWriteListeners.add(new OnCompleteListener() {
+                    @Override
+                    public void success() {
+                        Log.i(TAG, "(3/3) Request MTU ...");
+                        gatt.requestMtu(512);
+                    }
+
+                    @Override
+                    public void failure() {
+
+                    }
+                });
+
+                if (mControlPointCharacteristic != null) {
+                    BluetoothGattDescriptor descriptor = mControlPointCharacteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIGURATION_UUID);
+                    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                    gatt.writeDescriptor(descriptor);
+                }
+            }
+        }
+
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            if (characteristic.getUuid().equals(CONTROL_POINT_UUID)) {
+                Log.i(TAG, "controlPointBuffer -> +" + characteristic.getValue().length + " bytes");
+                mControlPointBuffer.addAll(Bytes.asList(characteristic.getValue()));
+            }
+        }
+
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.i(TAG, "onCharacteristicWrite: success");
+                if (characteristic.getUuid().equals(CONTROL_POINT_UUID)) {
+                    while (mControlPointWriteListeners.size() > 0) {
+                        mControlPointWriteListeners.remove().success();
+                    }
+                }
+            } else {
+                Log.i(TAG, "onCharacteristicWrite: failure");
+                if (characteristic.getUuid().equals(CONTROL_POINT_UUID)) {
+                    while (mControlPointWriteListeners.size() > 0) {
+                        mControlPointWriteListeners.remove().failure();
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.i(TAG, "onDescriptorWrite: " + descriptor.getUuid() + " success");
+                if (descriptor.getUuid().equals(CLIENT_CHARACTERISTIC_CONFIGURATION_UUID)) {
+                    while (mClientCharacteristicConfigurationDescriptorWriteListeners.size() > 0) {
+                        mClientCharacteristicConfigurationDescriptorWriteListeners.remove().success();
+                    }
+                }
+            } else {
+                Log.i(TAG, "onDescriptorWrite: " + descriptor.getUuid() + " fail");
+                if (descriptor.getUuid().equals(CLIENT_CHARACTERISTIC_CONFIGURATION_UUID)) {
+                    while (mClientCharacteristicConfigurationDescriptorWriteListeners.size() > 0) {
+                        mClientCharacteristicConfigurationDescriptorWriteListeners.remove().failure();
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+            Log.i(TAG, "onMtuChanged");
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.i(TAG, "onMtuChanged: success (now " + mtu + ")");
+                while (mMtuChangedListeners.size() > 0) {
+                    mMtuChangedListeners.remove().success();
+                }
+            } else {
+                Log.i(TAG, "onMtuChanged: fail");
+                while (mMtuChangedListeners.size() > 0) {
+                    mMtuChangedListeners.remove().failure();
+                }
+            }
+        }
+    };
+
     private int mConnectionState = BluetoothProfile.STATE_DISCONNECTED;
-    private Queue<OnCompleteListener> mControlPointWriteListeners = new LinkedList<>();
 
     @Nullable
     private BluetoothGatt mBluetoothGatt;
     @Nullable
-    private BluetoothGattService mService;
-    @Nullable
     private BluetoothGattCharacteristic mControlPointCharacteristic;
-    @Nullable
-    private BluetoothGattDescriptor mControlPointCharacteristicConfigurationDescriptor;
 
     public GKBLECard(Context context, String macAddress) throws CardException {
-        Log.i(TAG, "init");
         mContext = context;
         mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
 
@@ -68,7 +182,15 @@ public class GKBLECard {
         } else {
             BluetoothAdapter bluetoothAdapter = mBluetoothManager.getAdapter();
             mBluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
-            mBluetoothCardName = mBluetoothDevice.getName().replace("ID-", "CG-");
+
+            if (Objects.equals(mBluetoothDevice.getName(), "IDENTITY")) {
+                mBluetoothCardName = "BLUSTOR";
+            } else {
+                mBluetoothCardName = mBluetoothDevice.getName().replace("ID-", "CG-");
+            }
+            Log.i(TAG, "Device: " + mBluetoothDevice.getAddress());
+            Log.i(TAG, "LE: " + mBluetoothDevice.getName());
+            Log.i(TAG, "Classic: " + mBluetoothCardName);
         }
     }
 
@@ -91,7 +213,7 @@ public class GKBLECard {
                 deferredObject.reject(new CardException(CardError.MAKE_COMMAND_DATA_FAILED));
             }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -122,7 +244,7 @@ public class GKBLECard {
 
             deferredObject.resolve(data);
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -139,23 +261,13 @@ public class GKBLECard {
                 return;
             }
 
-            switch (bluetoothCard.getConnectionState()) {
-                case BLUETOOTH_DISABLED:
-                    deferredObject.reject(new CardException(CardError.BLUETOOTH_NOT_ENABLED));
-                    return;
-                case CARD_NOT_PAIRED:
-                    deferredObject.reject(new CardException(CardError.CARD_NOT_PAIRED));
-                    return;
-                case CONNECTING:
-                    break;
-                case CONNECTED:
-                    break;
-                case TRANSFERRING:
-                    break;
-                case DISCONNECTING:
-                    break;
-                case DISCONNECTED:
-                    break;
+            GKCard.ConnectionState i = bluetoothCard.getConnectionState();
+            if (i == GKCard.ConnectionState.BLUETOOTH_DISABLED) {
+                deferredObject.reject(new CardException(CardError.BLUETOOTH_NOT_ENABLED));
+                return;
+            } else if (i == GKCard.ConnectionState.CARD_NOT_PAIRED) {
+                deferredObject.reject(new CardException(CardError.CARD_NOT_PAIRED));
+                return;
             }
 
             try {
@@ -173,7 +285,7 @@ public class GKBLECard {
                 deferredObject.reject(new CardException(CardError.FILE_READ_FAILED));
             }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -190,34 +302,31 @@ public class GKBLECard {
                 return;
             }
 
-            switch (bluetoothCard.getConnectionState()) {
-                case BLUETOOTH_DISABLED:
-                    deferredObject.reject(new CardException(CardError.BLUETOOTH_NOT_ENABLED));
-                    return;
-                case CARD_NOT_PAIRED:
-                    deferredObject.reject(new CardException(CardError.CARD_NOT_PAIRED));
-                    return;
-                case CONNECTING:
-                    break;
-                case CONNECTED:
-                    break;
-                case TRANSFERRING:
-                    break;
-                case DISCONNECTING:
-                    break;
-                case DISCONNECTED:
-                    break;
+            GKCard.ConnectionState i = bluetoothCard.getConnectionState();
+            if (i == GKCard.ConnectionState.BLUETOOTH_DISABLED) {
+                deferredObject.reject(new CardException(CardError.BLUETOOTH_NOT_ENABLED));
+                return;
+            } else if (i == GKCard.ConnectionState.CARD_NOT_PAIRED) {
+                deferredObject.reject(new CardException(CardError.CARD_NOT_PAIRED));
+                return;
             }
 
             try {
                 bluetoothCard.put(path, new ByteArrayInputStream(data));
+                bluetoothCard.finalize(path);
                 deferredObject.resolve(null);
             } catch (IOException e) {
                 e.printStackTrace();
                 deferredObject.reject(new CardException(CardError.FILE_WRITE_FAILED));
             }
+
+            try {
+                bluetoothCard.disconnect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -246,107 +355,41 @@ public class GKBLECard {
                 mBluetoothGatt.writeCharacteristic(mControlPointCharacteristic);
             }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
     public Promise<Void, CardException, Void> connect() {
-        Log.i("GKBLECard", "connect");
+        Log.i(TAG, "connect");
         DeferredObject<Void, CardException, Void> deferredObject = new DeferredObject<>();
         Runnable runnable = () -> {
             if (mBluetoothGatt == null) {
-                mBluetoothGatt = mBluetoothDevice.connectGatt(mContext, false, new BluetoothGattCallback() {
-                    @Override
-                    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-                        Log.i("GKBLECard", "onConnectionStateChange: " + status + " (status) " + newState + " (newState)");
-                        if (status == BluetoothGatt.GATT_SUCCESS) {
-                            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                                if (mConnectionState == BluetoothProfile.STATE_DISCONNECTED) {
-                                    Log.i("GKBLECard", "onConnectionStateChange: discovering services ...");
-                                    gatt.discoverServices();
-                                }
-                            }
-
-                            mConnectionState = newState;
-                        }
-                    }
-
-                    @Override
-                    public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-                        Log.i("GKBLECard", "onServicesDiscovered");
-                        mService = gatt.getService(SERVICE_UUID);
-                        mControlPointCharacteristic = mService.getCharacteristic(CONTROL_POINT_UUID);
-
-                        if (mControlPointCharacteristic == null) {
-                            deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
-                        } else {
-                            mControlPointCharacteristicConfigurationDescriptor = mControlPointCharacteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIGURATION_UUID);
-                            mControlPointCharacteristicConfigurationDescriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                            mBluetoothGatt.writeDescriptor(mControlPointCharacteristicConfigurationDescriptor);
-
-                            gatt.setCharacteristicNotification(mControlPointCharacteristic, true);
-                        }
-                    }
-
-                    @Override
-                    public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                        if (characteristic.getUuid().equals(CONTROL_POINT_UUID)) {
-                            Log.i("GKBLECard", "controlPointBuffer -> +" + characteristic.getValue().length + " bytes");
-                            mControlPointBuffer.addAll(Bytes.asList(characteristic.getValue()));
-                        }
-                    }
-
-                    @Override
-                    public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                        if (status == BluetoothGatt.GATT_SUCCESS) {
-                            Log.i("GKBLECard", "onCharacteristicWrite: success");
-                            if (characteristic.getUuid().equals(CONTROL_POINT_UUID)) {
-                                while (mControlPointWriteListeners.size() > 0) {
-                                    mControlPointWriteListeners.remove().success();
-                                }
-                            }
-                        } else {
-                            Log.i("GKBLECard", "onCharacteristicWrite: failure");
-                            if (characteristic.getUuid().equals(CONTROL_POINT_UUID)) {
-                                while (mControlPointWriteListeners.size() > 0) {
-                                    mControlPointWriteListeners.remove().failure();
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
-                        Log.i("GKBLECard", "onDescriptorWrite: " + descriptor.getUuid());
-                        if (descriptor.getUuid().equals(CLIENT_CHARACTERISTIC_CONFIGURATION_UUID)) {
-                            if (status == BluetoothGatt.GATT_SUCCESS) {
-                                if (deferredObject.isPending()) {
-                                    deferredObject.resolve(null);
-                                }
-                            } else {
-                                if (deferredObject.isPending()) {
-                                    deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
-                                }
-                            }
-                        }
-                    }
-                });
-
-                try {
-                    Thread.sleep(10000L);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                if (deferredObject.isPending()) {
-                    deferredObject.reject(new CardException(CardError.CONNECTION_TIMEOUT));
-                }
+                Log.i(TAG, "connectGatt");
+                mBluetoothGatt = mBluetoothDevice.connectGatt(mContext, false, mBluetoothGattCallback);
             } else {
-                Log.i("GKBLECard", "connect: connect (already established)");
                 mBluetoothGatt.connect();
             }
         };
-        new Thread(runnable).start();
+
+        mMtuChangedListeners.add(new OnCompleteListener() {
+            @Override
+            public void success() {
+                deferredObject.resolve(null);
+            }
+
+            @Override
+            public void failure() {
+                deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
+            }
+        });
+
+        HANDLER.post(runnable);
+        HANDLER.postDelayed(() -> {
+            if (deferredObject.isPending()) {
+                deferredObject.reject(new CardException(CardError.CONNECTION_TIMEOUT));
+            }
+        }, 10000L);
+
         return deferredObject.promise();
     }
 
@@ -356,11 +399,12 @@ public class GKBLECard {
         Runnable runnable = () -> {
             if (mBluetoothGatt != null) {
                 mBluetoothGatt.disconnect();
+                mBluetoothGatt.close();
             }
 
             deferredObject.resolve(null);
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -374,7 +418,7 @@ public class GKBLECard {
                 deferredObject.reject(new CardException(CardError.BLUETOOTH_NOT_ENABLED));
             }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -394,7 +438,7 @@ public class GKBLECard {
                 deferredObject.reject(new CardException(CardError.ARGUMENT_INVALID));
             }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -426,7 +470,7 @@ public class GKBLECard {
                 deferredObject.reject(new CardException(CardError.ARGUMENT_INVALID));
             }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -435,7 +479,7 @@ public class GKBLECard {
         DeferredObject<byte[], CardException, Void> deferredObject = new DeferredObject<>();
         Runnable runnable = () -> {
             if (path.length() <= 30) {
-                makeCommandData((byte) 1, path).then(
+                makeCommandData((byte) 1, null).then(
                         this::writeToControlPoint
                 ).then((DonePipe<Void, byte[], CardException, Void>) result ->
                         waitOnControlPointResult()
@@ -458,7 +502,7 @@ public class GKBLECard {
                 deferredObject.reject(new CardException(CardError.ARGUMENT_INVALID));
             }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -478,7 +522,7 @@ public class GKBLECard {
                 deferredObject.reject(new CardException(CardError.ARGUMENT_INVALID));
             }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 
@@ -503,7 +547,7 @@ public class GKBLECard {
                 deferredObject.reject(new CardException(CardError.ARGUMENT_INVALID));
             }
         };
-        new Thread(runnable).start();
+        HANDLER.post(runnable);
         return deferredObject.promise();
     }
 

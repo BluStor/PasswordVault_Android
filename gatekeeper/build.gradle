@@ -40,7 +40,7 @@ android {
 
     defaultConfig {
         applicationId "co.blustor.pwv"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 3
         versionName "1.0.2"
