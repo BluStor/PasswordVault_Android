@@ -1,7 +1,7 @@
 <resources>
-    <string name="about_address">401 North Michigan Avenue Chicago, IL 60611</string>
+    <string name="about_address">965 W. Chicago Avenue, Chicago, IL 60642</string>
     <string name="about_email">info@blustor.co</string>
-    <string name="about_phone">+1 312–840–8250</string>
+    <string name="about_phone">+1 312-265-3058</string>
     <string name="app_name">GateKeeper</string>
     <string name="button_change_password">Change password</string>
     <string name="button_generate">Generate</string>
