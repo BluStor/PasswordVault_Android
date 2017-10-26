@@ -22,6 +22,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.exceptions.BleScanException;
 import com.polidea.rxandroidble.scan.ScanFilter;
 import com.polidea.rxandroidble.scan.ScanResult;
@@ -76,9 +77,12 @@ public class ChooseActivity extends AppCompatActivity {
         mScanResultAdapter.setOnAdapterItemClickListener(view -> {
             int position = mCardsRecyclerView.getChildAdapterPosition(view);
             ScanResult scanResult = mScanResultAdapter.getItemAtPosition(position);
-            String macAddress = scanResult.getBleDevice().getMacAddress();
 
-            Vault.setCardMacAddress(this, macAddress);
+            RxBleDevice device = scanResult.getBleDevice();
+            String address = device.getMacAddress();
+            String name = device.getName();
+
+            Vault.setCardAddressName(this, address, name);
             Intent splashActivity = new Intent(this, SplashActivity.class);
             startActivity(splashActivity);
             finish();

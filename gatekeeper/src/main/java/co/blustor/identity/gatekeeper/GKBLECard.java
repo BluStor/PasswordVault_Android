@@ -30,13 +30,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.UUID;
 
 import co.blustor.gatekeepersdk.devices.GKBluetoothCard;
 import co.blustor.gatekeepersdk.devices.GKCard;
 import co.blustor.identity.utils.FileUtils;
+
+import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
 
 public class GKBLECard {
 
@@ -75,11 +76,12 @@ public class GKBLECard {
             Log.i(TAG, "onServicesDiscovered");
             @Nullable
             BluetoothGattService service = gatt.getService(SERVICE_UUID);
+
             if (service != null) {
                 mControlPointCharacteristic = service.getCharacteristic(CONTROL_POINT_UUID);
-                mControlPointCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
 
                 Log.i(TAG, "(2/3) Enable characteristic notification (control point) ...");
+
                 gatt.setCharacteristicNotification(mControlPointCharacteristic, true);
 
                 mClientCharacteristicConfigurationDescriptorWriteListeners.add(new OnCompleteListener() {
@@ -132,6 +134,7 @@ public class GKBLECard {
 
         @Override
         public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            Log.i(TAG, "onDescriptorWrite");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.i(TAG, "onDescriptorWrite: " + descriptor.getUuid() + " success");
                 if (descriptor.getUuid().equals(CLIENT_CHARACTERISTIC_CONFIGURATION_UUID)) {
@@ -173,7 +176,7 @@ public class GKBLECard {
     @Nullable
     private BluetoothGattCharacteristic mControlPointCharacteristic;
 
-    public GKBLECard(Context context, String macAddress) throws CardException {
+    public GKBLECard(Context context, String address, String name) throws CardException {
         mContext = context;
         mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
 
@@ -181,13 +184,10 @@ public class GKBLECard {
             throw new CardException(CardError.BLUETOOTH_NOT_AVAILABLE);
         } else {
             BluetoothAdapter bluetoothAdapter = mBluetoothManager.getAdapter();
-            mBluetoothDevice = bluetoothAdapter.getRemoteDevice(macAddress);
+            mBluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
 
-            if (Objects.equals(mBluetoothDevice.getName(), "IDENTITY")) {
-                mBluetoothCardName = "BLUSTOR";
-            } else {
-                mBluetoothCardName = mBluetoothDevice.getName().replace("ID-", "CG-");
-            }
+            mBluetoothCardName = name.replace("ID-", "CG-");
+
             Log.i(TAG, "Device: " + mBluetoothDevice.getAddress());
             Log.i(TAG, "LE: " + mBluetoothDevice.getName());
             Log.i(TAG, "Classic: " + mBluetoothCardName);
@@ -366,6 +366,7 @@ public class GKBLECard {
             if (mBluetoothGatt == null) {
                 Log.i(TAG, "connectGatt");
                 mBluetoothGatt = mBluetoothDevice.connectGatt(mContext, false, mBluetoothGattCallback);
+                mBluetoothGatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
             } else {
                 mBluetoothGatt.connect();
             }
@@ -388,7 +389,7 @@ public class GKBLECard {
             if (deferredObject.isPending()) {
                 deferredObject.reject(new CardException(CardError.CONNECTION_TIMEOUT));
             }
-        }, 10000L);
+        }, 20000L);
 
         return deferredObject.promise();
     }

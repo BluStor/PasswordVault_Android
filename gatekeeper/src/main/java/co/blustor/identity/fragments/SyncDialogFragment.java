@@ -15,6 +15,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jdeferred.Promise;
+import org.jdeferred.android.AndroidDeferredManager;
 
 import java.util.UUID;
 
@@ -64,7 +65,8 @@ public class SyncDialogFragment extends DialogFragment {
             promise = setRoot(getActivity(), password);
         }
 
-        promise.done(result -> {
+        AndroidDeferredManager deferredManager = new AndroidDeferredManager();
+        deferredManager.when(promise).done(result -> {
             Log.i(TAG, "done");
             if (mSyncListener != null) {
                 Log.i(TAG, "syncComplete");

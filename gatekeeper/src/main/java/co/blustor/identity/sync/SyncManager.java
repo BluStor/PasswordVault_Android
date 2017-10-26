@@ -1,6 +1,9 @@
 package co.blustor.identity.sync;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Pair;
 
 import org.greenrobot.eventbus.EventBus;
 import org.jdeferred.DonePipe;
@@ -24,14 +27,18 @@ public class SyncManager {
     private static final String TAG = "SyncManager";
     private static final String VAULT_PATH = "/passwordvault/db.kdbx";
     private static final EventBus EVENT_BUS = EventBus.getDefault();
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     public static synchronized Promise<VaultGroup, Exception, Void> getRoot(Context context, String password) {
         final DeferredObject<VaultGroup, Exception, Void> deferredObject = new DeferredObject<>();
         Runnable runnable = () -> {
-            String macAddress = Vault.getCardMacAddress(context);
-            if (macAddress != null) {
+            Pair<String, String> cardAddressName = Vault.getCardAddressName(context);
+            String address = cardAddressName.first;
+            String name = cardAddressName.second;
+
+            if (address != null && name != null) {
                 try {
-                    GKBLECard card = new GKBLECard(context, macAddress);
+                    GKBLECard card = new GKBLECard(context, address, name);
                     card.checkBluetoothState().then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result -> {
                         EVENT_BUS.postSticky(SyncStatus.CONNECTING);
                         return card.connect();
@@ -72,7 +79,8 @@ public class SyncManager {
                 deferredObject.reject(new SyncException(SyncError.CARD_NOT_CHOSEN));
             }
         };
-        new Thread(runnable).run();
+
+        HANDLER.post(runnable);
 
         return deferredObject.promise();
     }
@@ -93,10 +101,13 @@ public class SyncManager {
 
                 byte[] bytes = byteArrayOutputStream.toByteArray();
 
-                String macAddress = Vault.getCardMacAddress(context);
-                if (macAddress != null) {
+                Pair<String, String> cardAddressName = Vault.getCardAddressName(context);
+                String address = cardAddressName.first;
+                String name = cardAddressName.second;
+
+                if (address != null && name != null) {
                     try {
-                        GKBLECard card = new GKBLECard(context, macAddress);
+                        GKBLECard card = new GKBLECard(context, address, name);
                         card.checkBluetoothState().then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result -> {
                             EVENT_BUS.postSticky(SyncStatus.CONNECTING);
                             return card.connect();
@@ -125,7 +136,9 @@ public class SyncManager {
                 deferredObject.reject(new SyncException(SyncError.VAULT_EMPTY));
             }
         };
-        new Thread(runnable).run();
+
+        HANDLER.post(runnable);
+
         return deferredObject.promise();
     }
 
