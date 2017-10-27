@@ -27,7 +27,6 @@ public class SyncManager {
     private static final String TAG = "SyncManager";
     private static final String VAULT_PATH = "/passwordvault/db.kdbx";
     private static final EventBus EVENT_BUS = EventBus.getDefault();
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     public static synchronized Promise<VaultGroup, Exception, Void> getRoot(Context context, String password) {
         final DeferredObject<VaultGroup, Exception, Void> deferredObject = new DeferredObject<>();
@@ -80,7 +79,7 @@ public class SyncManager {
             }
         };
 
-        HANDLER.post(runnable);
+        new Thread(runnable).start();
 
         return deferredObject.promise();
     }
@@ -137,7 +136,7 @@ public class SyncManager {
             }
         };
 
-        HANDLER.post(runnable);
+        new Thread(runnable).start();
 
         return deferredObject.promise();
     }
