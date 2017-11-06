@@ -30,15 +30,15 @@ import com.polidea.rxandroidble.scan.ScanSettings;
 
 import co.blustor.identity.R;
 import co.blustor.identity.adapters.ScanResultAdapter;
-import co.blustor.identity.vault.Vault;
-import co.blustor.identity.gatekeeper.GKBLECard;
+import co.blustor.identity.gatekeeper.GKCard;
 import co.blustor.identity.utils.MyApplication;
+import co.blustor.identity.vault.Vault;
 import rx.Subscription;
 
 public class ChooseActivity extends AppCompatActivity {
 
     private static ScanSettings SCAN_SETTINGS = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES).build();
-    private static ScanFilter SCAN_FILTER = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(GKBLECard.SERVICE_UUID)).build();
+    private static ScanFilter SCAN_FILTER = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(GKCard.SERVICE_UUID)).build();
 
     @Nullable
     private Subscription mScanSubscription;
@@ -75,14 +75,17 @@ public class ChooseActivity extends AppCompatActivity {
         mCardsRecyclerView.setAdapter(mScanResultAdapter);
 
         mScanResultAdapter.setOnAdapterItemClickListener(view -> {
+            if (mScanSubscription != null) {
+                mScanSubscription.unsubscribe();
+            }
+
             int position = mCardsRecyclerView.getChildAdapterPosition(view);
             ScanResult scanResult = mScanResultAdapter.getItemAtPosition(position);
 
             RxBleDevice device = scanResult.getBleDevice();
             String address = device.getMacAddress();
-            String name = device.getName();
+            Vault.setCardAddress(this, address);
 
-            Vault.setCardAddressName(this, address, name);
             Intent splashActivity = new Intent(this, SplashActivity.class);
             startActivity(splashActivity);
             finish();

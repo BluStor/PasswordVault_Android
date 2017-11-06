@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-feature android:name="android.hardware.bluetooth_le" />
@@ -45,7 +46,9 @@
         </activity>
         <activity android:name="co.blustor.identity.activities.PasswordGeneratorActivity" />
         <activity android:name="co.blustor.identity.activities.SettingsActivity" />
-        <activity android:name="co.blustor.identity.activities.SplashActivity" android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="co.blustor.identity.activities.SplashActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="co.blustor.identity.activities.UnlockActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
@@ -57,10 +60,6 @@
                 <action android:name="co.blustor.pwv.lock_database" />
             </intent-filter>
         </receiver>
-
-        <service
-            android:name="co.blustor.identity.services.NotificationService"
-            android:exported="false" />
-
+        
     </application>
 </manifest>

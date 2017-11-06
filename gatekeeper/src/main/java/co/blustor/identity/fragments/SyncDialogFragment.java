@@ -15,16 +15,15 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jdeferred.Promise;
-import org.jdeferred.android.AndroidDeferredManager;
 
 import java.util.UUID;
 
 import co.blustor.identity.R;
-import co.blustor.identity.vault.VaultGroup;
-import co.blustor.identity.gatekeeper.GKBLECard;
+import co.blustor.identity.gatekeeper.GKCard;
 import co.blustor.identity.sync.SyncManager;
 import co.blustor.identity.sync.SyncStatus;
 import co.blustor.identity.utils.AlertUtils;
+import co.blustor.identity.vault.VaultGroup;
 
 import static co.blustor.identity.sync.SyncManager.getRoot;
 import static co.blustor.identity.sync.SyncManager.setRoot;
@@ -65,8 +64,7 @@ public class SyncDialogFragment extends DialogFragment {
             promise = setRoot(getActivity(), password);
         }
 
-        AndroidDeferredManager deferredManager = new AndroidDeferredManager();
-        deferredManager.when(promise).done(result -> {
+        promise.done(result -> {
             Log.i(TAG, "done");
             if (mSyncListener != null) {
                 Log.i(TAG, "syncComplete");
@@ -79,7 +77,6 @@ public class SyncDialogFragment extends DialogFragment {
         ).fail(result -> {
             if (result instanceof SyncManager.SyncException) {
                 SyncManager.SyncException syncException = (SyncManager.SyncException) result;
-                Log.i(TAG, "sync exception");
                 Log.i(TAG, syncException.getError().toString());
                 getActivity().runOnUiThread(() -> {
                     switch (syncException.getError()) {
@@ -94,8 +91,8 @@ public class SyncDialogFragment extends DialogFragment {
                             break;
                     }
                 });
-            } else if (result instanceof GKBLECard.CardException) {
-                GKBLECard.CardException cardException = (GKBLECard.CardException) result;
+            } else if (result instanceof GKCard.CardException) {
+                GKCard.CardException cardException = (GKCard.CardException) result;
                 Log.i(TAG, cardException.getError().toString());
                 getActivity().runOnUiThread(() -> {
                     switch (cardException.getError()) {
@@ -105,20 +102,17 @@ public class SyncDialogFragment extends DialogFragment {
                         case BLUETOOTH_NOT_AVAILABLE:
                             AlertUtils.showError(getActivity(), "Bluetooth not available.");
                             break;
-                        case BLUETOOTH_NOT_ENABLED:
+                        case BLUETOOTH_ADAPTER_NOT_ENABLED:
                             AlertUtils.showError(getActivity(), "Bluetooth not enabled.");
                             break;
                         case CARD_NOT_PAIRED:
-                            AlertUtils.showError(getActivity(), "Card is not paired.");
+                            AlertUtils.showError(getActivity(), "'ID' is not paired. Check your Bluetooth settings.");
                             break;
                         case CONNECTION_FAILED:
                             AlertUtils.showError(getActivity(), "Connection failed.");
                             break;
-                        case CONNECTION_REQUIRED:
-                            AlertUtils.showError(getActivity(), "Not connected.");
-                            break;
-                        case CONNECTION_TIMEOUT:
-                            AlertUtils.showError(getActivity(), "Connection timed out.");
+                        case CHARACTERISTIC_READ_FAILURE:
+                            AlertUtils.showError(getActivity(), "Card read failure.");
                             break;
                         case CHARACTERISTIC_WRITE_FAILURE:
                             AlertUtils.showError(getActivity(), "Card write failure.");
@@ -134,6 +128,9 @@ public class SyncDialogFragment extends DialogFragment {
                             break;
                         case MAKE_COMMAND_DATA_FAILED:
                             AlertUtils.showError(getActivity(), "Card command failure.");
+                            break;
+                        case INVALID_CHECKSUM:
+                            AlertUtils.showError(getActivity(), "Transfer error.");
                             break;
                         case INVALID_RESPONSE:
                             AlertUtils.showError(getActivity(), "Invalid response.");

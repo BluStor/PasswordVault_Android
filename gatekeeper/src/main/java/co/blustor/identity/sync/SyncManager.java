@@ -1,9 +1,7 @@
 package co.blustor.identity.sync;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Pair;
+import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 import org.jdeferred.DonePipe;
@@ -13,10 +11,10 @@ import org.jdeferred.impl.DeferredObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import co.blustor.identity.gatekeeper.GKCard;
 import co.blustor.identity.vault.Translator;
 import co.blustor.identity.vault.Vault;
 import co.blustor.identity.vault.VaultGroup;
-import co.blustor.identity.gatekeeper.GKBLECard;
 import de.slackspace.openkeepass.KeePassDatabase;
 import de.slackspace.openkeepass.domain.Group;
 import de.slackspace.openkeepass.domain.KeePassFile;
@@ -31,20 +29,20 @@ public class SyncManager {
     public static synchronized Promise<VaultGroup, Exception, Void> getRoot(Context context, String password) {
         final DeferredObject<VaultGroup, Exception, Void> deferredObject = new DeferredObject<>();
         Runnable runnable = () -> {
-            Pair<String, String> cardAddressName = Vault.getCardAddressName(context);
-            String address = cardAddressName.first;
-            String name = cardAddressName.second;
+            EVENT_BUS.postSticky(SyncStatus.CONNECTING);
 
-            if (address != null && name != null) {
+            String address = Vault.getCardAddress(context);
+
+            if (address != null) {
                 try {
-                    GKBLECard card = new GKBLECard(context, address, name);
-                    card.checkBluetoothState().then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result -> {
-                        EVENT_BUS.postSticky(SyncStatus.CONNECTING);
-                        return card.connect();
-                    }).then((DonePipe<Void, byte[], GKBLECard.CardException, Void>) result -> {
+                    GKCard card = new GKCard(address);
+                    card.checkBluetoothState().then((DonePipe<Void, Void, GKCard.CardException, Void>) result ->
+                            card.connect(context)
+                    ).then((DonePipe<Void, byte[], GKCard.CardException, Void>) result -> {
                         EVENT_BUS.postSticky(SyncStatus.TRANSFERRING);
                         return card.get(Vault.DB_PATH);
                     }).then(result -> {
+                        Log.d(TAG, "Decrypting");
                         EVENT_BUS.postSticky(SyncStatus.DECRYPTING);
                         try {
                             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(result);
@@ -59,9 +57,11 @@ public class SyncManager {
 
                             EVENT_BUS.postSticky(SyncStatus.SYNCED);
                             deferredObject.resolve(group);
+                            Log.d(TAG, "Database synced.");
                         } catch (KeePassDatabaseUnreadableException e) {
                             EVENT_BUS.postSticky(SyncStatus.FAILED);
                             deferredObject.reject(new SyncException(SyncError.DATABASE_UNREADABLE));
+                            Log.d(TAG, "Database unreadable.");
                         }
                     }).always((state, resolved, rejected) ->
                             card.disconnect()
@@ -69,7 +69,7 @@ public class SyncManager {
                         EVENT_BUS.postSticky(SyncStatus.FAILED);
                         deferredObject.reject(result);
                     });
-                } catch (GKBLECard.CardException e) {
+                } catch (GKCard.CardException e) {
                     EVENT_BUS.postSticky(SyncStatus.FAILED);
                     deferredObject.reject(e);
                 }
@@ -78,7 +78,6 @@ public class SyncManager {
                 deferredObject.reject(new SyncException(SyncError.CARD_NOT_CHOSEN));
             }
         };
-
         new Thread(runnable).start();
 
         return deferredObject.promise();
@@ -98,22 +97,24 @@ public class SyncManager {
                 KeePassFile keePassFile = new KeePassFileBuilder("passwords").addTopGroups(group).build();
                 KeePassDatabase.write(keePassFile, password, byteArrayOutputStream);
 
-                byte[] bytes = byteArrayOutputStream.toByteArray();
+                byte[] data = byteArrayOutputStream.toByteArray();
 
-                Pair<String, String> cardAddressName = Vault.getCardAddressName(context);
-                String address = cardAddressName.first;
-                String name = cardAddressName.second;
+                String address = Vault.getCardAddress(context);
 
-                if (address != null && name != null) {
+                if (address != null) {
                     try {
-                        GKBLECard card = new GKBLECard(context, address, name);
-                        card.checkBluetoothState().then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result -> {
+                        GKCard card = new GKCard(address);
+                        card.checkBluetoothState().then((DonePipe<Void, Void, GKCard.CardException, Void>) result -> {
                             EVENT_BUS.postSticky(SyncStatus.CONNECTING);
-                            return card.connect();
-                        }).then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result -> {
+                            return card.connect(context);
+                        }).then((DonePipe<Void, Void, GKCard.CardException, Void>) result -> {
                             EVENT_BUS.postSticky(SyncStatus.TRANSFERRING);
-                            return card.put(VAULT_PATH, bytes);
-                        }).then(result -> {
+                            return card.put(data);
+                        }).then((DonePipe<Void, Void, GKCard.CardException, Void>) result ->
+                                card.checksum(data)
+                        ).then((DonePipe<Void, Void, GKCard.CardException, Void>) result ->
+                                card.close(VAULT_PATH)
+                        ).then(result -> {
                             EVENT_BUS.postSticky(SyncStatus.SYNCED);
                             deferredObject.resolve(rootGroup);
                         }).always((state, resolved, rejected) ->
@@ -122,7 +123,7 @@ public class SyncManager {
                             EVENT_BUS.postSticky(SyncStatus.FAILED);
                             deferredObject.reject(result);
                         });
-                    } catch (GKBLECard.CardException e) {
+                    } catch (GKCard.CardException e) {
                         EVENT_BUS.postSticky(SyncStatus.FAILED);
                         deferredObject.reject(e);
                     }

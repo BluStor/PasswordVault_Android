@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.util.Pair;
 
 import com.google.common.base.Optional;
 
@@ -28,18 +27,15 @@ public class Vault {
         return instance;
     }
 
-    public static Pair<String, String> getCardAddressName(Context context) {
+    public static String getCardAddress(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String address = sharedPreferences.getString("cardAddress", null);
-        String name = sharedPreferences.getString("cardName", null);
-        return new Pair<>(address, name);
+        return sharedPreferences.getString("cardAddress", null);
     }
 
-    public static void setCardAddressName(Context context, String address, String name) {
+    public static void setCardAddress(Context context, String address) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("cardAddress", address);
-        editor.putString("cardName", name);
         editor.apply();
     }
 

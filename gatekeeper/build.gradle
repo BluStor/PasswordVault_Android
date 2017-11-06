@@ -40,10 +40,10 @@ android {
 
     defaultConfig {
         applicationId "co.blustor.pwv"
-        minSdkVersion 22
+        minSdkVersion 23
         targetSdkVersion 26
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 5
+        versionName "1.0.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 }
@@ -53,7 +53,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'co.blustor:gatekeeper-sdk:0.20.7'
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support:support-v4:26.1.0'
@@ -61,16 +60,15 @@ dependencies {
     implementation 'com.github.clans:fab:1.6.4'
     implementation 'com.github.Kennyc1012:BottomSheet:2.3.4'
     implementation 'com.google.guava:guava:23.0-android'
-    implementation 'com.karumi:dexter:4.1.0'
-    implementation 'com.polidea.rxandroidble:rxandroidble:1.3.3'
+    implementation 'com.karumi:dexter:4.2.0'
+    implementation 'com.polidea.rxandroidble:rxandroidble:1.4.2'
     implementation('de.slackspace:openkeepass:0.6.1') {
         exclude module: 'stax'
         exclude module: 'stax-api'
         exclude module: 'xpp3'
     }
     implementation 'org.greenrobot:eventbus:3.0.0'
-    implementation 'org.jdeferred:jdeferred-android-aar:1.2.6'
-
+    implementation 'org.jdeferred:jdeferred-core:1.2.6'
     testImplementation 'com.android.support.test:runner:1.0.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

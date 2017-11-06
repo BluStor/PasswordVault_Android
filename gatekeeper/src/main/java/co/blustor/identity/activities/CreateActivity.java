@@ -18,8 +18,8 @@ import com.github.clans.fab.FloatingActionButton;
 import java.util.UUID;
 
 import co.blustor.identity.R;
-import co.blustor.identity.vault.Vault;
 import co.blustor.identity.fragments.SyncDialogFragment;
+import co.blustor.identity.vault.Vault;
 
 public class CreateActivity extends AppCompatActivity implements SyncDialogFragment.SyncListener {
     private static final String TAG = "CreateActivity";
@@ -93,7 +93,11 @@ public class CreateActivity extends AppCompatActivity implements SyncDialogFragm
     @Override
     public void syncComplete(UUID uuid) {
         Log.i(TAG, "syncComplete: " + uuid.toString());
-        Intent groupActivity = new Intent(CreateActivity.this, GroupActivity.class);
+
+        Intent unlockActivity = new Intent(this, UnlockActivity.class);
+        startActivity(unlockActivity);
+
+        Intent groupActivity = new Intent(this, GroupActivity.class);
         groupActivity.putExtra("uuid", uuid);
         startActivity(groupActivity);
 

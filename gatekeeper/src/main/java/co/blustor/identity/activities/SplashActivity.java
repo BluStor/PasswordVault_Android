@@ -4,13 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Pair;
 
 import org.jdeferred.DonePipe;
-import org.jdeferred.android.AndroidDeferredManager;
 
 import co.blustor.identity.R;
-import co.blustor.identity.gatekeeper.GKBLECard;
+import co.blustor.identity.gatekeeper.GKCard;
 import co.blustor.identity.vault.Vault;
 
 public class SplashActivity extends AppCompatActivity {
@@ -35,17 +33,14 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void checkIfDatabaseExists() {
-        Pair<String, String> cardAddressName = Vault.getCardAddressName(this);
-        String address = cardAddressName.first;
-        String name = cardAddressName.second;
+        String address = Vault.getCardAddress(this);
 
-        if (address != null && name != null) {
+        if (address != null) {
             try {
-                GKBLECard card = new GKBLECard(this, address, name);
-                AndroidDeferredManager androidDeferredManager = new AndroidDeferredManager();
-                androidDeferredManager.when(card.checkBluetoothState()).then((DonePipe<Void, Void, GKBLECard.CardException, Void>) result ->
-                        card.connect()
-                ).then((DonePipe<Void, Boolean, GKBLECard.CardException, Void>) result ->
+                GKCard card = new GKCard(address);
+                card.checkBluetoothState().then((DonePipe<Void, Void, GKCard.CardException, Void>) result ->
+                        card.connect(this)
+                ).then((DonePipe<Void, Boolean, GKCard.CardException, Void>) result ->
                         card.exists(Vault.DB_PATH)
                 ).then(result -> {
                     if (result) {
@@ -55,10 +50,10 @@ public class SplashActivity extends AppCompatActivity {
                     }
                 }).always((state, resolved, rejected) ->
                         card.disconnect()
-                ).fail(result -> {
-                    startUnlock();
-                });
-            } catch (GKBLECard.CardException e) {
+                ).fail(result ->
+                        startUnlock()
+                );
+            } catch (GKCard.CardException e) {
                 startUnlock();
             }
         } else {

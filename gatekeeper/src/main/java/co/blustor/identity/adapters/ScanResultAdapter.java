@@ -50,10 +50,11 @@ public class ScanResultAdapter extends RecyclerView.Adapter<ScanResultAdapter.Vi
     }
 
     public void addScanResult(ScanResult scanResult) {
-        scanResults.add(scanResult);
+        String resultAddress = scanResult.getBleDevice().getMacAddress().toLowerCase();
 
-        for (ScanResult result : scanResults) {
-            if (result.getBleDevice().getMacAddress().equals(scanResult.getBleDevice().getMacAddress())) {
+        for (int i = 0; i < scanResults.size(); i++) {
+            if (scanResults.get(i).getBleDevice().getMacAddress().toLowerCase().equals(resultAddress)) {
+                scanResults.set(i, scanResult);
                 return;
             }
         }

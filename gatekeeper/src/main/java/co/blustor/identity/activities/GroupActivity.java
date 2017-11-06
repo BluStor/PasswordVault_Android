@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,13 +32,13 @@ import co.blustor.identity.R;
 import co.blustor.identity.comparators.VaultEntryComparator;
 import co.blustor.identity.comparators.VaultGroupComparator;
 import co.blustor.identity.constants.Intents;
-import co.blustor.identity.vault.Vault;
-import co.blustor.identity.vault.VaultEntry;
-import co.blustor.identity.vault.VaultGroup;
 import co.blustor.identity.fragments.SearchFragment;
 import co.blustor.identity.services.NotificationService;
 import co.blustor.identity.sync.SyncManager;
 import co.blustor.identity.utils.MyApplication;
+import co.blustor.identity.vault.Vault;
+import co.blustor.identity.vault.VaultEntry;
+import co.blustor.identity.vault.VaultGroup;
 
 public class GroupActivity extends LockingActivity {
     private final GroupEntryAdapter mGroupEntryAdapter = new GroupEntryAdapter();
@@ -101,7 +100,7 @@ public class GroupActivity extends LockingActivity {
         groupFloatingActionButton.setImageResource(R.drawable.vaultgroup_white);
         groupFloatingActionButton.setOnClickListener(view -> {
             fam.close(false);
-            Intent addGroupActivity = new Intent(view.getContext(), AddGroupActivity.class);
+            Intent addGroupActivity = new Intent(this, AddGroupActivity.class);
             addGroupActivity.putExtra("uuid", mGroup.getUUID());
             startActivity(addGroupActivity);
         });
@@ -114,7 +113,7 @@ public class GroupActivity extends LockingActivity {
         entryFloatingActionButton.setImageResource(R.drawable.vaultentry_white);
         entryFloatingActionButton.setOnClickListener(view -> {
             fam.close(false);
-            Intent addEntryActivity = new Intent(view.getContext(), AddEntryActivity.class);
+            Intent addEntryActivity = new Intent(this, AddEntryActivity.class);
             addEntryActivity.putExtra("uuid", mGroup.getUUID());
             startActivity(addEntryActivity);
         });
@@ -304,8 +303,7 @@ public class GroupActivity extends LockingActivity {
                     Intent editEntryActivity = new Intent(view.getContext(), EditEntryActivity.class);
                     editEntryActivity.putExtra("uuid", entry.getUUID());
 
-                    ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(GroupActivity.this, iconImageView, "entry");
-                    startActivity(editEntryActivity, activityOptions.toBundle());
+                    startActivity(editEntryActivity);
                 }
             }
 
