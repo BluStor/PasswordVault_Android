@@ -6,6 +6,4 @@ public interface DisconnectCallback {
     void onNotConnected();
 
     void onTimeout();
-
-    void onInterrupted();
 }

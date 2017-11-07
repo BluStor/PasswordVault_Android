@@ -78,21 +78,13 @@ public class BluetoothClient {
                 if (CONNECT_CALLBACK != null) {
                     BluetoothLog.d("onConnectionStateChange: CONNECT_CALLBACK");
                     CONNECT_CALLBACK.onConnectionStateChange(status, newState);
-                    try {
-                        CYCLIC_BARRIER.await();
-                    } catch (InterruptedException | BrokenBarrierException e) {
-                        e.printStackTrace();
-                    }
+                    stopWaitingForCallback();
                 }
             } else if (newState == STATE_DISCONNECTED) {
                 if (DISCONNECT_CALLBACK != null) {
                     BluetoothLog.d("onConnectionStateChange: DISCONNECT_CALLBACK");
                     DISCONNECT_CALLBACK.onDisconnected();
-                    try {
-                        CYCLIC_BARRIER.await();
-                    } catch (InterruptedException | BrokenBarrierException e) {
-                        e.printStackTrace();
-                    }
+                    stopWaitingForCallback();
                 }
             } else {
                 BluetoothLog.d(String.format(Locale.getDefault(), "onConnectionStateChange: Unknown status %d, newState = %d", status, newState));
@@ -105,11 +97,7 @@ public class BluetoothClient {
             if (DISCOVER_SERVICES_CALLBACK != null) {
                 BluetoothLog.d("onServicesDiscovered: DISCOVER_SERVICES_CALLBACK");
                 DISCOVER_SERVICES_CALLBACK.onServicesDiscovered(status);
-                try {
-                    CYCLIC_BARRIER.await();
-                } catch (InterruptedException | BrokenBarrierException e) {
-                    e.printStackTrace();
-                }
+                stopWaitingForCallback();
             }
         }
 
@@ -119,11 +107,7 @@ public class BluetoothClient {
             if (CHARACTERISTIC_READ_CALLBACK != null) {
                 BluetoothLog.d("onCharacteristicRead: CHARACTERISTIC_READ_CALLBACK");
                 CHARACTERISTIC_READ_CALLBACK.onCharacteristicRead(status, characteristic.getValue());
-                try {
-                    CYCLIC_BARRIER.await();
-                } catch (InterruptedException | BrokenBarrierException e) {
-                    e.printStackTrace();
-                }
+                stopWaitingForCallback();
             }
         }
 
@@ -133,11 +117,7 @@ public class BluetoothClient {
             if (CHARACTERISTIC_WRITE_CALLBACK != null) {
                 BluetoothLog.d("onCharacteristicWrite: CHARACTERISTIC_WRITE_CALLBACK");
                 CHARACTERISTIC_WRITE_CALLBACK.onCharacteristicWrite(status);
-                try {
-                    CYCLIC_BARRIER.await();
-                } catch (InterruptedException | BrokenBarrierException e) {
-                    e.printStackTrace();
-                }
+                stopWaitingForCallback();
             }
         }
 
@@ -172,11 +152,7 @@ public class BluetoothClient {
             if (DESCRIPTOR_WRITE_CALLBACK != null) {
                 BluetoothLog.d("onDescriptorWrite: DESCRIPTOR_WRITE_CALLBACK");
                 DESCRIPTOR_WRITE_CALLBACK.onDescriptorWrite(status);
-                try {
-                    CYCLIC_BARRIER.await();
-                } catch (InterruptedException | BrokenBarrierException e) {
-                    e.printStackTrace();
-                }
+                stopWaitingForCallback();
             }
         }
 
@@ -186,14 +162,18 @@ public class BluetoothClient {
             if (REQUEST_MTU_CALLBACK != null) {
                 BluetoothLog.d("onMtuChanged: REQUEST_MTU_CALLBACK");
                 REQUEST_MTU_CALLBACK.onMtuChanged(mtu, status);
-                try {
-                    CYCLIC_BARRIER.await();
-                } catch (InterruptedException | BrokenBarrierException e) {
-                    e.printStackTrace();
-                }
+                stopWaitingForCallback();
             }
         }
     };
+
+    private static void stopWaitingForCallback() {
+        try {
+            CYCLIC_BARRIER.await();
+        } catch (InterruptedException | BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+    }
 
     // Event processing
 
@@ -249,11 +229,7 @@ public class BluetoothClient {
                             GATT.readCharacteristic(characteristic);
                             try {
                                 CYCLIC_BARRIER.await(1000, TimeUnit.MILLISECONDS);
-                            } catch (InterruptedException | BrokenBarrierException e) {
-                                if (CHARACTERISTIC_READ_CALLBACK != null) {
-                                    CHARACTERISTIC_READ_CALLBACK.onInterrupted();
-                                }
-                            } catch (TimeoutException e) {
+                            } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                                 if (CHARACTERISTIC_READ_CALLBACK != null) {
                                     CHARACTERISTIC_READ_CALLBACK.onTimeout();
                                 }
@@ -285,11 +261,7 @@ public class BluetoothClient {
                             GATT.writeCharacteristic(characteristic);
                             try {
                                 CYCLIC_BARRIER.await(1000, TimeUnit.MILLISECONDS);
-                            } catch (InterruptedException | BrokenBarrierException e) {
-                                if (CHARACTERISTIC_WRITE_CALLBACK != null) {
-                                    CHARACTERISTIC_WRITE_CALLBACK.onInterrupted();
-                                }
-                            } catch (TimeoutException e) {
+                            } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                                 if (CHARACTERISTIC_WRITE_CALLBACK != null) {
                                     CHARACTERISTIC_WRITE_CALLBACK.onTimeout();
                                 }
@@ -318,11 +290,7 @@ public class BluetoothClient {
 
                         try {
                             CYCLIC_BARRIER.await(10000, TimeUnit.MILLISECONDS);
-                        } catch (InterruptedException | BrokenBarrierException e) {
-                            if (CONNECT_CALLBACK != null) {
-                                CONNECT_CALLBACK.onInterrupted();
-                            }
-                        } catch (TimeoutException e) {
+                        } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                             if (CONNECT_CALLBACK != null) {
                                 CONNECT_CALLBACK.onTimeout();
                             }
@@ -347,11 +315,7 @@ public class BluetoothClient {
                             GATT.readDescriptor(descriptor);
                             try {
                                 CYCLIC_BARRIER.await(1000, TimeUnit.MILLISECONDS);
-                            } catch (InterruptedException | BrokenBarrierException e) {
-                                if (DESCRIPTOR_READ_CALLBACK != null) {
-                                    DESCRIPTOR_READ_CALLBACK.onInterrupted();
-                                }
-                            } catch (TimeoutException e) {
+                            } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                                 if (DESCRIPTOR_READ_CALLBACK != null) {
                                     DESCRIPTOR_READ_CALLBACK.onTimeout();
                                 }
@@ -383,11 +347,7 @@ public class BluetoothClient {
                             GATT.writeDescriptor(descriptor);
                             try {
                                 CYCLIC_BARRIER.await(1000, TimeUnit.MILLISECONDS);
-                            } catch (InterruptedException | BrokenBarrierException e) {
-                                if (DESCRIPTOR_WRITE_CALLBACK != null) {
-                                    DESCRIPTOR_WRITE_CALLBACK.onInterrupted();
-                                }
-                            } catch (TimeoutException e) {
+                            } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                                 if (DESCRIPTOR_WRITE_CALLBACK != null) {
                                     DESCRIPTOR_WRITE_CALLBACK.onTimeout();
                                 }
@@ -405,11 +365,7 @@ public class BluetoothClient {
                         GATT.disconnect();
                         try {
                             CYCLIC_BARRIER.await(1000, TimeUnit.MILLISECONDS);
-                        } catch (InterruptedException | BrokenBarrierException e) {
-                            if (DISCONNECT_CALLBACK != null) {
-                                DISCONNECT_CALLBACK.onInterrupted();
-                            }
-                        } catch (TimeoutException e) {
+                        } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                             if (DISCONNECT_CALLBACK != null) {
                                 DISCONNECT_CALLBACK.onTimeout();
                             }
@@ -428,11 +384,7 @@ public class BluetoothClient {
                         GATT.discoverServices();
                         try {
                             CYCLIC_BARRIER.await(1000, TimeUnit.MILLISECONDS);
-                        } catch (InterruptedException | BrokenBarrierException e) {
-                            if (DISCOVER_SERVICES_CALLBACK != null) {
-                                DISCOVER_SERVICES_CALLBACK.onInterrupted();
-                            }
-                        } catch (TimeoutException e) {
+                        } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                             if (DISCOVER_SERVICES_CALLBACK != null) {
                                 DISCOVER_SERVICES_CALLBACK.onTimeout();
                             }
@@ -454,11 +406,7 @@ public class BluetoothClient {
                         GATT.requestMtu(requestMtuEvent.getMtu());
                         try {
                             CYCLIC_BARRIER.await(1000, TimeUnit.MILLISECONDS);
-                        } catch (InterruptedException | BrokenBarrierException e) {
-                            if (REQUEST_MTU_CALLBACK != null) {
-                                REQUEST_MTU_CALLBACK.onInterrupted();
-                            }
-                        } catch (TimeoutException e) {
+                        } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                             if (REQUEST_MTU_CALLBACK != null) {
                                 REQUEST_MTU_CALLBACK.onTimeout();
                             }

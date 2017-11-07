@@ -6,6 +6,4 @@ public interface DiscoverServicesCallback {
     void onNotConnected();
 
     void onTimeout();
-
-    void onInterrupted();
 }

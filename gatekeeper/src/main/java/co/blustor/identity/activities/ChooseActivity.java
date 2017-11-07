@@ -2,6 +2,12 @@ package co.blustor.identity.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,46 +17,68 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
-import com.polidea.rxandroidble.RxBleDevice;
-import com.polidea.rxandroidble.exceptions.BleScanException;
-import com.polidea.rxandroidble.scan.ScanFilter;
-import com.polidea.rxandroidble.scan.ScanResult;
-import com.polidea.rxandroidble.scan.ScanSettings;
+
+import java.util.Collections;
+import java.util.List;
 
 import co.blustor.identity.R;
 import co.blustor.identity.adapters.ScanResultAdapter;
 import co.blustor.identity.gatekeeper.GKCard;
-import co.blustor.identity.utils.MyApplication;
 import co.blustor.identity.vault.Vault;
-import rx.Subscription;
+
+import static android.bluetooth.le.ScanSettings.MATCH_MODE_AGGRESSIVE;
+import static android.bluetooth.le.ScanSettings.SCAN_MODE_BALANCED;
 
 public class ChooseActivity extends AppCompatActivity {
 
-    private static ScanSettings SCAN_SETTINGS = new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES).build();
-    private static ScanFilter SCAN_FILTER = new ScanFilter.Builder().setServiceUuid(new ParcelUuid(GKCard.SERVICE_UUID)).build();
+    private static final String TAG = "ChooseActivity";
 
-    @Nullable
-    private Subscription mScanSubscription;
+    private BluetoothLeScanner mBlutoothLeScanner;
+    private ScanCallback mScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            mScanResultAdapter.addScanResult(result);
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            for (ScanResult result : results) {
+                mScanResultAdapter.addScanResult(result);
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            Log.d(TAG, "onScanFailed: " + errorCode);
+
+            mScanToggleButton.setChecked(false);
+            mProgressBar.setVisibility(View.GONE);
+        }
+    };
     private ScanResultAdapter mScanResultAdapter = new ScanResultAdapter();
-
     private ToggleButton mScanToggleButton;
     private ProgressBar mProgressBar;
     private RecyclerView mCardsRecyclerView;
+    private boolean isScanning = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
 
         setContentView(R.layout.activity_cardchooser);
         setTitle(getString(R.string.title_choose_card));
@@ -58,11 +86,16 @@ public class ChooseActivity extends AppCompatActivity {
         // Views
 
         mScanToggleButton = findViewById(R.id.button_scan_toggle);
-        mScanToggleButton.setOnCheckedChangeListener((compoundButton, b) -> {
-            if (b) {
-                startScanning();
-            } else {
-                stopScanning();
+        mScanToggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isScanning) {
+                    stopScanning();
+                } else {
+                    startScanning();
+                }
+
+                mScanToggleButton.setChecked(isScanning);
             }
         });
 
@@ -75,15 +108,12 @@ public class ChooseActivity extends AppCompatActivity {
         mCardsRecyclerView.setAdapter(mScanResultAdapter);
 
         mScanResultAdapter.setOnAdapterItemClickListener(view -> {
-            if (mScanSubscription != null) {
-                mScanSubscription.unsubscribe();
-            }
+            stopScanning();
 
             int position = mCardsRecyclerView.getChildAdapterPosition(view);
             ScanResult scanResult = mScanResultAdapter.getItemAtPosition(position);
 
-            RxBleDevice device = scanResult.getBleDevice();
-            String address = device.getMacAddress();
+            String address = scanResult.getDevice().getAddress();
             Vault.setCardAddress(this, address);
 
             Intent splashActivity = new Intent(this, SplashActivity.class);
@@ -91,104 +121,83 @@ public class ChooseActivity extends AppCompatActivity {
             finish();
         });
 
+        // Scanner
+
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        if (bluetoothManager != null) {
+            mBlutoothLeScanner = bluetoothManager.getAdapter().getBluetoothLeScanner();
+        }
+
         // Scan
 
         startScanning();
     }
 
     private void startScanning() {
-        mScanToggleButton.setChecked(true);
-        mProgressBar.setVisibility(View.VISIBLE);
+        Log.d(TAG, "startScanning");
 
-        if (mScanSubscription == null || mScanSubscription.isUnsubscribed()) {
-            Dexter.withActivity(this)
-                    .withPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                    .withListener(new PermissionListener() {
-                        @Override
-                        public void onPermissionGranted(PermissionGrantedResponse response) {
-                            mScanSubscription = MyApplication.getBleClient(ChooseActivity.this)
-                                    .scanBleDevices(SCAN_SETTINGS, SCAN_FILTER)
-                                    .subscribe(
-                                            scanResult -> {
-                                                mProgressBar.setVisibility(View.GONE);
-                                                mScanResultAdapter.addScanResult(scanResult);
-                                            },
-                                            throwable -> {
-                                                onScanFailure(throwable);
-                                                stopScanning();
-                                            }
-                                    );
-                        }
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        if (bluetoothManager != null) {
+            if (!bluetoothManager.getAdapter().isEnabled()) {
+                Toast.makeText(this, "Bluetooth is not enabled.", Toast.LENGTH_SHORT).show();
+            } else {
+                Dexter.withActivity(this)
+                        .withPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        .withListener(new MultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                if (report.areAllPermissionsGranted()) {
+                                    ParcelUuid serviceUuid = new ParcelUuid(GKCard.SERVICE_UUID);
 
-                        @Override
-                        public void onPermissionDenied(PermissionDeniedResponse response) {
-                            if (response.isPermanentlyDenied()) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ChooseActivity.this)
-                                        .setMessage(R.string.error_permission_location_scan)
-                                        .setPositiveButton("Settings", (dialogInterface, i) -> {
-                                            Intent intent = new Intent();
-                                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                            Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                            intent.setData(uri);
-                                            startActivity(intent);
+                                    ScanFilter scanFilter = new ScanFilter.Builder()
+                                            .setServiceUuid(serviceUuid)
+                                            .build();
 
-                                            dialogInterface.cancel();
-                                        })
-                                        .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
+                                    ScanSettings scanSettings = new ScanSettings.Builder()
+                                            .setScanMode(SCAN_MODE_BALANCED)
+                                            .setMatchMode(MATCH_MODE_AGGRESSIVE)
+                                            .build();
 
-                                builder.create().show();
+                                    List<ScanFilter> scanFilters = Collections.singletonList(scanFilter);
+
+                                    mBlutoothLeScanner.startScan(scanFilters, scanSettings, mScanCallback);
+
+                                    isScanning = true;
+                                    mScanToggleButton.setChecked(true);
+                                    mProgressBar.setVisibility(View.VISIBLE);
+                                } else {
+                                    if (report.isAnyPermissionPermanentlyDenied()) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(ChooseActivity.this)
+                                                .setMessage(R.string.error_permission_location_scan)
+                                                .setPositiveButton("Settings", (dialogInterface, i) -> {
+                                                    Intent intent = new Intent();
+                                                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                                    intent.setData(uri);
+                                                    startActivity(intent);
+
+                                                    dialogInterface.cancel();
+                                                })
+                                                .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
+
+                                        builder.create().show();
+                                    }
+                                }
                             }
 
-                            stopScanning();
-                        }
-
-                        @Override
-                        public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                            token.continuePermissionRequest();
-                        }
-                    }).check();
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();
+            }
         }
-    }
-
-    private void onScanFailure(Throwable throwable) {
-        if (throwable instanceof BleScanException) {
-            handleBleException((BleScanException) throwable);
-        }
-    }
-
-    private void handleBleException(BleScanException exception) {
-        String error;
-        switch (exception.getReason()) {
-            case BleScanException.BLUETOOTH_NOT_AVAILABLE:
-                error = "Bluetooth is not available.";
-                break;
-            case BleScanException.BLUETOOTH_DISABLED:
-                error = "Bluetooth is disabled.";
-                break;
-            case BleScanException.SCAN_FAILED_ALREADY_STARTED:
-                error = "Scan already started.";
-                break;
-            case BleScanException.LOCATION_SERVICES_DISABLED:
-                error = "Location services is disabled.";
-                break;
-            case BleScanException.LOCATION_PERMISSION_MISSING:
-                error = "Location permission is missing.";
-                break;
-            default:
-                error = "Unknown error.";
-        }
-
-        Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
     }
 
     private void stopScanning() {
+        mBlutoothLeScanner.stopScan(mScanCallback);
+        isScanning = false;
         mScanToggleButton.setChecked(false);
         mProgressBar.setVisibility(View.GONE);
-
-        mScanResultAdapter.clearScanResults();
-
-        if (mScanSubscription != null && !mScanSubscription.isUnsubscribed()) {
-            mScanSubscription.unsubscribe();
-        }
     }
 }

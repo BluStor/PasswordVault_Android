@@ -161,12 +161,6 @@ public class GKCard {
                         deferredObject.reject(new CardException(CardError.CHARACTERISTIC_WRITE_FAILURE));
                         phaser.arriveAndDeregister();
                     }
-
-                    @Override
-                    public void onInterrupted() {
-                        deferredObject.reject(new CardException(CardError.CHARACTERISTIC_WRITE_FAILURE));
-                        phaser.arriveAndDeregister();
-                    }
                 });
 
                 try {
@@ -229,11 +223,6 @@ public class GKCard {
 
                 @Override
                 public void onTimeout() {
-                    deferredObject.reject(new CardException(CardError.CHARACTERISTIC_WRITE_FAILURE));
-                }
-
-                @Override
-                public void onInterrupted() {
                     deferredObject.reject(new CardException(CardError.CHARACTERISTIC_WRITE_FAILURE));
                 }
             });
@@ -305,11 +294,6 @@ public class GKCard {
                                                 public void onTimeout() {
                                                     deferredObject.reject(null);
                                                 }
-
-                                                @Override
-                                                public void onInterrupted() {
-                                                    deferredObject.reject(null);
-                                                }
                                             });
                                         }
 
@@ -320,11 +304,6 @@ public class GKCard {
 
                                         @Override
                                         public void onTimeout() {
-                                            deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
-                                        }
-
-                                        @Override
-                                        public void onInterrupted() {
                                             deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
                                         }
                                     });
@@ -344,12 +323,6 @@ public class GKCard {
                                 Log.i(TAG, "onTimeout");
                                 deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
                             }
-
-                            @Override
-                            public void onInterrupted() {
-                                Log.i(TAG, "onInterrupted");
-                                deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
-                            }
                         });
                     } else {
                         deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
@@ -363,11 +336,6 @@ public class GKCard {
 
                 @Override
                 public void onTimeout() {
-                    deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
-                }
-
-                @Override
-                public void onInterrupted() {
                     deferredObject.reject(new CardException(CardError.CONNECTION_FAILED));
                 }
             });
@@ -396,11 +364,6 @@ public class GKCard {
                 @Override
                 public void onTimeout() {
                     Log.d(TAG, "disconnect: timeout");
-                }
-
-                @Override
-                public void onInterrupted() {
-                    Log.d(TAG, "disconnect: interrupted");
                 }
             });
         };
@@ -593,11 +556,6 @@ public class GKCard {
 
                 @Override
                 public void onTimeout() {
-                    deferredObject.reject(new CardException(CardError.CHARACTERISTIC_READ_FAILURE));
-                }
-
-                @Override
-                public void onInterrupted() {
                     deferredObject.reject(new CardException(CardError.CHARACTERISTIC_READ_FAILURE));
                 }
             });

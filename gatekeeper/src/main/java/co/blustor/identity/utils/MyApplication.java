@@ -5,15 +5,12 @@ import android.app.Application;
 import android.content.Context;
 import android.util.SparseIntArray;
 
-import com.polidea.rxandroidble.RxBleClient;
-
 import co.blustor.identity.R;
 
 @SuppressLint("Registered")
 public class MyApplication extends Application {
 
     private static final SparseIntArray ICONS;
-    private static RxBleClient BLE_CLIENT;
 
     static {
         ICONS = new SparseIntArray();
@@ -86,13 +83,6 @@ public class MyApplication extends Application {
         ICONS.append(66, R.drawable.ic_66);
         ICONS.append(67, R.drawable.ic_67);
         ICONS.append(68, R.drawable.ic_68);
-    }
-
-    public static RxBleClient getBleClient(Context context) {
-        if (BLE_CLIENT == null) {
-            BLE_CLIENT = RxBleClient.create(context.getApplicationContext());
-        }
-        return BLE_CLIENT;
     }
 
     public static SparseIntArray getIcons() {

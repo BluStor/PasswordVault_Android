@@ -6,6 +6,4 @@ public interface ConnectCallback {
     void onBluetoothNotSupported();
 
     void onTimeout();
-
-    void onInterrupted();
 }

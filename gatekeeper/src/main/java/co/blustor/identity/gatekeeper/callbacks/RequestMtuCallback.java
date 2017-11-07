@@ -6,6 +6,4 @@ public interface RequestMtuCallback {
     void onNotConnected();
 
     void onTimeout();
-
-    void onInterrupted();
 }

@@ -8,6 +8,4 @@ public interface DescriptorReadCallback {
     void onNotConnected();
 
     void onTimeout();
-
-    void onInterrupted();
 }

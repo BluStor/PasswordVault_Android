@@ -106,7 +106,7 @@ public class SyncDialogFragment extends DialogFragment {
                             AlertUtils.showError(getActivity(), "Bluetooth not enabled.");
                             break;
                         case CARD_NOT_PAIRED:
-                            AlertUtils.showError(getActivity(), "'ID' is not paired. Check your Bluetooth settings.");
+                            AlertUtils.showError(getActivity(), "Card is not paired. Pair the device starting with 'ID-' in your phone's Bluetooth settings.");
                             break;
                         case CONNECTION_FAILED:
                             AlertUtils.showError(getActivity(), "Connection failed.");

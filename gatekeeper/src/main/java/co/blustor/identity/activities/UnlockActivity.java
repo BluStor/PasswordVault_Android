@@ -63,7 +63,6 @@ public class UnlockActivity extends AppCompatActivity implements SyncDialogFragm
         } else if (id == R.id.action_choose) {
             Intent chooseActivity = new Intent(this, ChooseActivity.class);
             startActivity(chooseActivity);
-            finish();
         } else if (id == R.id.action_new) {
             Intent createActivity = new Intent(getApplicationContext(), CreateActivity.class);
             startActivity(createActivity);

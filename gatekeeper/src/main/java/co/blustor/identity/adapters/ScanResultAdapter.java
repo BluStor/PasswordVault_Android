@@ -1,12 +1,11 @@
 package co.blustor.identity.adapters;
 
+import android.bluetooth.le.ScanResult;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.polidea.rxandroidble.scan.ScanResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +39,7 @@ public class ScanResultAdapter extends RecyclerView.Adapter<ScanResultAdapter.Vi
     public void onBindViewHolder(ScanResultAdapter.ViewHolder holder, int position) {
         final ScanResult scanResult = scanResults.get(position);
 
-        holder.mNameTextView.setText(scanResult.getBleDevice().getName());
+        holder.mNameTextView.setText(scanResult.getDevice().getName());
         holder.mStatusTextView.setText(String.valueOf(scanResult.getRssi()));
     }
 
@@ -50,10 +49,10 @@ public class ScanResultAdapter extends RecyclerView.Adapter<ScanResultAdapter.Vi
     }
 
     public void addScanResult(ScanResult scanResult) {
-        String resultAddress = scanResult.getBleDevice().getMacAddress().toLowerCase();
+        String resultAddress = scanResult.getDevice().getAddress().toLowerCase();
 
         for (int i = 0; i < scanResults.size(); i++) {
-            if (scanResults.get(i).getBleDevice().getMacAddress().toLowerCase().equals(resultAddress)) {
+            if (scanResults.get(i).getDevice().getAddress().toLowerCase().equals(resultAddress)) {
                 scanResults.set(i, scanResult);
                 return;
             }

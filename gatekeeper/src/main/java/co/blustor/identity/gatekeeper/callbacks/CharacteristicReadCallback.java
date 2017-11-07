@@ -8,6 +8,4 @@ public interface CharacteristicReadCallback {
     void onDisconnected();
 
     void onTimeout();
-
-    void onInterrupted();
 }

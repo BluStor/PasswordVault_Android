@@ -8,6 +8,4 @@ public interface CharacteristicWriteCallback {
     void onNotConnected();
 
     void onTimeout();
-
-    void onInterrupted();
 }
