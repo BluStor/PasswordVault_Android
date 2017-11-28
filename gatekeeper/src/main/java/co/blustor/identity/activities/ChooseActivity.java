@@ -2,12 +2,14 @@ package co.blustor.identity.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -37,6 +40,7 @@ import java.util.List;
 
 import co.blustor.identity.R;
 import co.blustor.identity.adapters.ScanResultAdapter;
+import co.blustor.identity.gatekeeper.BluetoothClient;
 import co.blustor.identity.gatekeeper.GKCard;
 import co.blustor.identity.vault.Vault;
 
@@ -108,17 +112,36 @@ public class ChooseActivity extends AppCompatActivity {
         mCardsRecyclerView.setAdapter(mScanResultAdapter);
 
         mScanResultAdapter.setOnAdapterItemClickListener(view -> {
-            stopScanning();
 
             int position = mCardsRecyclerView.getChildAdapterPosition(view);
-            ScanResult scanResult = mScanResultAdapter.getItemAtPosition(position);
 
-            String address = scanResult.getDevice().getAddress();
-            Vault.setCardAddress(this, address);
+            if (position > -1) {
+                ScanResult scanResult = mScanResultAdapter.getItemAtPosition(position);
 
-            Intent splashActivity = new Intent(this, SplashActivity.class);
-            startActivity(splashActivity);
-            finish();
+                String address = scanResult.getDevice().getAddress();
+
+                // Make sure paired
+                if (BluetoothClient.getBondState(address) != BluetoothDevice.BOND_BONDED) {
+                    AlertDialog alertDialog = new AlertDialog.Builder(ChooseActivity.this).create();
+                    alertDialog.setTitle("Alert");
+                    alertDialog.setMessage(getResources().getString(R.string.bluetooth_not_paired));
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.setCancelable(false);
+                    alertDialog.show();
+                    return;
+                }
+                Vault.setCardAddress(this, address);
+                stopScanning();
+
+                Intent splashActivity = new Intent(this, SplashActivity.class);
+                startActivity(splashActivity);
+                finish();
+            }
         });
 
         // Scanner
@@ -139,7 +162,17 @@ public class ChooseActivity extends AppCompatActivity {
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         if (bluetoothManager != null) {
             if (!bluetoothManager.getAdapter().isEnabled()) {
-                Toast.makeText(this, "Bluetooth is not enabled.", Toast.LENGTH_SHORT).show();
+                AlertDialog alertDialog = new AlertDialog.Builder(ChooseActivity.this).create();
+                alertDialog.setTitle("Alert");
+                alertDialog.setMessage(getResources().getString(R.string.bluetooth_not_enabled));
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.setCancelable(false);
+                alertDialog.show();
             } else {
                 Dexter.withActivity(this)
                         .withPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -195,6 +228,7 @@ public class ChooseActivity extends AppCompatActivity {
     }
 
     private void stopScanning() {
+        mScanResultAdapter.clearScanResults();
         mBlutoothLeScanner.stopScan(mScanCallback);
         isScanning = false;
         mScanToggleButton.setChecked(false);

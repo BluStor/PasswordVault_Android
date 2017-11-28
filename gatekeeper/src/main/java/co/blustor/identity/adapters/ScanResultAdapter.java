@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -16,7 +17,8 @@ import co.blustor.identity.R;
 
 public class ScanResultAdapter extends RecyclerView.Adapter<ScanResultAdapter.ViewHolder> {
 
-    private final Comparator<ScanResult> SORTING_COMPARATOR = (lhs, rhs) -> lhs.getRssi() - rhs.getRssi();
+    // private final Comparator<ScanResult> SORTING_COMPARATOR = (lhs, rhs) -> lhs.getRssi() - rhs.getRssi();
+    private final Comparator<ScanResult> SORTING_COMPARATOR = (lhs, rhs) -> rhs.getRssi() - lhs.getRssi();
     private List<ScanResult> scanResults = new ArrayList<>();
     private OnAdapterItemClickListener onAdapterItemClickListener;
     private final View.OnClickListener onClickListener = new View.OnClickListener() {

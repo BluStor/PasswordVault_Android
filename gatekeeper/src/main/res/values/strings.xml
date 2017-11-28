@@ -61,4 +61,6 @@
     <string name="togglebutton_not_scanning">Not scanning</string>
     <string name="error_permission_location_scan">We need location permission to scan for your card.</string>
     <string name="menu_choose_card">Choose card</string>
+    <string name="bluetooth_not_paired">Card is not paired with your phone.  Open Bluetooth settings to pair card.  Make sure the card has a rapidly flashing yellow light.</string>
+    <string name="bluetooth_not_enabled">Bluetooth is not enabled.  Open your Bluetooth settings and enable.</string>
 </resources>

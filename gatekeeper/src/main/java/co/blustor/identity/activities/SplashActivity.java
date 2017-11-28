@@ -21,7 +21,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void startCreate() {
-        Intent createActivity = new Intent(this, CreateActivity.class);
+        Intent createActivity = new Intent(this, CreateActivity.class); 
         startActivity(createActivity);
         finish();
     }
@@ -29,6 +29,12 @@ public class SplashActivity extends AppCompatActivity {
     private void startUnlock() {
         Intent unlockActivity = new Intent(this, UnlockActivity.class);
         startActivity(unlockActivity);
+        finish();
+    }
+
+    private void startChoose() {
+        Intent chooseActivity = new Intent(this, ChooseActivity.class);
+        startActivity(chooseActivity);
         finish();
     }
 
@@ -50,11 +56,12 @@ public class SplashActivity extends AppCompatActivity {
                     }
                 }).always((state, resolved, rejected) ->
                         card.disconnect()
-                ).fail(result ->
-                        startUnlock()
-                );
+                ).fail(result -> {
+                    // startUnlock();
+                    startChoose();
+                });
             } catch (GKCard.CardException e) {
-                startUnlock();
+                startChoose();
             }
         } else {
             startUnlock();
