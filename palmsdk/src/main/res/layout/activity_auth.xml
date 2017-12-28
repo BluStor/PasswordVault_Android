@@ -1,0 +1,221 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/white">
+
+    <FrameLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/scanInfoLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/infoLayout"
+                android:layout_gravity="center_horizontal|bottom"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_marginRight="10dp"
+                    android:id="@+id/palmImageView"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/left_palm"/>
+
+                <LinearLayout
+                    android:layout_gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="@string/spread_fingers_hint"
+                        android:textColor="@color/black"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="12sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="@string/show_palm_hint"
+                        android:textColor="@color/black"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="12sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="@string/circle_hint"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:id="@+id/pinInfoLayout"
+            android:alpha="0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/pinHint"
+                android:textColor="@color/black"
+                android:layout_marginBottom="8dp"
+                android:text="@string/enter_pin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <FrameLayout android:layout_width="wrap_content"
+                         android:layout_height="wrap_content">
+
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    android:numStars="4"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/PinRatingBar" />
+
+                <RatingBar
+                    android:visibility="gone"
+                    android:id="@+id/errorRatingBar"
+                    android:numStars="4"
+                    android:rating="4"
+                    android:layout_gravity="center_horizontal|bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/ErrorRatingBar" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/testCapTextView"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:text="@string/user_palm_hint_postfix"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/closeButton"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:scaleType="center"
+            android:src="@drawable/ic_close_black_24dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/scanRootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="400dp">
+
+        <SurfaceView
+            android:id="@+id/surfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.zwsb.palmsdk.customViews.ScanGradientView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.zwsb.palmsdk.customViews.GradientView
+            android:id="@+id/gradientView"
+            android:src="@drawable/bottom_preview_gradient"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.zwsb.palmsdk.customViews.ScanCircleGradientView
+            android:id="@+id/circleGradientView"
+            android:alpha="0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <FrameLayout
+            android:id="@+id/scanLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.zwsb.palmsdk.customViews.ScanView
+                android:id="@+id/scanView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.zwsb.palmsdk.customViews.CircleAnimationView
+                android:id="@+id/circleAnimationView"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <TextView
+                android:id="@+id/resultTextView"
+                android:layout_gravity="center"
+                android:textColor="@color/white"
+                android:textSize="42sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:id="@+id/palmTextView"
+                android:layout_marginTop="24dp"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/blue"
+                android:textSize="22sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <ImageView
+                android:id="@+id/pinButton"
+                android:visibility="gone"
+                android:layout_marginBottom="@dimen/activityMargin"
+                android:layout_gravity="center_horizontal|bottom"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:scaleType="center"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/pin_icon"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/pinLayout"
+            android:alpha="0"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.zwsb.palmsdk.customViews.PinInputView
+                android:id="@+id/pinInputView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </com.zwsb.palmsdk.customViews.PinInputView>
+
+            <ImageView
+                android:id="@+id/palmButton"
+                android:visibility="gone"
+                android:layout_marginBottom="@dimen/activityMargin"
+                android:layout_gravity="center_horizontal|bottom"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:scaleType="center"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/palm_icon"/>
+        </FrameLayout>
+
+    </FrameLayout>
+</LinearLayout>

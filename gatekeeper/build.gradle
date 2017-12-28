@@ -1,9 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
+    flavorDimensions "default"
+
     compileSdkVersion 27
     buildToolsVersion '27.0.1'
 
+    def buildName = "1.0.6"
     signingConfigs {
         release {
             storeFile file("gatekeeper.jks")
@@ -23,7 +26,6 @@ android {
     buildTypes {
         release {
             multiDexEnabled true
-            //minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
@@ -42,10 +44,21 @@ android {
         applicationId "co.blustor.identity"
         minSdkVersion 23
         targetSdkVersion 27
-        versionCode 6
-        versionName "1.0.5"
+        versionCode 7
+        versionName "1.0.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    productFlavors {
+        local {
+            applicationId "co.blustor.identity"
+            minSdkVersion 23
+            targetSdkVersion 27
+            versionCode 7
+            versionName "1.0.6"
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        }
+    }
+    
 }
 
 repositories {
@@ -53,6 +66,15 @@ repositories {
 }
 
 dependencies {
+    // compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    compile project(":palmsdk")
+
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.0.1'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'com.google.code.gson:gson:2.6.1'
     implementation 'com.android.support:appcompat-v7:27.0.0'
     implementation 'com.android.support:design:27.0.0'
     implementation 'com.android.support:support-v4:27.0.0'

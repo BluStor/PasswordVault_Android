@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:orientation="vertical"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:columnCount="3"
+            android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/button1"
+            style="@style/PinButtonStyle"
+            android:text="1"/>
+
+        <TextView
+            android:id="@+id/button2"
+            style="@style/PinButtonStyle"
+            android:text="2"/>
+
+        <TextView
+            android:id="@+id/button3"
+            style="@style/PinButtonStyle"
+            android:text="3"/>
+
+        <TextView
+            android:id="@+id/button4"
+            style="@style/PinButtonStyle"
+            android:text="4"/>
+
+        <TextView
+            android:id="@+id/button5"
+            style="@style/PinButtonStyle"
+            android:text="5"/>
+
+        <TextView
+            android:id="@+id/button6"
+            style="@style/PinButtonStyle"
+            android:text="6"/>
+
+        <TextView
+            android:id="@+id/button7"
+            style="@style/PinButtonStyle"
+            android:text="7"/>
+
+        <TextView
+            android:id="@+id/button8"
+            style="@style/PinButtonStyle"
+            android:text="8"/>
+
+        <TextView
+            android:id="@+id/button9"
+            style="@style/PinButtonStyle"
+            android:text="9"/>
+
+        <TextView
+            android:id="@+id/cap"
+            style="@style/PinButtonStyle"
+            android:text=""/>
+
+        <TextView
+            android:id="@+id/button0"
+            style="@style/PinButtonStyle"
+            android:text="0"/>
+
+        <ImageView
+            android:clickable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:alpha="0.5"
+            android:id="@+id/buttonRemove"
+            android:layout_width="@dimen/pin_button_width"
+            android:layout_height="@dimen/pin_button_height"
+            android:scaleType="center"
+            android:src="@drawable/ic_backspace_black_24dp"/>
+    </GridLayout>
+
+</FrameLayout>

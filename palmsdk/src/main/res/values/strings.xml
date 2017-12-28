@@ -1,0 +1,32 @@
+<resources>
+    <!-- Common strings -->
+    <string name="permissions_alert">PERMISSIONS DENIED, PALM ID WAS FINISHED</string>
+    <string name="toolbar_title_text">Users</string>
+
+    <!-- AuthActivity strings (register and palm match screen) -->
+    <string name="right_palm">RIGHT PALM</string>
+    <string name="left_palm">LEFT PALM</string>
+
+    <string name="check_failure">FAIL</string>
+    <string name="check_success">PASS</string>
+
+    <string name="user_palm_hint_postfix">ALIGN PALM OUTLINE WITH CIRCLE</string>
+    <string name="spread_fingers_hint">• Spread your fingers apart</string>
+    <string name="show_palm_hint">• Show palm toward light</string>
+    <string name="circle_hint">• Align your palm outline with circle</string>
+
+    <string name="enter_pin">ENTER YOUR 4-DIGIT PIN</string>
+    <string name="pin_error">Please enter a valid PIN</string>
+
+    <!-- PalmActivity strings (palm image screen) -->
+    <string name="next">NEXT</string>
+    <string name="left_palm_title">Left palm</string>
+    <string name="right_palm_title">Right palm</string>
+
+    <string name="retake_palm">RETAKE</string>
+
+    <!-- SettingsActivity strings (DEPRECATED) -->
+    <string name="done">DONE</string>
+    <string name="palm_alert">You must add both palms</string>
+    <string name="lockscreen">Lock Screen</string>
+</resources>

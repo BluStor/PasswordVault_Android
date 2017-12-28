@@ -1,0 +1,53 @@
+apply plugin: 'com.android.library'
+
+android {
+    flavorDimensions "default"
+
+    def buildName = "1.2"
+
+    compileSdkVersion 24
+    buildToolsVersion '26.0.2'
+
+    defaultConfig {
+        minSdkVersion 18
+        targetSdkVersion 24
+        versionCode 1
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    publishNonDefault true
+    productFlavors {
+        local {
+            versionName buildName + "local"
+            resValue "string", "app_name", "Local PalmId Demo"
+        }
+
+        cloud {
+            versionName buildName + "cloud"
+            resValue "string", "app_name", "PalmId Demo"
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.0.1'
+
+    compile 'org.greenrobot:eventbus:3.0.0'
+
+    compile files('libs/PalmAPIJava.jar')
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+    compile 'com.google.code.gson:gson:2.6.1'
+}

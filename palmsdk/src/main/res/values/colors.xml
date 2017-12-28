@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <!--<color name="blue">#0082ff</color>-->
+    <color name="blue">#2778FF</color>
+    <color name="green_outside">#b6dbff</color>
+    <color name="green_bg">#e5f2ff</color>
+    <color name="gray">#d1d3d4</color>
+    <color name="gray_light">#e6e6e6</color>
+    <color name="trans_gray">#33d1d3d4</color>
+    <color name="secondary_grey">#9EAFB8</color>
+    <color name="top_color">#1e1f23</color>
+    <color name="transparent_color">#001e1f23</color>
+
+    <color name="trans_gray_2">#88292a2e</color>
+    <color name="dark_black">#292a2e</color>
+    <color name="scan_green_out">#2778FF</color>
+    <color name="gesture_green">#55a2eb74</color>
+
+    <color name="white_blur_color">#4CFFFFFF</color>
+    <color name="red">#EF0034</color>
+    <color name="red_for_clear_button_color">#FF1846</color>
+
+    <color name="palm_sdk_colorPrimary">#3F51B5</color>
+    <color name="palm_sdk_colorPrimaryDark">#303F9F</color>
+    <color name="palm_sdk_colorAccent">#009B8B</color>
+
+    <color name="borderCircleSuccessColor">#E62979FF</color>
+    <color name="circleSuccessColor">#E62979FF</color>
+
+    <color name="borderCircleFailureColor">#E6ff1744</color>
+    <color name="circleFailureColor">#E6ff1744</color>
+
+    <color name="selection_color">#D4E4FE</color>
+    <color name="defaultBackgroundColor">#EEEEEE</color>
+    <color name="defaultToolbarColor">#303030</color>
+</resources>
