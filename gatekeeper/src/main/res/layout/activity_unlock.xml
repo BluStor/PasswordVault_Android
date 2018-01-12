@@ -36,7 +36,7 @@
                     app:passwordToggleEnabled="true">
 
                     <android.support.design.widget.TextInputEditText
-                        android:id="@+id/edittext_password"
+                        android:id="@+id/editTextPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/hint_password"
@@ -49,17 +49,16 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Palm Biometric Login:" />
 
                     <ToggleButton
-                        android:id="@+id/toggBtn"
+                        android:id="@+id/buttonToggle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-
-                        android:gravity="left"
+                        android:gravity="start"
                         />
                 </LinearLayout>
             </LinearLayout>
@@ -67,7 +66,7 @@
     </ScrollView>
 
     <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/buttonFloatingAction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
