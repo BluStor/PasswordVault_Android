@@ -58,42 +58,46 @@ class EditEntryActivity : LockingActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_editentry, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return if (item != null) {
+            val id = item.itemId
 
-        if (id == R.id.action_save) {
-            save()
+            if (id == R.id.action_save) {
+                save()
+            }
+
+            super.onOptionsItemSelected(item)
+        } else {
+            false
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onBackPressed() {
         if (hasBeenEdited()) {
-            AlertDialog.Builder(this)
-                    .setMessage("Close without saving?")
-                    .setPositiveButton("Close") { _, _ -> supportFinishAfterTransition() }
-                    .setNegativeButton("Cancel", null)
-                    .show()
+            AlertDialog.Builder(this).setMessage("Close without saving?")
+                .setPositiveButton("Close") { _, _ -> supportFinishAfterTransition() }
+                .setNegativeButton("Cancel", null).show()
         } else {
             supportFinishAfterTransition()
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode == requestIcon) {
-            if (resultCode == RESULT_OK) {
-                iconId = data.getIntExtra("icon", 0)
-                imageViewIcon.setImageResource(MyApplication.icons.get(iconId))
-            }
-        } else if (requestCode == requestPassword) {
-            if (resultCode == RESULT_OK) {
-                editTextPassword.setText(data.getStringExtra("password"))
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (data != null) {
+            if (requestCode == requestIcon) {
+                if (resultCode == RESULT_OK) {
+                    iconId = data.getIntExtra("icon", 0)
+                    imageViewIcon.setImageResource(MyApplication.icons.get(iconId))
+                }
+            } else if (requestCode == requestPassword) {
+                if (resultCode == RESULT_OK) {
+                    editTextPassword.setText(data.getStringExtra("password"))
+                }
             }
         }
     }
@@ -133,12 +137,7 @@ class EditEntryActivity : LockingActivity() {
     }
 
     private fun hasBeenEdited(): Boolean {
-        return !(entry?.title == editTextTitle.text.toString()
-                && entry?.username == editTextUsername.text.toString()
-                && entry?.password == editTextPassword.text.toString()
-                && entry?.url == editTextUrl.text.toString()
-                && entry?.notes == editTextNotes.text.toString()
-                && entry?.iconId == iconId)
+        return !(entry?.title == editTextTitle.text.toString() && entry?.username == editTextUsername.text.toString() && entry?.password == editTextPassword.text.toString() && entry?.url == editTextUrl.text.toString() && entry?.notes == editTextNotes.text.toString() && entry?.iconId == iconId)
     }
 
     private fun validate(): Boolean {
@@ -156,7 +155,7 @@ class EditEntryActivity : LockingActivity() {
     }
 
     companion object {
-        private val requestIcon = 0
-        private val requestPassword = 1
+        private const val requestIcon = 0
+        private const val requestPassword = 1
     }
 }

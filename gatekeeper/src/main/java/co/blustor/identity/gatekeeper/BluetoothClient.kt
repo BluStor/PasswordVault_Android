@@ -41,7 +41,11 @@ object BluetoothClient {
                     stopWaitingForCallback()
                 }
             } else {
-                BluetoothLog.d(String.format(Locale.getDefault(), "onConnectionStateChange: Unknown status %d, newState = %d", status, newState))
+                BluetoothLog.d(
+                    String.format(
+                        Locale.getDefault(), "onConnectionStateChange: Unknown status %d, newState = %d", status, newState
+                    )
+                )
             }
         }
 
@@ -54,7 +58,9 @@ object BluetoothClient {
             }
         }
 
-        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int
+        ) {
             BluetoothLog.d("onCharacteristicRead")
             if (characteristicReadCallback != null) {
                 BluetoothLog.d("onCharacteristicRead: characteristicReadCallback")
@@ -63,7 +69,9 @@ object BluetoothClient {
             }
         }
 
-        override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int
+        ) {
             BluetoothLog.d("onCharacteristicWrite")
             if (characteristicWriteCallback != null) {
                 BluetoothLog.d("onCharacteristicWrite: characteristicWriteCallback")
@@ -72,9 +80,15 @@ object BluetoothClient {
             }
         }
 
-        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic
+        ) {
             val hexString = BaseEncoding.base16().encode(characteristic.value)
-            BluetoothLog.d(String.format("onCharacteristicChanged: %s to %s", characteristic.uuid, hexString))
+            BluetoothLog.d(
+                String.format(
+                    "onCharacteristicChanged: %s to %s", characteristic.uuid, hexString
+                )
+            )
             if (notifyCallback != null) {
                 BluetoothLog.d("onCharacteristicChanged: notifyCallback")
                 val service = characteristic.service
@@ -82,7 +96,9 @@ object BluetoothClient {
             }
         }
 
-        override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        override fun onDescriptorRead(
+            gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int
+        ) {
             BluetoothLog.d("onDescriptorRead")
             if (descriptorReadCallback != null) {
                 BluetoothLog.d("onDescriptorRead: descriptorReadCallback")
@@ -98,7 +114,9 @@ object BluetoothClient {
             }
         }
 
-        override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int
+        ) {
             BluetoothLog.d("onDescriptorWrite")
             if (descriptorWriteCallback != null) {
                 BluetoothLog.d("onDescriptorWrite: descriptorWriteCallback")
@@ -129,7 +147,9 @@ object BluetoothClient {
 
     // Event processing
 
-    private fun getCharacteristic(gatt: BluetoothGatt?, serviceUUID: UUID, characteristicUUID: UUID): BluetoothGattCharacteristic? {
+    private fun getCharacteristic(
+        gatt: BluetoothGatt?, serviceUUID: UUID, characteristicUUID: UUID
+    ): BluetoothGattCharacteristic? {
         return if (gatt == null) {
             null
         } else {
@@ -138,7 +158,9 @@ object BluetoothClient {
         }
     }
 
-    private fun getDescriptor(gatt: BluetoothGatt?, serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID): BluetoothGattDescriptor? {
+    private fun getDescriptor(
+        gatt: BluetoothGatt?, serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID
+    ): BluetoothGattDescriptor? {
         return if (gatt == null) {
             null
         } else {
@@ -170,7 +192,9 @@ object BluetoothClient {
                             characteristicReadCallback?.onDisconnected()
                         }
                     } else {
-                        val characteristic = getCharacteristic(gatt, characteristicReadEvent.serviceUUID, characteristicReadEvent.characteristicUUID)
+                        val characteristic = getCharacteristic(
+                            gatt, characteristicReadEvent.serviceUUID, characteristicReadEvent.characteristicUUID
+                        )
                         if (characteristic == null) {
                             if (characteristicReadCallback != null) {
                                 characteristicReadCallback?.onCharacteristicNotFound()
@@ -205,7 +229,9 @@ object BluetoothClient {
                             characteristicWriteCallback?.onNotConnected()
                         }
                     } else {
-                        val characteristic = getCharacteristic(gatt, characteristicWriteEvent.serviceUUID, characteristicWriteEvent.characteristicUUID)
+                        val characteristic = getCharacteristic(
+                            gatt, characteristicWriteEvent.serviceUUID, characteristicWriteEvent.characteristicUUID
+                        )
                         if (characteristic == null) {
                             if (characteristicWriteCallback != null) {
                                 characteristicWriteCallback?.onCharacteristicNotFound()
@@ -214,7 +240,11 @@ object BluetoothClient {
                             val value = characteristicWriteEvent.value
                             val hexString = BaseEncoding.base16().encode(value)
 
-                            BluetoothLog.d(String.format("writeDescriptor: %s to %s", hexString, characteristic.uuid))
+                            BluetoothLog.d(
+                                String.format(
+                                    "writeDescriptor: %s to %s", hexString, characteristic.uuid
+                                )
+                            )
                             characteristic.value = characteristicWriteEvent.value
 
                             gatt?.writeCharacteristic(characteristic)
@@ -283,7 +313,9 @@ object BluetoothClient {
                             descriptorReadCallback?.onNotConnected()
                         }
                     } else {
-                        val descriptor = getDescriptor(gatt, descriptorReadEvent.serviceUUID, descriptorReadEvent.characteristicUUID, descriptorReadEvent.descriptorUUID)
+                        val descriptor = getDescriptor(
+                            gatt, descriptorReadEvent.serviceUUID, descriptorReadEvent.characteristicUUID, descriptorReadEvent.descriptorUUID
+                        )
                         if (descriptor == null) {
                             if (descriptorReadCallback != null) {
                                 descriptorReadCallback?.onDescriptorNotFound()
@@ -318,7 +350,9 @@ object BluetoothClient {
                             descriptorWriteCallback?.onNotConnected()
                         }
                     } else {
-                        val descriptor = getDescriptor(gatt, descriptorWriteEvent.serviceUUID, descriptorWriteEvent.characteristicUUID, descriptorWriteEvent.descriptorUUID)
+                        val descriptor = getDescriptor(
+                            gatt, descriptorWriteEvent.serviceUUID, descriptorWriteEvent.characteristicUUID, descriptorWriteEvent.descriptorUUID
+                        )
                         if (descriptor == null) {
                             if (descriptorWriteCallback != null) {
                                 descriptorWriteCallback?.onDescriptorNotFound()
@@ -326,7 +360,11 @@ object BluetoothClient {
                         } else {
                             val value = descriptorWriteEvent.value
                             val hexString = BaseEncoding.base16().encode(value)
-                            BluetoothLog.d(String.format("writeDescriptor: %s to %s", hexString, descriptor.uuid))
+                            BluetoothLog.d(
+                                String.format(
+                                    "writeDescriptor: %s to %s", hexString, descriptor.uuid
+                                )
+                            )
 
                             descriptor.value = value
 
@@ -452,11 +490,15 @@ object BluetoothClient {
         queueEvent(DiscoverServicesEvent(callback))
     }
 
-    fun characteristicRead(serviceUUID: UUID, characteristicUUID: UUID, callback: CharacteristicReadCallback) {
+    fun characteristicRead(
+        serviceUUID: UUID, characteristicUUID: UUID, callback: CharacteristicReadCallback
+    ) {
         queueEvent(CharacteristicReadEvent(serviceUUID, characteristicUUID, callback))
     }
 
-    fun readDescriptor(serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID, callback: DescriptorReadCallback) {
+    fun readDescriptor(
+        serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID, callback: DescriptorReadCallback
+    ) {
         queueEvent(DescriptorReadEvent(serviceUUID, characteristicUUID, descriptorUUID, callback))
     }
 
@@ -464,12 +506,20 @@ object BluetoothClient {
         queueEvent(RequestMtuEvent(mtu, callback))
     }
 
-    fun characteristicWrite(serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray, callback: CharacteristicWriteCallback) {
+    fun characteristicWrite(
+        serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray, callback: CharacteristicWriteCallback
+    ) {
         queueEvent(CharacteristicWriteEvent(serviceUUID, characteristicUUID, value, callback))
     }
 
-    fun descriptorWrite(serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID, value: ByteArray, callback: DescriptorWriteCallback) {
-        queueEvent(DescriptorWriteEvent(serviceUUID, characteristicUUID, descriptorUUID, value, callback))
+    fun descriptorWrite(
+        serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID, value: ByteArray, callback: DescriptorWriteCallback
+    ) {
+        queueEvent(
+            DescriptorWriteEvent(
+                serviceUUID, characteristicUUID, descriptorUUID, value, callback
+            )
+        )
     }
 
     // Device
@@ -499,7 +549,9 @@ object BluetoothClient {
         }
     }
 
-    fun setCharacteristicWriteType(serviceUUID: UUID, characteristicUUID: UUID, writeType: Int): Boolean {
+    fun setCharacteristicWriteType(
+        serviceUUID: UUID, characteristicUUID: UUID, writeType: Int
+    ): Boolean {
         return if (gatt == null) {
             false
         } else {

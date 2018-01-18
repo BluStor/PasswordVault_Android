@@ -27,17 +27,17 @@ class SearchFragment : Fragment() {
 
     private val searchResultAdapter = SearchResultAdapter()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_search, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_search, container, false)
+    }
 
-        // Views
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val linearLayoutManager = LinearLayoutManager(activity)
 
-        recyclerView.layoutManager = linearLayoutManager
-        recyclerView.adapter = searchResultAdapter
-
-        return view
+        recyclerViewSearch.layoutManager = linearLayoutManager
+        recyclerViewSearch.adapter = searchResultAdapter
     }
 
     fun search(query: String) {
@@ -58,7 +58,8 @@ class SearchFragment : Fragment() {
         private var mLoweredQuery = ""
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_search, parent, false)
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_search, parent, false)
             return SearchResultViewHolder(view)
         }
 
@@ -78,7 +79,9 @@ class SearchFragment : Fragment() {
             if (loweredTitle.contains(mLoweredQuery)) {
                 val start = loweredTitle.indexOf(mLoweredQuery)
                 val end = start + mLoweredQuery.length
-                titleSpannable.setSpan(foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                titleSpannable.setSpan(
+                    foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
 
             holder.titleTextView.setText(titleSpannable, TextView.BufferType.SPANNABLE)
@@ -147,7 +150,9 @@ class SearchFragment : Fragment() {
                 val editEntryActivity = Intent(activity, EditEntryActivity::class.java)
                 editEntryActivity.putExtra("uuid", entry.uuid)
 
-                val activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(activity!!, iconImageView, "entry")
+                val activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    activity!!, iconImageView, "entry"
+                )
                 startActivity(editEntryActivity, activityOptions.toBundle())
             }
         }

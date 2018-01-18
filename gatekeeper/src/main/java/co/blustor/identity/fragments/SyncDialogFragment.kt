@@ -24,12 +24,16 @@ class SyncDialogFragment : DialogFragment() {
 
     private var syncListener: SyncListener? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle): View? {
-        val view = inflater.inflate(R.layout.dialogfragment_sync, container, false)
-
+    override fun onCreateView(
+        inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         isCancelable = false
 
-        return view
+        return if (inflater == null) {
+            View.inflate(context, R.layout.dialogfragment_sync, container)
+        } else {
+            inflater.inflate(R.layout.dialogfragment_sync, container, false)
+        }
     }
 
     override fun onStart() {
@@ -62,28 +66,60 @@ class SyncDialogFragment : DialogFragment() {
                 Log.i(tag, it.error.toString())
                 activity.runOnUiThread {
                     when (it.error) {
-                        SyncManager.SyncError.CARD_NOT_CHOSEN -> AlertUtils.showError(activity, "Card not chosen.")
-                        SyncManager.SyncError.DATABASE_UNREADABLE -> AlertUtils.showError(activity, "Invalid password.")
-                        SyncManager.SyncError.VAULT_EMPTY -> AlertUtils.showError(activity, "Vault is empty.")
+                        SyncManager.SyncError.CARD_NOT_CHOSEN -> AlertUtils.showError(
+                            activity, "Card not chosen."
+                        )
+                        SyncManager.SyncError.DATABASE_UNREADABLE -> AlertUtils.showError(
+                            activity, "Invalid password."
+                        )
+                        SyncManager.SyncError.VAULT_EMPTY -> AlertUtils.showError(
+                            activity, "Vault is empty."
+                        )
                     }
                 }
             } else if (it is GKCard.CardException) {
                 Log.i(tag, it.error.toString())
                 activity.runOnUiThread {
                     when (it.error) {
-                        GKCard.CardError.ARGUMENT_INVALID -> AlertUtils.showError(activity, "Invalid argument.")
-                        GKCard.CardError.BLUETOOTH_NOT_AVAILABLE -> AlertUtils.showError(activity, "Bluetooth not available.")
-                        GKCard.CardError.BLUETOOTH_ADAPTER_NOT_ENABLED -> AlertUtils.showError(activity, "Bluetooth not enabled.")
-                        GKCard.CardError.CARD_NOT_PAIRED -> AlertUtils.showError(activity, "Card is not paired. Pair the device starting with 'ID-' in your phone's Bluetooth settings.")
-                        GKCard.CardError.CONNECTION_FAILED -> AlertUtils.showError(activity, "Connection failed.")
-                        GKCard.CardError.CHARACTERISTIC_READ_FAILURE -> AlertUtils.showError(activity, "Card read failure.")
-                        GKCard.CardError.CHARACTERISTIC_WRITE_FAILURE -> AlertUtils.showError(activity, "Card write failure.")
-                        GKCard.CardError.FILE_NOT_FOUND -> AlertUtils.showError(activity, "File not found.")
-                        GKCard.CardError.FILE_READ_FAILED -> AlertUtils.showError(activity, "File read failed.")
-                        GKCard.CardError.FILE_WRITE_FAILED -> AlertUtils.showError(activity, "File write failed.")
-                        GKCard.CardError.MAKE_COMMAND_DATA_FAILED -> AlertUtils.showError(activity, "Card command failure.")
-                        GKCard.CardError.INVALID_CHECKSUM -> AlertUtils.showError(activity, "Transfer error.")
-                        GKCard.CardError.INVALID_RESPONSE -> AlertUtils.showError(activity, "Invalid response.")
+                        GKCard.CardError.ARGUMENT_INVALID -> AlertUtils.showError(
+                            activity, "Invalid argument."
+                        )
+                        GKCard.CardError.BLUETOOTH_NOT_AVAILABLE -> AlertUtils.showError(
+                            activity, "Bluetooth not available."
+                        )
+                        GKCard.CardError.BLUETOOTH_ADAPTER_NOT_ENABLED -> AlertUtils.showError(
+                            activity, "Bluetooth not enabled."
+                        )
+                        GKCard.CardError.CARD_NOT_PAIRED -> AlertUtils.showError(
+                            activity, "Card is not paired. Pair the device starting with 'ID-' in your phone's Bluetooth settings."
+                        )
+                        GKCard.CardError.CONNECTION_FAILED -> AlertUtils.showError(
+                            activity, "Connection failed."
+                        )
+                        GKCard.CardError.CHARACTERISTIC_READ_FAILURE -> AlertUtils.showError(
+                            activity, "Card read failure."
+                        )
+                        GKCard.CardError.CHARACTERISTIC_WRITE_FAILURE -> AlertUtils.showError(
+                            activity, "Card write failure."
+                        )
+                        GKCard.CardError.FILE_NOT_FOUND -> AlertUtils.showError(
+                            activity, "File not found."
+                        )
+                        GKCard.CardError.FILE_READ_FAILED -> AlertUtils.showError(
+                            activity, "File read failed."
+                        )
+                        GKCard.CardError.FILE_WRITE_FAILED -> AlertUtils.showError(
+                            activity, "File write failed."
+                        )
+                        GKCard.CardError.MAKE_COMMAND_DATA_FAILED -> AlertUtils.showError(
+                            activity, "Card command failure."
+                        )
+                        GKCard.CardError.INVALID_CHECKSUM -> AlertUtils.showError(
+                            activity, "Transfer error."
+                        )
+                        GKCard.CardError.INVALID_RESPONSE -> AlertUtils.showError(
+                            activity, "Invalid response."
+                        )
                     }
                 }
             }

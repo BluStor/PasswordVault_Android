@@ -24,10 +24,8 @@ class Vault {
         val root = root
 
         if (root != null) {
-            val match = VaultGroup.traverser.preOrderTraversal(root).firstMatch { input -> input.uuid == uuid }
-
-            if (match.isPresent) {
-                return match.get()
+            return VaultGroup.traverser.depthFirstPreOrder(root).firstOrNull {
+                it?.uuid == uuid
             }
         }
 
@@ -38,7 +36,8 @@ class Vault {
         val root = root
 
         if (root != null) {
-            val groups = VaultGroup.traverser.preOrderTraversal(root).toList()
+            val groups = VaultGroup.traverser.depthFirstPreOrder(root).toList()
+
             groups.mapNotNull { it.getEntry(uuid) }.first { return it }
         }
 
@@ -50,10 +49,12 @@ class Vault {
             return emptyList()
         }
 
+        val root = root
+
         return if (root != null) {
             val loweredQuery = query.toLowerCase(Locale.getDefault())
 
-            val vaultGroups = VaultGroup.traverser.preOrderTraversal(root!!).toList()
+            val vaultGroups = VaultGroup.traverser.depthFirstPreOrder(root).toList()
 
             vaultGroups.flatMap { it.entries }.filter {
                 it.title.toLowerCase(Locale.getDefault()).contains(loweredQuery)
@@ -64,7 +65,7 @@ class Vault {
     }
 
     companion object {
-        val dbPath = "/passwordvault/db.kdbx"
+        const val dbPath = "/passwordvault/db.kdbx"
 
         val instance: Vault by lazy {
             Vault()

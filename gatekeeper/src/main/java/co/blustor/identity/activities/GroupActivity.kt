@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import co.blustor.identity.R
 import co.blustor.identity.constants.Intents
+import co.blustor.identity.fragments.SearchFragment
 import co.blustor.identity.services.NotificationService
 import co.blustor.identity.sync.SyncManager
 import co.blustor.identity.utils.MyApplication
@@ -40,8 +41,6 @@ class GroupActivity : LockingActivity() {
 
         group = Vault.instance.getGroupByUUID(uuid)
 
-        assert(group != null)
-
         // Start notification service if necessary
 
         if (group?.parentUUID == null) {
@@ -61,11 +60,11 @@ class GroupActivity : LockingActivity() {
             }
         }
 
-        recyclerView.setHasFixedSize(true)
+        recyclerViewGroup.setHasFixedSize(true)
 
         val linearLayoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = linearLayoutManager
-        recyclerView.adapter = groupEntryAdapter
+        recyclerViewGroup.layoutManager = linearLayoutManager
+        recyclerViewGroup.adapter = groupEntryAdapter
 
         val groupFloatingActionButton = FloatingActionButton(this)
         groupFloatingActionButton.buttonSize = FloatingActionButton.SIZE_MINI
@@ -96,23 +95,24 @@ class GroupActivity : LockingActivity() {
         fam.addMenuButton(groupFloatingActionButton)
         fam.addMenuButton(entryFloatingActionButton)
         fam.setClosedOnTouchOutside(true)
+
+        (fragmentSearch as SearchFragment).hide()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         menu.clear()
-        fragmentSearch.hide()
 
         menuInflater.inflate(R.menu.menu_group, menu)
 
         val menuItem = menu.findItem(R.id.action_search)
         menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(menuItem: MenuItem): Boolean {
-                fragmentSearch.show()
+                (fragmentSearch as SearchFragment).show()
                 return true
             }
 
             override fun onMenuItemActionCollapse(menuItem: MenuItem): Boolean {
-                fragmentSearch.hide()
+                (fragmentSearch as SearchFragment).hide()
                 return true
             }
         })
@@ -125,7 +125,7 @@ class GroupActivity : LockingActivity() {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                fragmentSearch.search(newText)
+                (fragmentSearch as SearchFragment).search(newText)
                 return false
             }
         })
@@ -147,8 +147,6 @@ class GroupActivity : LockingActivity() {
     }
 
     override fun onBackPressed() {
-        assert(group != null)
-
         if (group?.parentUUID == null) {
             val lockDatabase = Intent(Intents.lockDatabase)
             sendBroadcast(lockDatabase)
@@ -167,11 +165,9 @@ class GroupActivity : LockingActivity() {
         private val mGroups = ArrayList<VaultGroup>()
         private val mEntries = ArrayList<VaultEntry>()
 
-        init {
-            updateData()
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupEntryAdapter.GroupEntryViewHolder {
+        override fun onCreateViewHolder(
+            parent: ViewGroup, viewType: Int
+        ): GroupEntryAdapter.GroupEntryViewHolder {
             val view = if (viewType == 0) {
                 LayoutInflater.from(parent.context).inflate(R.layout.item_group, parent, false)
             } else {
@@ -188,7 +184,9 @@ class GroupActivity : LockingActivity() {
             }
         }
 
-        override fun onBindViewHolder(holder: GroupEntryAdapter.GroupEntryViewHolder, position: Int) {
+        override fun onBindViewHolder(
+            holder: GroupEntryAdapter.GroupEntryViewHolder, position: Int
+        ) {
             if (holder.itemViewType == 0) {
                 val group = mGroups[position]
 
@@ -271,68 +269,66 @@ class GroupActivity : LockingActivity() {
             }
 
             override fun onLongClick(v: View): Boolean {
-                assert(group != null)
-
                 val position = adapterPosition
                 if (position < mGroups.size) {
                     val group = mGroups[position]
-                    BottomSheet.Builder(this@GroupActivity)
-                            .setTitle(group.name)
-                            .setSheet(R.menu.menu_bottom_group)
-                            .setListener(object : BottomSheetListener {
-                                override fun onSheetShown(bottomSheet: BottomSheet) {
+                    BottomSheet.Builder(this@GroupActivity).setTitle(group.name)
+                        .setSheet(R.menu.menu_bottom_group)
+                        .setListener(object : BottomSheetListener {
+                            override fun onSheetShown(bottomSheet: BottomSheet) {
 
+                            }
+
+                            override fun onSheetItemSelected(
+                                bottomSheet: BottomSheet, menuItem: MenuItem
+                            ) {
+                                val itemId = menuItem.itemId
+
+                                if (itemId == R.id.action_delete) {
+                                    this@GroupActivity.group?.removeGroup(group.uuid)
+                                    updateData()
+
+                                    SyncManager.setRoot(this@GroupActivity, Vault.instance.password)
+                                } else if (itemId == R.id.action_edit) {
+                                    val editGroupActivity = Intent(this@GroupActivity, EditGroupActivity::class.java)
+                                    editGroupActivity.putExtra("uuid", group.uuid)
+                                    startActivity(editGroupActivity)
                                 }
+                            }
 
-                                override fun onSheetItemSelected(bottomSheet: BottomSheet, menuItem: MenuItem) {
-                                    val itemId = menuItem.itemId
+                            override fun onSheetDismissed(bottomSheet: BottomSheet, i: Int) {
 
-                                    if (itemId == R.id.action_delete) {
-                                        this@GroupActivity.group?.removeGroup(group.uuid)
-                                        updateData()
-
-                                        SyncManager.setRoot(this@GroupActivity, Vault.instance.password)
-                                    } else if (itemId == R.id.action_edit) {
-                                        val editGroupActivity = Intent(this@GroupActivity, EditGroupActivity::class.java)
-                                        editGroupActivity.putExtra("uuid", group.uuid)
-                                        startActivity(editGroupActivity)
-                                    }
-                                }
-
-                                override fun onSheetDismissed(bottomSheet: BottomSheet, i: Int) {
-
-                                }
-                            })
-                            .show()
+                            }
+                        }).show()
                 } else {
                     val entry = mEntries[position - mGroups.size]
-                    BottomSheet.Builder(this@GroupActivity)
-                            .setTitle(entry.title)
-                            .setSheet(R.menu.menu_bottom_entry)
-                            .setListener(object : BottomSheetListener {
-                                override fun onSheetShown(bottomSheet: BottomSheet) {
+                    BottomSheet.Builder(this@GroupActivity).setTitle(entry.title)
+                        .setSheet(R.menu.menu_bottom_entry)
+                        .setListener(object : BottomSheetListener {
+                            override fun onSheetShown(bottomSheet: BottomSheet) {
 
+                            }
+
+                            override fun onSheetItemSelected(
+                                bottomSheet: BottomSheet, menuItem: MenuItem
+                            ) {
+                                val itemId = menuItem.itemId
+                                if (itemId == R.id.action_delete) {
+                                    group?.removeEntry(entry.uuid)
+                                    updateData()
+
+                                    SyncManager.setRoot(this@GroupActivity, Vault.instance.password)
+                                } else if (itemId == R.id.action_edit) {
+                                    val editEntryActivity = Intent(this@GroupActivity, EditEntryActivity::class.java)
+                                    editEntryActivity.putExtra("uuid", entry.uuid)
+                                    startActivity(editEntryActivity)
                                 }
+                            }
 
-                                override fun onSheetItemSelected(bottomSheet: BottomSheet, menuItem: MenuItem) {
-                                    val itemId = menuItem.itemId
-                                    if (itemId == R.id.action_delete) {
-                                        group?.removeEntry(entry.uuid)
-                                        updateData()
+                            override fun onSheetDismissed(bottomSheet: BottomSheet, i: Int) {
 
-                                        SyncManager.setRoot(this@GroupActivity, Vault.instance.password)
-                                    } else if (itemId == R.id.action_edit) {
-                                        val editEntryActivity = Intent(this@GroupActivity, EditEntryActivity::class.java)
-                                        editEntryActivity.putExtra("uuid", entry.uuid)
-                                        startActivity(editEntryActivity)
-                                    }
-                                }
-
-                                override fun onSheetDismissed(bottomSheet: BottomSheet, i: Int) {
-
-                                }
-                            })
-                            .show()
+                            }
+                        }).show()
                 }
 
                 return true

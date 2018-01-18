@@ -9,7 +9,8 @@ import com.zwsb.palmsdk.PalmSDK
 
 class MyApplication : Application() {
     companion object {
-        val tag = "MyApplication"
+        const val tag = "MyApplication"
+
         val icons = SparseIntArray()
 
         init {

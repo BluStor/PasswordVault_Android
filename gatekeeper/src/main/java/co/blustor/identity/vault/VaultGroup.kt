@@ -1,7 +1,8 @@
 package co.blustor.identity.vault
 
 import co.blustor.identity.constants.Icons
-import com.google.common.collect.TreeTraverser
+import com.google.common.graph.SuccessorsFunction
+import com.google.common.graph.Traverser
 import java.util.*
 
 data class VaultGroup(val parentUUID: UUID?, val uuid: UUID, var name: String) {
@@ -79,10 +80,8 @@ data class VaultGroup(val parentUUID: UUID?, val uuid: UUID, var name: String) {
     }
 
     companion object {
-        internal val traverser: TreeTraverser<VaultGroup> = object : TreeTraverser<VaultGroup>() {
-            override fun children(root: VaultGroup): Iterable<VaultGroup> {
-                return root.groups
-            }
-        }
+        val traverser: Traverser<VaultGroup> = Traverser.forTree(SuccessorsFunction<VaultGroup> {
+            it.groups
+        })
     }
 }

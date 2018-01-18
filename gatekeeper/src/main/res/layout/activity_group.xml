@@ -19,8 +19,9 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <co.blustor.identity.fragments.SyncStatusFragment
+    <fragment
         android:id="@+id/fragment_syncstatus"
+        android:name="co.blustor.identity.fragments.SyncStatusFragment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -40,7 +41,7 @@
         app:layout_constraintTop_toTopOf="@id/fragment_syncstatus" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/recyclerViewGroup"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -65,13 +66,13 @@
         app:menu_colorNormal="@color/colorAccent"
         app:menu_colorPressed="@color/colorAccent" />
 
-    <co.blustor.identity.fragments.SearchFragment
+    <fragment
         android:id="@+id/fragmentSearch"
+        android:name="co.blustor.identity.fragments.SearchFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

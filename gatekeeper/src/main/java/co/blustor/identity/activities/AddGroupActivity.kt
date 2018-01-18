@@ -60,11 +60,9 @@ class AddGroupActivity : LockingActivity() {
     }
 
     override fun onBackPressed() {
-        AlertDialog.Builder(this)
-                .setMessage("Close without saving?")
-                .setPositiveButton("Close") { _, _ -> finish() }
-                .setNegativeButton("Cancel", null)
-                .show()
+        AlertDialog.Builder(this).setMessage("Close without saving?")
+            .setPositiveButton("Close") { _, _ -> finish() }.setNegativeButton("Cancel", null)
+            .show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
@@ -83,9 +81,7 @@ class AddGroupActivity : LockingActivity() {
     private fun save() {
         if (validate()) {
             val group = VaultGroup(
-                    group?.uuid,
-                    UUID.randomUUID(),
-                    editTextName.text.toString()
+                group?.uuid, UUID.randomUUID(), editTextName.text.toString()
             )
             group.iconId = iconId
 
@@ -113,7 +109,7 @@ class AddGroupActivity : LockingActivity() {
     }
 
     companion object {
-        private val requestIcon = 0
-        private val tag = "AddGroupActivity"
+        private const val requestIcon = 0
+        private const val tag = "AddGroupActivity"
     }
 }

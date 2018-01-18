@@ -20,16 +20,17 @@ class ScanResultAdapter : RecyclerView.Adapter<ScanResultAdapter.ViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScanResultAdapter.ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_scanresult, parent, false)
-        itemView.setOnClickListener(onClickListener)
-        return ViewHolder(itemView)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_scanresult, parent, false)
+        view.setOnClickListener(onClickListener)
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ScanResultAdapter.ViewHolder, position: Int) {
         val scanResult = scanResults[position]
 
-        holder.mNameTextView.text = scanResult.device.name
-        holder.mStatusTextView.text = scanResult.rssi.toString()
+        holder.textViewName.text = scanResult.device.name
+        holder.textViewStatus.text = scanResult.rssi.toString()
     }
 
     override fun getItemCount(): Int {
@@ -73,7 +74,7 @@ class ScanResultAdapter : RecyclerView.Adapter<ScanResultAdapter.ViewHolder>() {
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val mNameTextView: TextView = itemView.findViewById(R.id.textview_name)
-        val mStatusTextView: TextView = itemView.findViewById(R.id.textViewStatus)
+        val textViewName: TextView = itemView.findViewById(R.id.textview_name)
+        val textViewStatus: TextView = itemView.findViewById(R.id.textViewStatus)
     }
 }

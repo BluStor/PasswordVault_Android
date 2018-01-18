@@ -17,8 +17,8 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
 object SyncManager {
-    private val tag = "SyncManager"
-    private val vaultPath = "/passwordvault/db.kdbx"
+    private const val tag = "SyncManager"
+    private const val vaultPath = "/passwordvault/db.kdbx"
     private val eventBus = EventBus.getDefault()
 
     @Synchronized
@@ -32,9 +32,10 @@ object SyncManager {
             if (address != null) {
                 try {
                     val card = GKCard(address)
-                    card.checkBluetoothState().then(DonePipe<Void, Void, GKCard.CardException, Void> {
-                        card.connect(context)
-                    }).then(DonePipe<Void, ByteArray, GKCard.CardException, Void> {
+                    card.checkBluetoothState()
+                        .then(DonePipe<Void, Void, GKCard.CardException, Void> {
+                            card.connect(context)
+                        }).then(DonePipe<Void, ByteArray, GKCard.CardException, Void> {
                         eventBus.postSticky(SyncStatus.TRANSFERRING)
                         card.getPath(Vault.dbPath)
                     }).then({
@@ -42,7 +43,8 @@ object SyncManager {
                         eventBus.postSticky(SyncStatus.DECRYPTING)
                         try {
                             val byteArrayInputStream = ByteArrayInputStream(it)
-                            val keePassFile = KeePassDatabase.getInstance(byteArrayInputStream).openDatabase(password)
+                            val keePassFile = KeePassDatabase.getInstance(byteArrayInputStream)
+                                .openDatabase(password)
 
                             val keePassRoot = keePassFile.root.groups[0]
                             val group = Translator.importKeePass(keePassRoot)
@@ -100,10 +102,11 @@ object SyncManager {
                 if (address != null) {
                     try {
                         val card = GKCard(address)
-                        card.checkBluetoothState().then(DonePipe<Void, Void, GKCard.CardException, Void> {
-                            eventBus.postSticky(SyncStatus.CONNECTING)
-                            card.connect(context)
-                        }).then(DonePipe<Void, Void, GKCard.CardException, Void> {
+                        card.checkBluetoothState()
+                            .then(DonePipe<Void, Void, GKCard.CardException, Void> {
+                                eventBus.postSticky(SyncStatus.CONNECTING)
+                                card.connect(context)
+                            }).then(DonePipe<Void, Void, GKCard.CardException, Void> {
                             eventBus.postSticky(SyncStatus.TRANSFERRING)
                             card.put(data)
                         }).then(DonePipe<Void, Void, GKCard.CardException, Void> {
@@ -138,9 +141,7 @@ object SyncManager {
     }
 
     enum class SyncError {
-        CARD_NOT_CHOSEN,
-        DATABASE_UNREADABLE,
-        VAULT_EMPTY
+        CARD_NOT_CHOSEN, DATABASE_UNREADABLE, VAULT_EMPTY
     }
 
     class SyncException internal constructor(val error: SyncError) : Exception()

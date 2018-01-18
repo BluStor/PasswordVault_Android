@@ -26,18 +26,18 @@ class AboutActivity : AppCompatActivity() {
 
         // Recycler view
 
-        recyclerView.setHasFixedSize(true)
+        recyclerViewAbout.setHasFixedSize(true)
 
         val linearLayoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = linearLayoutManager
+        recyclerViewAbout.layoutManager = linearLayoutManager
 
-        recyclerView.adapter = AboutAdapter()
+        recyclerViewAbout.adapter = AboutAdapter()
     }
 
     private inner class AboutAdapter : RecyclerView.Adapter<AboutAdapter.AboutViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AboutViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_about, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_about, parent)
             return AboutViewHolder(view)
         }
 

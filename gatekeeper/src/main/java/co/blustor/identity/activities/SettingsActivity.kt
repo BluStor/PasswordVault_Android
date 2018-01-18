@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import co.blustor.identity.R
 import co.blustor.identity.fragments.SyncDialogFragment
+import co.blustor.identity.sync.SyncManager
 import co.blustor.identity.vault.Vault
 import kotlinx.android.synthetic.main.activity_settings.*
 import java.util.*
@@ -47,19 +48,10 @@ class SettingsActivity : LockingActivity(), SyncDialogFragment.SyncListener {
 
             Vault.instance.password = password
 
-            save()
+            SyncManager.setRoot(this, password)
+
+            finish()
         }
-    }
-
-    private fun save() {
-        val syncDialogFragment = SyncDialogFragment()
-
-        val args = Bundle()
-        args.putSerializable("type", "write")
-        args.putSerializable("password", Vault.instance.password)
-
-        syncDialogFragment.arguments = args
-        syncDialogFragment.show(fragmentManager, "dialog")
     }
 
     private fun validatePassword(): Boolean {

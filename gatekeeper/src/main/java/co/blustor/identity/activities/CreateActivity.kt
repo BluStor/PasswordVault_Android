@@ -86,26 +86,23 @@ class CreateActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
 
     private fun create() {
         if (validate()) {
-            AlertDialog.Builder(this@CreateActivity)
-                    .setTitle("Replace database?")
-                    .setMessage("This will replace the password database on your card, potentially destroying data.  Are you sure?")
-                    .setPositiveButton("Yes") { dialog, _ ->
-                        dialog.cancel()
+            AlertDialog.Builder(this@CreateActivity).setTitle("Replace database?")
+                .setMessage("This will replace the password database on your card, potentially destroying data.  Are you sure?")
+                .setPositiveButton("Yes") { dialog, _ ->
+                    dialog.cancel()
 
-                        Vault.instance.create()
+                    Vault.instance.create()
 
-                        val syncDialogFragment = SyncDialogFragment()
+                    val syncDialogFragment = SyncDialogFragment()
 
-                        val args = Bundle()
-                        args.putSerializable("type", "write")
-                        args.putSerializable("password", editTextPassword.text.toString())
+                    val args = Bundle()
+                    args.putSerializable("type", "write")
+                    args.putSerializable("password", editTextPassword.text.toString())
 
-                        syncDialogFragment.arguments = args
-                        syncDialogFragment.setSyncListener(this)
-                        syncDialogFragment.show(fragmentManager, "dialog")
-                    }
-                    .setNegativeButton("No") { dialog, _ -> dialog.cancel() }
-                    .show()
+                    syncDialogFragment.arguments = args
+                    syncDialogFragment.setSyncListener(this)
+                    syncDialogFragment.show(fragmentManager, "dialog")
+                }.setNegativeButton("No") { dialog, _ -> dialog.cancel() }.show()
         }
     }
 
@@ -132,6 +129,6 @@ class CreateActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
     }
 
     companion object {
-        private val tag = "CreateActivity"
+        private const val tag = "CreateActivity"
     }
 }

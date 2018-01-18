@@ -25,18 +25,12 @@ class NotificationService : Service() {
         }
 
     private val lockDatabaseIntent: PendingIntent
-        get() = PendingIntent.getBroadcast(this, 0, Intent(Intents.lockDatabase), PendingIntent.FLAG_UPDATE_CURRENT)
+        get() = PendingIntent.getBroadcast(
+            this, 0, Intent(Intents.lockDatabase), PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
     private val unlockedNotification: Notification
-        get() = NotificationCompat.Builder(this, NotificationChannels.standard)
-                .setOngoing(true)
-                .setVisibility(VISIBILITY_PUBLIC)
-                .setContentTitle("BluStor KeePassDatabase")
-                .setContentText("Database is unlocked.")
-                .setContentIntent(switchToAppPendingIntent)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .addAction(android.R.drawable.ic_lock_lock, "Lock database", lockDatabaseIntent)
-                .build()
+        get() = NotificationCompat.Builder(this, NotificationChannels.standard).setOngoing(true).setVisibility(VISIBILITY_PUBLIC).setContentTitle("BluStor KeePassDatabase").setContentText("Database is unlocked.").setContentIntent(switchToAppPendingIntent).setVisibility(NotificationCompat.VISIBILITY_PUBLIC).addAction(android.R.drawable.ic_lock_lock, "Lock database", lockDatabaseIntent).build()
 
     override fun onBind(intent: Intent): IBinder? {
         return null

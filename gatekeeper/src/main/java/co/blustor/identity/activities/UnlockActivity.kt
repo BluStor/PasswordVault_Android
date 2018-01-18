@@ -1,11 +1,8 @@
 package co.blustor.identity.activities
 
-import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
@@ -16,7 +13,6 @@ import co.blustor.identity.fragments.SyncDialogFragment
 import com.zwsb.palmsdk.activities.AuthActivity
 import com.zwsb.palmsdk.activities.AuthActivity.ON_SCAN_RESULT_ERROR
 import com.zwsb.palmsdk.activities.AuthActivity.ON_SCAN_RESULT_OK
-import com.zwsb.palmsdk.helpers.SharedPreferenceHelper
 import kotlinx.android.synthetic.main.activity_unlock.*
 import java.util.*
 
@@ -52,17 +48,6 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
             }
         }
 
-        buttonToggle.setOnCheckedChangeListener { _, isChecked ->
-            checkPermissions()
-
-            if (isChecked) {
-                Log.d(tag, "Biometic palm enabled")
-            } else {
-                Log.d(tag, "Disable palm")
-                deletePalmCredentials()
-            }
-        }
-
         buttonFloatingAction.setOnClickListener { submit() }
     }
 
@@ -80,24 +65,6 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
                 }
             }
         }
-    }
-
-    private fun deletePalmCredentials() {
-        val users = SharedPreferenceHelper.getStringArray(this@UnlockActivity, SharedPreferenceHelper.USER_NAMES_KEY)
-        users.remove(palmUser)
-        SharedPreferenceHelper.setStringArray(this@UnlockActivity, SharedPreferenceHelper.USER_NAMES_KEY, users)
-        SharedPreferenceHelper.setLeftPalmEnabled(false, palmUser)
-        SharedPreferenceHelper.setRightPalmEnabled(false, palmUser)
-    }
-
-    private fun checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), 0)
-        }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -152,7 +119,6 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
     }
 
     companion object {
-        private val tag = "UnlockActivity"
-        private val palmUser = "Palm Authentication"
+        private const val tag = "UnlockActivity"
     }
 }

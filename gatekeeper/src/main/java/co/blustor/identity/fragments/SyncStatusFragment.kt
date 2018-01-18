@@ -17,7 +17,9 @@ class SyncStatusFragment : Fragment() {
 
     private var statusTextView: TextView? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_syncstatus, container, false)
     }
 
@@ -47,27 +49,51 @@ class SyncStatusFragment : Fragment() {
         if (context != null) {
             when (syncStatus) {
                 SyncStatus.SYNCED -> {
-                    statusTextView?.setTextColor(ContextCompat.getColor(context, R.color.statusSynced))
+                    statusTextView?.setTextColor(
+                        ContextCompat.getColor(
+                            context, R.color.statusSynced
+                        )
+                    )
                     statusTextView?.setText(R.string.status_synced)
                 }
                 SyncStatus.CONNECTING -> {
-                    statusTextView?.setTextColor(ContextCompat.getColor(context, R.color.statusBusy))
+                    statusTextView?.setTextColor(
+                        ContextCompat.getColor(
+                            context, R.color.statusBusy
+                        )
+                    )
                     statusTextView?.setText(R.string.status_connecting)
                 }
                 SyncStatus.DECRYPTING -> {
-                    statusTextView?.setTextColor(ContextCompat.getColor(context, R.color.statusBusy))
+                    statusTextView?.setTextColor(
+                        ContextCompat.getColor(
+                            context, R.color.statusBusy
+                        )
+                    )
                     statusTextView?.setText(R.string.status_decrypting)
                 }
                 SyncStatus.ENCRYPTING -> {
-                    statusTextView?.setTextColor(ContextCompat.getColor(context, R.color.statusBusy))
+                    statusTextView?.setTextColor(
+                        ContextCompat.getColor(
+                            context, R.color.statusBusy
+                        )
+                    )
                     statusTextView?.setText(R.string.status_encrypting)
                 }
                 SyncStatus.TRANSFERRING -> {
-                    statusTextView?.setTextColor(ContextCompat.getColor(context, R.color.statusBusy))
+                    statusTextView?.setTextColor(
+                        ContextCompat.getColor(
+                            context, R.color.statusBusy
+                        )
+                    )
                     statusTextView?.setText(R.string.status_transferring)
                 }
                 SyncStatus.FAILED -> {
-                    statusTextView?.setTextColor(ContextCompat.getColor(context, R.color.statusFailed))
+                    statusTextView?.setTextColor(
+                        ContextCompat.getColor(
+                            context, R.color.statusFailed
+                        )
+                    )
                     statusTextView?.setText(R.string.status_failed)
                 }
             }

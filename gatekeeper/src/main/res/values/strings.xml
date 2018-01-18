@@ -63,4 +63,6 @@
     <string name="menu_choose_card">Choose card</string>
     <string name="bluetooth_not_paired">Card is not paired with your phone.  Open Bluetooth settings to pair card.  Make sure the card has a rapidly flashing yellow light.</string>
     <string name="bluetooth_not_enabled">Bluetooth is not enabled.  Open your Bluetooth settings and enable.</string>
+    <string name="checkbox_palm">Palm</string>
+    <string name="checkbox_fingerprint">Fingerprint</string>
 </resources>

@@ -7,7 +7,6 @@ import android.view.MenuItem
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import co.blustor.identity.R
-import com.google.common.primitives.Chars
 import kotlinx.android.synthetic.main.activity_passwordgenerator.*
 import java.util.*
 
@@ -109,13 +108,13 @@ class PasswordGeneratorActivity : LockingActivity() {
         characters.clear()
 
         if (checkBoxUpper.isChecked) {
-            characters.addAll(Chars.asList(*charsUpper))
+            characters.addAll(charsUpper)
         }
         if (checkBoxLower.isChecked) {
-            characters.addAll(Chars.asList(*charsLower))
+            characters.addAll(charsLower)
         }
         if (checkBoxDigits.isChecked) {
-            characters.addAll(Chars.asList(*charsDigits))
+            characters.addAll(charsDigits)
         }
         if (checkBoxDash.isChecked) {
             characters.add('-')
@@ -127,10 +126,10 @@ class PasswordGeneratorActivity : LockingActivity() {
             characters.add(' ')
         }
         if (checkBoxSpecial.isChecked) {
-            characters.addAll(Chars.asList(*charsSpecial))
+            characters.addAll(charsSpecial)
         }
         if (checkBoxBrackets.isChecked) {
-            characters.addAll(Chars.asList(*charsBrackets))
+            characters.addAll(charsBrackets)
         }
     }
 
@@ -150,10 +149,10 @@ class PasswordGeneratorActivity : LockingActivity() {
     }
 
     companion object {
-        private val charsUpper = charArrayOf('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')
-        private val charsLower = charArrayOf('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z')
-        private val charsDigits = charArrayOf('1', '2', '3', '4', '5', '6', '7', '8', '9', '0')
-        private val charsSpecial = charArrayOf('!', '@', '#', '$', '%', '^', '&', '*')
-        private val charsBrackets = charArrayOf('[', ']', '{', '}', '(', ')', '<', '>')
+        private val charsUpper = listOf('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')
+        private val charsLower = listOf('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z')
+        private val charsDigits = listOf('1', '2', '3', '4', '5', '6', '7', '8', '9', '0')
+        private val charsSpecial = listOf('!', '@', '#', '$', '%', '^', '&', '*')
+        private val charsBrackets = listOf('[', ']', '{', '}', '(', ')', '<', '>')
     }
 }

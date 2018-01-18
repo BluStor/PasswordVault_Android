@@ -70,11 +70,9 @@ class EditGroupActivity : LockingActivity() {
 
     override fun onBackPressed() {
         if (hasBeenEdited()) {
-            AlertDialog.Builder(this)
-                    .setMessage("Close without saving?")
-                    .setPositiveButton("Close") { _, _ -> finish() }
-                    .setNegativeButton("Cancel", null)
-                    .show()
+            AlertDialog.Builder(this).setMessage("Close without saving?")
+                .setPositiveButton("Close") { _, _ -> finish() }.setNegativeButton("Cancel", null)
+                .show()
         } else {
             finish()
         }
@@ -126,6 +124,6 @@ class EditGroupActivity : LockingActivity() {
     }
 
     companion object {
-        private val requestIcon = 0
+        private const val requestIcon = 0
     }
 }

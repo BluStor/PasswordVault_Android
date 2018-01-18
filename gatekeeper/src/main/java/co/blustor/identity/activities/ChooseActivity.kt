@@ -93,7 +93,8 @@ class ChooseActivity : AppCompatActivity() {
                     val alertDialog = AlertDialog.Builder(this@ChooseActivity).create()
                     alertDialog.setTitle("Alert")
                     alertDialog.setMessage(resources.getString(R.string.bluetooth_not_paired))
-                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK"
+                    alertDialog.setButton(
+                        AlertDialog.BUTTON_NEUTRAL, "OK"
                     ) { dialog, _ -> dialog.dismiss() }
                     alertDialog.setCancelable(false)
                     alertDialog.show()
@@ -124,53 +125,52 @@ class ChooseActivity : AppCompatActivity() {
 
         val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
         if (bluetoothManager.adapter.isEnabled) {
-            Dexter.withActivity(this)
-                    .withPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
-                    .withListener(object : MultiplePermissionsListener {
-                        override fun onPermissionsChecked(report: MultiplePermissionsReport) {
-                            if (report.areAllPermissionsGranted()) {
-                                val serviceUuid = ParcelUuid(GKCard.serviceUUID)
+            Dexter.withActivity(this).withPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
+                .withListener(object : MultiplePermissionsListener {
+                    override fun onPermissionsChecked(report: MultiplePermissionsReport) {
+                        if (report.areAllPermissionsGranted()) {
+                            val serviceUuid = ParcelUuid(GKCard.serviceUUID)
 
-                                val scanFilter = ScanFilter.Builder()
-                                        .setServiceUuid(serviceUuid)
-                                        .build()
+                            val scanFilter = ScanFilter.Builder().setServiceUuid(serviceUuid)
+                                .build()
 
-                                val scanSettings = ScanSettings.Builder()
-                                        .setScanMode(SCAN_MODE_BALANCED)
-                                        .setMatchMode(MATCH_MODE_AGGRESSIVE)
-                                        .build()
+                            val scanSettings = ScanSettings.Builder()
+                                .setScanMode(SCAN_MODE_BALANCED).setMatchMode(MATCH_MODE_AGGRESSIVE)
+                                .build()
 
-                                val scanFilters = listOf<ScanFilter>(scanFilter)
+                            val scanFilters = listOf<ScanFilter>(scanFilter)
 
-                                bluetoothLeScanner?.startScan(scanFilters, scanSettings, scanCallback)
+                            bluetoothLeScanner?.startScan(scanFilters, scanSettings, scanCallback)
 
-                                isScanning = true
-                                buttonScanToggle.isChecked = true
-                                progressBarResults.visibility = View.VISIBLE
-                            } else {
-                                if (report.isAnyPermissionPermanentlyDenied) {
-                                    val builder = AlertDialog.Builder(this@ChooseActivity)
-                                            .setMessage(R.string.error_permission_location_scan)
-                                            .setPositiveButton("Settings") { dialogInterface, _ ->
-                                                val intent = Intent()
-                                                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                                                val uri = Uri.fromParts("package", packageName, null)
-                                                intent.data = uri
-                                                startActivity(intent)
+                            isScanning = true
+                            buttonScanToggle.isChecked = true
+                            progressBarResults.visibility = View.VISIBLE
+                        } else {
+                            if (report.isAnyPermissionPermanentlyDenied) {
+                                val builder = AlertDialog.Builder(this@ChooseActivity)
+                                    .setMessage(R.string.error_permission_location_scan)
+                                    .setPositiveButton("Settings") { dialogInterface, _ ->
+                                        val intent = Intent()
+                                        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                        val uri = Uri.fromParts("package", packageName, null)
+                                        intent.data = uri
+                                        startActivity(intent)
 
-                                                dialogInterface.cancel()
-                                            }
-                                            .setNegativeButton("Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
+                                        dialogInterface.cancel()
+                                    }
+                                    .setNegativeButton("Cancel") { dialogInterface, _ -> dialogInterface.cancel() }
 
-                                    builder.create().show()
-                                }
+                                builder.create().show()
                             }
                         }
+                    }
 
-                        override fun onPermissionRationaleShouldBeShown(permissions: List<PermissionRequest>, token: PermissionToken) {
-                            token.continuePermissionRequest()
-                        }
-                    }).check()
+                    override fun onPermissionRationaleShouldBeShown(
+                        permissions: List<PermissionRequest>, token: PermissionToken
+                    ) {
+                        token.continuePermissionRequest()
+                    }
+                }).check()
         } else {
             val alertDialog = AlertDialog.Builder(this@ChooseActivity).create()
             alertDialog.setTitle("Alert")
@@ -192,6 +192,6 @@ class ChooseActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val tag = "ChooseActivity"
+        private const val tag = "ChooseActivity"
     }
 }

@@ -80,11 +80,9 @@ class AddEntryActivity : LockingActivity() {
     }
 
     override fun onBackPressed() {
-        AlertDialog.Builder(this)
-                .setMessage("Close without saving?")
-                .setPositiveButton("Close") { _, _ -> finish() }
-                .setNegativeButton("Cancel", null)
-                .show()
+        AlertDialog.Builder(this).setMessage("Close without saving?")
+            .setPositiveButton("Close") { _, _ -> finish() }.setNegativeButton("Cancel", null)
+            .show()
     }
 
 
@@ -139,7 +137,7 @@ class AddEntryActivity : LockingActivity() {
     }
 
     companion object {
-        private val requestIcon = 0
-        private val requestPassword = 1
+        private const val requestIcon = 0
+        private const val requestPassword = 1
     }
 }

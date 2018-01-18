@@ -26,7 +26,9 @@ class GKCard(private val mAddress: String) {
 
     private var mMtu = 20
 
-    private fun makeCommandData(command: Byte, string: String?): Promise<ByteArray, CardException, Void> {
+    private fun makeCommandData(
+        command: Byte, string: String?
+    ): Promise<ByteArray, CardException, Void> {
         Log.d(tag, "makeCommandData")
         val deferredObject = DeferredObject<ByteArray, CardException, Void>()
 
@@ -221,7 +223,9 @@ class GKCard(private val mAddress: String) {
                                     Log.d(tag, "(3/4) Discover services ...")
                                     BluetoothClient.discoverServices(object : DiscoverServicesCallback {
                                         override fun onServicesDiscovered(status: Int) {
-                                            Log.i(tag, "(4/4) Enable control point notifications ...")
+                                            Log.i(
+                                                tag, "(4/4) Enable control point notifications ..."
+                                            )
                                             BluetoothClient.descriptorWrite(serviceUUID, controlPointUUID, characteristicConfigurationUUID, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE, object : DescriptorWriteCallback {
                                                 override fun onDescriptorNotFound() {
                                                     deferredObject.reject(null)
@@ -229,24 +233,44 @@ class GKCard(private val mAddress: String) {
 
                                                 override fun onDescriptorWrite(status: Int) {
                                                     if (status == GATT_SUCCESS) {
-                                                        if (BluetoothClient.enableNotify(serviceUUID, controlPointUUID)) {
+                                                        if (BluetoothClient.enableNotify(
+                                                                serviceUUID, controlPointUUID
+                                                            )) {
                                                             BluetoothClient.notify(object : NotifyCallback {
-                                                                override fun onNotify(serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray) {
+                                                                override fun onNotify(
+                                                                    serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray
+                                                                ) {
                                                                     if (characteristicUUID == controlPointUUID) {
-                                                                        Log.d(tag, String.format("controlPointBuffer <- %d bytes", value.size))
-                                                                        mControlPointBuffer.addAll(Bytes.asList(*value))
+                                                                        Log.d(
+                                                                            tag, String.format(
+                                                                                "controlPointBuffer <- %d bytes", value.size
+                                                                            )
+                                                                        )
+                                                                        mControlPointBuffer.addAll(
+                                                                            Bytes.asList(*value)
+                                                                        )
                                                                     } else {
-                                                                        Log.d(tag, "Notification callback received a value for unknown service $serviceUUID, characteristic $characteristicUUID")
+                                                                        Log.d(
+                                                                            tag, "Notification callback received a value for unknown service $serviceUUID, characteristic $characteristicUUID"
+                                                                        )
                                                                     }
                                                                 }
                                                             })
 
                                                             deferredObject.resolve(null)
                                                         } else {
-                                                            deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
+                                                            deferredObject.reject(
+                                                                CardException(
+                                                                    CardError.CONNECTION_FAILED
+                                                                )
+                                                            )
                                                         }
                                                     } else {
-                                                        deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
+                                                        deferredObject.reject(
+                                                            CardException(
+                                                                CardError.CONNECTION_FAILED
+                                                            )
+                                                        )
                                                     }
                                                 }
 
@@ -356,7 +380,9 @@ class GKCard(private val mAddress: String) {
 
         val runnable = Runnable {
             if (path.length <= 30) {
-                makeCommandData(7.toByte(), path).then(DonePipe<ByteArray, Void, CardException, Void> {
+                makeCommandData(
+                    7.toByte(), path
+                ).then(DonePipe<ByteArray, Void, CardException, Void> {
                     this.writeToControlPoint(it)
                 }).then(DonePipe<Void, Void, CardException, Void> {
                     deferredObject.resolve(it)
@@ -378,7 +404,9 @@ class GKCard(private val mAddress: String) {
 
         val runnable = Runnable {
             if (path.length <= 30) {
-                makeCommandData(10.toByte(), path).then(DonePipe<ByteArray, Void, CardException, Void> {
+                makeCommandData(
+                    10.toByte(), path
+                ).then(DonePipe<ByteArray, Void, CardException, Void> {
                     this.writeToControlPoint(it)
                 }).then(DonePipe<Void, ByteArray, CardException, Void> {
                     waitOnControlPointResult()
@@ -416,7 +444,9 @@ class GKCard(private val mAddress: String) {
 
         val runnable = Runnable {
             if (path.length <= 30) {
-                makeCommandData(2.toByte(), path).then(DonePipe<ByteArray, Void, CardException, Void> {
+                makeCommandData(
+                    2.toByte(), path
+                ).then(DonePipe<ByteArray, Void, CardException, Void> {
                     this.writeToControlPoint(it)
                 }).then(DonePipe<Void, ByteArray, CardException, Void> {
                     waitOnControlPointResult()
@@ -431,8 +461,8 @@ class GKCard(private val mAddress: String) {
                         deferredObject.resolve(it)
                     }
                 }.fail({
-                    deferredObject.reject(it)
-                })
+                        deferredObject.reject(it)
+                    })
             } else {
                 deferredObject.reject(CardException(CardError.ARGUMENT_INVALID))
             }
@@ -448,7 +478,9 @@ class GKCard(private val mAddress: String) {
 
         val runnable = Runnable {
             if (name.length <= 11) {
-                makeCommandData(8.toByte(), name).then(DonePipe<ByteArray, Void, CardException, Void> {
+                makeCommandData(
+                    8.toByte(), name
+                ).then(DonePipe<ByteArray, Void, CardException, Void> {
                     this.writeToControlPoint(it)
                 }).then(DonePipe<Void, Void, CardException, Void> {
                     deferredObject.resolve(it)
@@ -479,13 +511,25 @@ class GKCard(private val mAddress: String) {
                 override fun onCharacteristicRead(status: Int, value: ByteArray) {
                     if (status == GATT_SUCCESS) {
                         if (value.size == 2) {
-                            val ourHexString = BaseEncoding.base16().encode(byteArrayOf(ourChecksum.ushr(8).toByte(), ourChecksum.toByte()))
+                            val ourHexString = BaseEncoding.base16().encode(
+                                byteArrayOf(
+                                    ourChecksum.ushr(8).toByte(), ourChecksum.toByte()
+                                )
+                            )
                             val cardHexString = BaseEncoding.base16().encode(value)
 
                             val cardChecksum = value[0].toInt() shl 8 and 0x0000ff00 or (value[1].toInt() and 0x000000ff)
 
-                            Log.d(tag, String.format("checksum: %s (%d, ours)", ourHexString, ourChecksum))
-                            Log.d(tag, String.format("checksum: %s (%d, card)", cardHexString, cardChecksum))
+                            Log.d(
+                                tag, String.format(
+                                    "checksum: %s (%d, ours)", ourHexString, ourChecksum
+                                )
+                            )
+                            Log.d(
+                                tag, String.format(
+                                    "checksum: %s (%d, card)", cardHexString, cardChecksum
+                                )
+                            )
 
                             if (ourChecksum == cardChecksum) {
                                 Log.d(tag, "checksum: match")
@@ -522,7 +566,9 @@ class GKCard(private val mAddress: String) {
 
         val runnable = Runnable {
             if (path.length <= 30) {
-                makeCommandData(4.toByte(), path).then(DonePipe<ByteArray, Void, CardException, Void> {
+                makeCommandData(
+                    4.toByte(), path
+                ).then(DonePipe<ByteArray, Void, CardException, Void> {
                     this.writeToControlPoint(it)
                 }).then(DonePipe<Void, ByteArray, CardException, Void> {
                     waitOnControlPointResult()
@@ -563,19 +609,7 @@ class GKCard(private val mAddress: String) {
     }
 
     enum class CardError {
-        ARGUMENT_INVALID,
-        BLUETOOTH_NOT_AVAILABLE,
-        BLUETOOTH_ADAPTER_NOT_ENABLED,
-        CARD_NOT_PAIRED,
-        CONNECTION_FAILED,
-        CHARACTERISTIC_READ_FAILURE,
-        CHARACTERISTIC_WRITE_FAILURE,
-        FILE_NOT_FOUND,
-        FILE_READ_FAILED,
-        FILE_WRITE_FAILED,
-        MAKE_COMMAND_DATA_FAILED,
-        INVALID_CHECKSUM,
-        INVALID_RESPONSE
+        ARGUMENT_INVALID, BLUETOOTH_NOT_AVAILABLE, BLUETOOTH_ADAPTER_NOT_ENABLED, CARD_NOT_PAIRED, CONNECTION_FAILED, CHARACTERISTIC_READ_FAILURE, CHARACTERISTIC_WRITE_FAILURE, FILE_NOT_FOUND, FILE_READ_FAILED, FILE_WRITE_FAILED, MAKE_COMMAND_DATA_FAILED, INVALID_CHECKSUM, INVALID_RESPONSE
     }
 
     class CardException internal constructor(val error: CardError) : Exception()
