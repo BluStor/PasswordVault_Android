@@ -15,6 +15,8 @@ class IconPickerActivity : LockingActivity() {
 
         title = "Select icon"
 
+        // Views
+
         gridView.adapter = IconAdapter(this)
         gridView.setOnItemClickListener { _, _, position, _ ->
             val data = Intent()

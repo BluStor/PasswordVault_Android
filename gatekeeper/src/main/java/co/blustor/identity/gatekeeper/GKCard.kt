@@ -8,6 +8,7 @@ import android.content.Context
 import android.os.SystemClock
 import android.util.Log
 import co.blustor.identity.gatekeeper.callbacks.*
+import co.blustor.identity.gatekeeper.events.*
 import com.google.common.base.Charsets
 import com.google.common.io.BaseEncoding
 import com.google.common.primitives.Bytes
@@ -22,13 +23,12 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 class GKCard(private val mAddress: String) {
+
     private val mControlPointBuffer = ArrayList<Byte>()
 
     private var mMtu = 20
 
-    private fun makeCommandData(
-        command: Byte, string: String?
-    ): Promise<ByteArray, CardException, Void> {
+    private fun makeCommandData(command: Byte, string: String?): Promise<ByteArray, CardException, Void> {
         Log.d(tag, "makeCommandData")
         val deferredObject = DeferredObject<ByteArray, CardException, Void>()
 
@@ -36,9 +36,10 @@ class GKCard(private val mAddress: String) {
             try {
                 val byteArrayOutputStream = ByteArrayOutputStream()
                 byteArrayOutputStream.write(command.toInt())
-                if (string != null) {
-                    byteArrayOutputStream.write(string.length)
-                    byteArrayOutputStream.write(string.toByteArray(Charsets.UTF_8))
+
+                string?.let {
+                    byteArrayOutputStream.write(it.length)
+                    byteArrayOutputStream.write(it.toByteArray(Charsets.UTF_8))
                     byteArrayOutputStream.write(0)
                 }
 
@@ -107,7 +108,7 @@ class GKCard(private val mAddress: String) {
 
                 val phase = phaser.register()
 
-                BluetoothClient.characteristicWrite(serviceUUID, fileWriteUUID, chunk, object : CharacteristicWriteCallback {
+                BluetoothClient.queue(CharacteristicWriteEvent(serviceUUID, fileWriteUUID, chunk, object : CharacteristicWriteCallback {
                     override fun onCharacteristicNotFound() {
                         deferredObject.reject(CardException(CardError.CHARACTERISTIC_WRITE_FAILURE))
                         phaser.arriveAndDeregister()
@@ -132,7 +133,7 @@ class GKCard(private val mAddress: String) {
                         deferredObject.reject(CardException(CardError.CHARACTERISTIC_WRITE_FAILURE))
                         phaser.arriveAndDeregister()
                     }
-                })
+                }))
 
                 try {
                     phaser.awaitAdvanceInterruptibly(phase, 1000, TimeUnit.MILLISECONDS)
@@ -172,7 +173,7 @@ class GKCard(private val mAddress: String) {
             val hexString = BaseEncoding.base16().encode(data)
             Log.d(tag, String.format("writeToControlPoint: %s", hexString))
 
-            BluetoothClient.characteristicWrite(serviceUUID, controlPointUUID, data, object : CharacteristicWriteCallback {
+            BluetoothClient.queue(CharacteristicWriteEvent(serviceUUID, controlPointUUID, data, object : CharacteristicWriteCallback {
                 override fun onCharacteristicNotFound() {
                     deferredObject.reject(CardException(CardError.CHARACTERISTIC_WRITE_FAILURE))
                 }
@@ -194,7 +195,7 @@ class GKCard(private val mAddress: String) {
                 override fun onTimeout() {
                     deferredObject.reject(CardException(CardError.CHARACTERISTIC_WRITE_FAILURE))
                 }
-            })
+            }))
         }
         Thread(runnable).start()
 
@@ -209,24 +210,22 @@ class GKCard(private val mAddress: String) {
             mMtu = 20
 
             Log.d(tag, "(1/4) Connecting ...")
-            BluetoothClient.connect(context, mAddress, object : ConnectCallback {
+            BluetoothClient.queue(ConnectEvent(context, mAddress, object : ConnectCallback {
                 override fun onConnectionStateChange(status: Int, newState: Int) {
                     if (status == GATT_SUCCESS) {
                         Log.d(tag, "(2/4) Request MTU ...")
-                        BluetoothClient.requestMtu(512, object : RequestMtuCallback {
+                        BluetoothClient.queue(RequestMtuEvent(512, object : RequestMtuCallback {
                             override fun onMtuChanged(mtu: Int, status: Int) {
-                                Log.d(tag, "onMtuChanged")
                                 if (status == GATT_SUCCESS) {
                                     mMtu = mtu
-                                    Log.d(tag, "onMtuChanged: " + mMtu)
 
                                     Log.d(tag, "(3/4) Discover services ...")
-                                    BluetoothClient.discoverServices(object : DiscoverServicesCallback {
+                                    BluetoothClient.queue(DiscoverServicesEvent(object : DiscoverServicesCallback {
                                         override fun onServicesDiscovered(status: Int) {
                                             Log.i(
                                                 tag, "(4/4) Enable control point notifications ..."
                                             )
-                                            BluetoothClient.descriptorWrite(serviceUUID, controlPointUUID, characteristicConfigurationUUID, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE, object : DescriptorWriteCallback {
+                                            BluetoothClient.queue(DescriptorWriteEvent(serviceUUID, controlPointUUID, characteristicConfigurationUUID, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE, object : DescriptorWriteCallback {
                                                 override fun onDescriptorNotFound() {
                                                     deferredObject.reject(null)
                                                 }
@@ -281,7 +280,7 @@ class GKCard(private val mAddress: String) {
                                                 override fun onTimeout() {
                                                     deferredObject.reject(null)
                                                 }
-                                            })
+                                            }))
                                         }
 
                                         override fun onNotConnected() {
@@ -291,7 +290,7 @@ class GKCard(private val mAddress: String) {
                                         override fun onTimeout() {
                                             deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                                         }
-                                    })
+                                    }))
                                 } else {
                                     deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                                 }
@@ -306,7 +305,7 @@ class GKCard(private val mAddress: String) {
                                 Log.i(tag, "onTimeout")
                                 deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                             }
-                        })
+                        }))
                     } else {
                         deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                     }
@@ -319,7 +318,7 @@ class GKCard(private val mAddress: String) {
                 override fun onTimeout() {
                     deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                 }
-            })
+            }))
         }
         Thread(runnable).start()
 
@@ -331,7 +330,7 @@ class GKCard(private val mAddress: String) {
         val deferredObject = DeferredObject<Void, CardException, Void>()
 
         val runnable = {
-            BluetoothClient.disconnect(object : DisconnectCallback {
+            BluetoothClient.queue(DisconnectEvent(object : DisconnectCallback {
                 override fun onDisconnected() {
                     Log.d(tag, "disconnect: success")
                 }
@@ -343,7 +342,7 @@ class GKCard(private val mAddress: String) {
                 override fun onTimeout() {
                     Log.d(tag, "disconnect: timeout")
                 }
-            })
+            }))
         }
         Thread(runnable).start()
 
@@ -503,7 +502,7 @@ class GKCard(private val mAddress: String) {
         val runnable = {
             val ourChecksum = GKCrypto.crc16(data)
 
-            BluetoothClient.characteristicRead(serviceUUID, fileWriteUUID, object : CharacteristicReadCallback {
+            BluetoothClient.queue(CharacteristicReadEvent(serviceUUID, fileWriteUUID, object : CharacteristicReadCallback {
                 override fun onCharacteristicNotFound() {
                     deferredObject.reject(CardException(CardError.CHARACTERISTIC_READ_FAILURE))
                 }
@@ -553,7 +552,7 @@ class GKCard(private val mAddress: String) {
                 override fun onTimeout() {
                     deferredObject.reject(CardException(CardError.CHARACTERISTIC_READ_FAILURE))
                 }
-            })
+            }))
         }
         Thread(runnable).start()
 

@@ -55,9 +55,8 @@ class ChooseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(tag, "onCreate")
-
         setContentView(R.layout.activity_cardchooser)
+
         title = getString(R.string.title_choose_card)
 
         // Views

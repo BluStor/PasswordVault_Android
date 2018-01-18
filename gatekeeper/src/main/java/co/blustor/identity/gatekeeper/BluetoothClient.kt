@@ -3,7 +3,6 @@ package co.blustor.identity.gatekeeper
 import android.bluetooth.*
 import android.bluetooth.BluetoothProfile.STATE_CONNECTED
 import android.bluetooth.BluetoothProfile.STATE_DISCONNECTED
-import android.content.Context
 import co.blustor.identity.gatekeeper.callbacks.*
 import co.blustor.identity.gatekeeper.events.*
 import com.google.common.io.BaseEncoding
@@ -29,113 +28,63 @@ object BluetoothClient {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             BluetoothLog.d("onConnectionStateChange")
             if (newState == STATE_CONNECTED || newState == 133) {
-                if (connectCallback != null) {
-                    BluetoothLog.d("onConnectionStateChange: connectCallback")
-                    connectCallback?.onConnectionStateChange(status, newState)
-                    stopWaitingForCallback()
-                }
+                BluetoothLog.d("onConnectionStateChange: connectCallback")
+                connectCallback?.onConnectionStateChange(status, newState)
+                cancelTimeout()
             } else if (newState == STATE_DISCONNECTED) {
-                if (disconnectCallback != null) {
-                    BluetoothLog.d("onConnectionStateChange: disconnectCallback")
-                    disconnectCallback?.onDisconnected()
-                    stopWaitingForCallback()
-                }
+                BluetoothLog.d("onConnectionStateChange: disconnectCallback")
+                disconnectCallback?.onDisconnected()
+                cancelTimeout()
             } else {
-                BluetoothLog.d(
-                    String.format(
-                        Locale.getDefault(), "onConnectionStateChange: Unknown status %d, newState = %d", status, newState
-                    )
-                )
+                BluetoothLog.d("onConnectionStateChange: Unknown status $status, newState = $newState")
             }
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             BluetoothLog.d("onServicesDiscovered")
-            if (discoverServicesCallback != null) {
-                BluetoothLog.d("onServicesDiscovered: discoverServicesCallback")
-                discoverServicesCallback?.onServicesDiscovered(status)
-                stopWaitingForCallback()
-            }
+            discoverServicesCallback?.onServicesDiscovered(status)
+            cancelTimeout()
         }
 
-        override fun onCharacteristicRead(
-            gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int
-        ) {
+        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
             BluetoothLog.d("onCharacteristicRead")
-            if (characteristicReadCallback != null) {
-                BluetoothLog.d("onCharacteristicRead: characteristicReadCallback")
-                characteristicReadCallback?.onCharacteristicRead(status, characteristic.value)
-                stopWaitingForCallback()
-            }
+            characteristicReadCallback?.onCharacteristicRead(status, characteristic.value)
+            cancelTimeout()
         }
 
-        override fun onCharacteristicWrite(
-            gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int
-        ) {
-            BluetoothLog.d("onCharacteristicWrite")
-            if (characteristicWriteCallback != null) {
-                BluetoothLog.d("onCharacteristicWrite: characteristicWriteCallback")
-                characteristicWriteCallback?.onCharacteristicWrite(status)
-                stopWaitingForCallback()
-            }
+        override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+            BluetoothLog.d("onCharacteristicWrite: characteristicWriteCallback")
+            characteristicWriteCallback?.onCharacteristicWrite(status)
+            cancelTimeout()
         }
 
-        override fun onCharacteristicChanged(
-            gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic
-        ) {
+        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
             val hexString = BaseEncoding.base16().encode(characteristic.value)
-            BluetoothLog.d(
-                String.format(
-                    "onCharacteristicChanged: %s to %s", characteristic.uuid, hexString
-                )
-            )
-            if (notifyCallback != null) {
-                BluetoothLog.d("onCharacteristicChanged: notifyCallback")
-                val service = characteristic.service
-                notifyCallback?.onNotify(service.uuid, characteristic.uuid, characteristic.value)
-            }
+            BluetoothLog.d("onCharacteristicChanged: ${characteristic.uuid} to $hexString")
+
+            notifyCallback?.onNotify(characteristic.service.uuid, characteristic.uuid, characteristic.value)
         }
 
-        override fun onDescriptorRead(
-            gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int
-        ) {
+        override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
             BluetoothLog.d("onDescriptorRead")
-            if (descriptorReadCallback != null) {
-                BluetoothLog.d("onDescriptorRead: descriptorReadCallback")
-                descriptorReadCallback?.onDescriptorRead(status, descriptor.value)
-                try {
-                    cyclicBarrier.await()
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                } catch (e: BrokenBarrierException) {
-                    e.printStackTrace()
-                }
-
-            }
+            descriptorReadCallback?.onDescriptorRead(status, descriptor.value)
+            cancelTimeout()
         }
 
-        override fun onDescriptorWrite(
-            gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int
-        ) {
+        override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
             BluetoothLog.d("onDescriptorWrite")
-            if (descriptorWriteCallback != null) {
-                BluetoothLog.d("onDescriptorWrite: descriptorWriteCallback")
-                descriptorWriteCallback?.onDescriptorWrite(status)
-                stopWaitingForCallback()
-            }
+            descriptorWriteCallback?.onDescriptorWrite(status)
+            cancelTimeout()
         }
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             BluetoothLog.d("onMtuChanged")
-            if (requestMtuCallback != null) {
-                BluetoothLog.d("onMtuChanged: requestMtuCallback")
-                requestMtuCallback?.onMtuChanged(mtu, status)
-                stopWaitingForCallback()
-            }
+            requestMtuCallback?.onMtuChanged(mtu, status)
+            cancelTimeout()
         }
     }
 
-    private fun stopWaitingForCallback() {
+    private fun cancelTimeout() {
         try {
             cyclicBarrier.await()
         } catch (e: InterruptedException) {
@@ -147,125 +96,64 @@ object BluetoothClient {
 
     // Event processing
 
-    private fun getCharacteristic(
-        gatt: BluetoothGatt?, serviceUUID: UUID, characteristicUUID: UUID
-    ): BluetoothGattCharacteristic? {
-        return if (gatt == null) {
-            null
-        } else {
-            val service = gatt.getService(serviceUUID)
-            service?.getCharacteristic(characteristicUUID)
+    private fun getCharacteristic(gatt: BluetoothGatt?, serviceUUID: UUID, characteristicUUID: UUID): BluetoothGattCharacteristic? {
+        return gatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
+    }
+
+    private fun getDescriptor(gatt: BluetoothGatt?, serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID): BluetoothGattDescriptor? {
+        return gatt?.getService(serviceUUID)?.getCharacteristic(characteristicUUID)?.getDescriptor(descriptorUUID)
+    }
+
+    private fun timeout(value: Long, timeUnit: TimeUnit) {
+        try {
+            cyclicBarrier.await(value, timeUnit)
+        } catch (e: InterruptedException) {
+            requestMtuCallback?.onTimeout()
+        } catch (e: BrokenBarrierException) {
+            requestMtuCallback?.onTimeout()
+        } catch (e: TimeoutException) {
+            requestMtuCallback?.onTimeout()
         }
     }
 
-    private fun getDescriptor(
-        gatt: BluetoothGatt?, serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID
-    ): BluetoothGattDescriptor? {
-        return if (gatt == null) {
-            null
-        } else {
-            val service = gatt.getService(serviceUUID)
-            if (service == null) {
-                null
-            } else {
-                val characteristic = service.getCharacteristic(characteristicUUID)
-                characteristic?.getDescriptor(descriptorUUID)
-            }
-        }
-    }
-
-    private fun queueEvent(event: Event) {
+    fun queue(event: Event) {
         executorService.execute {
-
             cyclicBarrier.reset()
 
-            val eventName = event.name
-            BluetoothLog.d("Processing " + eventName.name)
-            when (eventName) {
+            BluetoothLog.d("Processing ${event.name}")
+            when (event.name) {
                 BluetoothConstants.EventName.CHARACTERISTIC_READ -> {
                     val characteristicReadEvent = event as CharacteristicReadEvent
                     characteristicReadCallback = characteristicReadEvent.callback
 
-                    if (gatt == null) {
-                        BluetoothLog.d("Not connected.")
-                        if (characteristicReadCallback != null) {
-                            characteristicReadCallback?.onDisconnected()
-                        }
-                    } else {
-                        val characteristic = getCharacteristic(
-                            gatt, characteristicReadEvent.serviceUUID, characteristicReadEvent.characteristicUUID
-                        )
+                    gatt?.let {
+                        val characteristic = getCharacteristic(gatt, characteristicReadEvent.serviceUUID, characteristicReadEvent.characteristicUUID)
                         if (characteristic == null) {
-                            if (characteristicReadCallback != null) {
-                                characteristicReadCallback?.onCharacteristicNotFound()
-                            }
+                            characteristicReadCallback?.onCharacteristicNotFound()
                         } else {
-                            gatt?.readCharacteristic(characteristic)
-                            try {
-                                cyclicBarrier.await(1000, TimeUnit.MILLISECONDS)
-                            } catch (e: InterruptedException) {
-                                if (characteristicReadCallback != null) {
-                                    characteristicReadCallback?.onTimeout()
-                                }
-                            } catch (e: BrokenBarrierException) {
-                                if (characteristicReadCallback != null) {
-                                    characteristicReadCallback?.onTimeout()
-                                }
-                            } catch (e: TimeoutException) {
-                                if (characteristicReadCallback != null) {
-                                    characteristicReadCallback?.onTimeout()
-                                }
-                            }
-
+                            it.readCharacteristic(characteristic)
+                            timeout(1, TimeUnit.SECONDS)
                         }
-                    }
+                    } ?: characteristicReadCallback?.onDisconnected()
                 }
                 BluetoothConstants.EventName.CHARACTERISTIC_WRITE -> {
                     val characteristicWriteEvent = event as CharacteristicWriteEvent
                     characteristicWriteCallback = characteristicWriteEvent.callback
 
-                    if (gatt == null) {
-                        if (characteristicWriteCallback != null) {
-                            characteristicWriteCallback?.onNotConnected()
-                        }
-                    } else {
-                        val characteristic = getCharacteristic(
-                            gatt, characteristicWriteEvent.serviceUUID, characteristicWriteEvent.characteristicUUID
-                        )
+                    gatt?.let {
+                        val characteristic = getCharacteristic(it, characteristicWriteEvent.serviceUUID, characteristicWriteEvent.characteristicUUID)
                         if (characteristic == null) {
-                            if (characteristicWriteCallback != null) {
-                                characteristicWriteCallback?.onCharacteristicNotFound()
-                            }
+                            characteristicWriteCallback?.onCharacteristicNotFound()
                         } else {
-                            val value = characteristicWriteEvent.value
-                            val hexString = BaseEncoding.base16().encode(value)
+                            val hexString = BaseEncoding.base16().encode(characteristicWriteEvent.value)
 
-                            BluetoothLog.d(
-                                String.format(
-                                    "writeDescriptor: %s to %s", hexString, characteristic.uuid
-                                )
-                            )
+                            BluetoothLog.d("writeDescriptor: $hexString to ${characteristic.uuid}")
                             characteristic.value = characteristicWriteEvent.value
 
-                            gatt?.writeCharacteristic(characteristic)
-                            try {
-                                cyclicBarrier.await(1000, TimeUnit.MILLISECONDS)
-                            } catch (e: InterruptedException) {
-                                if (characteristicWriteCallback != null) {
-                                    characteristicWriteCallback?.onTimeout()
-                                }
-                            } catch (e: BrokenBarrierException) {
-                                if (characteristicWriteCallback != null) {
-                                    characteristicWriteCallback?.onTimeout()
-                                }
-                            } catch (e: TimeoutException) {
-                                if (characteristicWriteCallback != null) {
-                                    characteristicWriteCallback?.onTimeout()
-                                }
-                            }
-
+                            it.writeCharacteristic(characteristic)
+                            timeout(1, TimeUnit.SECONDS)
                         }
-                    }
+                    } ?: characteristicWriteCallback?.onNotConnected()
                 }
                 BluetoothConstants.EventName.CONNECT -> {
                     val connectEvent = event as ConnectEvent
@@ -274,252 +162,81 @@ object BluetoothClient {
                     val address = connectEvent.address
                     device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address)
 
-                    if (device == null) {
-                        if (connectCallback != null) {
-                            connectCallback?.onBluetoothNotSupported()
+                    device?.let { device ->
+                        gatt = gatt?.let {
+                            it.close()
+                            device.connectGatt(connectEvent.context, false, gattCallback)
+                        } ?: run {
+                            device.connectGatt(connectEvent.context, false, gattCallback)
                         }
-                    } else {
-                        gatt = if (gatt == null) {
-                            device?.connectGatt(connectEvent.context, false, gattCallback)
-                        } else {
-                            gatt?.close()
-                            device?.connectGatt(connectEvent.context, false, gattCallback)
-                        }
-
-                        try {
-                            cyclicBarrier.await(10000, TimeUnit.MILLISECONDS)
-                        } catch (e: InterruptedException) {
-                            if (connectCallback != null) {
-                                connectCallback?.onTimeout()
-                            }
-                        } catch (e: BrokenBarrierException) {
-                            if (connectCallback != null) {
-                                connectCallback?.onTimeout()
-                            }
-                        } catch (e: TimeoutException) {
-                            if (connectCallback != null) {
-                                connectCallback?.onTimeout()
-                            }
-                        }
-
-                    }
+                        timeout(1, TimeUnit.SECONDS)
+                    } ?: connectCallback?.onBluetoothNotSupported()
                 }
                 BluetoothConstants.EventName.DESCRIPTOR_READ -> {
                     val descriptorReadEvent = event as DescriptorReadEvent
                     descriptorReadCallback = descriptorReadEvent.callback
 
-                    if (gatt == null) {
-                        if (descriptorReadCallback != null) {
-                            descriptorReadCallback?.onNotConnected()
-                        }
-                    } else {
-                        val descriptor = getDescriptor(
-                            gatt, descriptorReadEvent.serviceUUID, descriptorReadEvent.characteristicUUID, descriptorReadEvent.descriptorUUID
-                        )
+                    gatt?.let {
+                        val descriptor = getDescriptor(gatt, descriptorReadEvent.serviceUUID, descriptorReadEvent.characteristicUUID, descriptorReadEvent.descriptorUUID)
                         if (descriptor == null) {
-                            if (descriptorReadCallback != null) {
-                                descriptorReadCallback?.onDescriptorNotFound()
-                            }
+                            descriptorReadCallback?.onDescriptorNotFound()
                         } else {
-                            gatt?.readDescriptor(descriptor)
-                            try {
-                                cyclicBarrier.await(1000, TimeUnit.MILLISECONDS)
-                            } catch (e: InterruptedException) {
-                                if (descriptorReadCallback != null) {
-                                    descriptorReadCallback?.onTimeout()
-                                }
-                            } catch (e: BrokenBarrierException) {
-                                if (descriptorReadCallback != null) {
-                                    descriptorReadCallback?.onTimeout()
-                                }
-                            } catch (e: TimeoutException) {
-                                if (descriptorReadCallback != null) {
-                                    descriptorReadCallback?.onTimeout()
-                                }
-                            }
-
+                            it.readDescriptor(descriptor)
+                            timeout(1, TimeUnit.SECONDS)
                         }
-                    }
+                    } ?: descriptorReadCallback?.onNotConnected()
                 }
                 BluetoothConstants.EventName.DESCRIPTOR_WRITE -> {
                     val descriptorWriteEvent = event as DescriptorWriteEvent
                     descriptorWriteCallback = descriptorWriteEvent.callback
 
-                    if (gatt == null) {
-                        if (descriptorWriteCallback != null) {
-                            descriptorWriteCallback?.onNotConnected()
-                        }
-                    } else {
-                        val descriptor = getDescriptor(
-                            gatt, descriptorWriteEvent.serviceUUID, descriptorWriteEvent.characteristicUUID, descriptorWriteEvent.descriptorUUID
-                        )
+                    gatt?.let {
+                        val descriptor = getDescriptor(it, descriptorWriteEvent.serviceUUID, descriptorWriteEvent.characteristicUUID, descriptorWriteEvent.descriptorUUID)
                         if (descriptor == null) {
-                            if (descriptorWriteCallback != null) {
-                                descriptorWriteCallback?.onDescriptorNotFound()
-                            }
+                            descriptorWriteCallback?.onDescriptorNotFound()
                         } else {
-                            val value = descriptorWriteEvent.value
-                            val hexString = BaseEncoding.base16().encode(value)
-                            BluetoothLog.d(
-                                String.format(
-                                    "writeDescriptor: %s to %s", hexString, descriptor.uuid
-                                )
-                            )
+                            val hexString = BaseEncoding.base16().encode(descriptorWriteEvent.value)
 
-                            descriptor.value = value
+                            BluetoothLog.d("writeDescriptor: $hexString to ${descriptor.uuid}")
 
-                            gatt?.writeDescriptor(descriptor)
-                            try {
-                                cyclicBarrier.await(1000, TimeUnit.MILLISECONDS)
-                            } catch (e: InterruptedException) {
-                                if (descriptorWriteCallback != null) {
-                                    descriptorWriteCallback?.onTimeout()
-                                }
-                            } catch (e: BrokenBarrierException) {
-                                if (descriptorWriteCallback != null) {
-                                    descriptorWriteCallback?.onTimeout()
-                                }
-                            } catch (e: TimeoutException) {
-                                if (descriptorWriteCallback != null) {
-                                    descriptorWriteCallback?.onTimeout()
-                                }
-                            }
-
+                            descriptor.value = descriptorWriteEvent.value
+                            it.writeDescriptor(descriptor)
+                            timeout(1, TimeUnit.SECONDS)
                         }
-                    }
+                    } ?: descriptorWriteCallback?.onNotConnected()
                 }
                 BluetoothConstants.EventName.DISCONNECT -> {
                     val disconnectEvent = event as DisconnectEvent
                     disconnectCallback = disconnectEvent.callback
 
-                    if (gatt == null) {
-                        disconnectCallback?.onNotConnected()
-                    } else {
-                        gatt?.disconnect()
-                        try {
-                            cyclicBarrier.await(1000, TimeUnit.MILLISECONDS)
-                        } catch (e: InterruptedException) {
-                            if (disconnectCallback != null) {
-                                disconnectCallback?.onTimeout()
-                            }
-                        } catch (e: BrokenBarrierException) {
-                            if (disconnectCallback != null) {
-                                disconnectCallback?.onTimeout()
-                            }
-                        } catch (e: TimeoutException) {
-                            if (disconnectCallback != null) {
-                                disconnectCallback?.onTimeout()
-                            }
-                        }
-
-                    }
+                    gatt?.let {
+                        it.disconnect()
+                        timeout(1, TimeUnit.SECONDS)
+                    } ?: disconnectCallback?.onNotConnected()
                 }
                 BluetoothConstants.EventName.DISCOVER_SERVICES -> {
                     val discoverServicesEvent = event as DiscoverServicesEvent
                     discoverServicesCallback = discoverServicesEvent.callback
 
-                    if (gatt == null) {
-                        if (discoverServicesCallback != null) {
-                            discoverServicesCallback?.onNotConnected()
-                        }
-                    } else {
-                        gatt?.discoverServices()
-                        try {
-                            cyclicBarrier.await(1000, TimeUnit.MILLISECONDS)
-                        } catch (e: InterruptedException) {
-                            if (discoverServicesCallback != null) {
-                                discoverServicesCallback?.onTimeout()
-                            }
-                        } catch (e: BrokenBarrierException) {
-                            if (discoverServicesCallback != null) {
-                                discoverServicesCallback?.onTimeout()
-                            }
-                        } catch (e: TimeoutException) {
-                            if (discoverServicesCallback != null) {
-                                discoverServicesCallback?.onTimeout()
-                            }
-                        }
-
-                    }
+                    gatt?.let {
+                        it.discoverServices()
+                        timeout(1, TimeUnit.SECONDS)
+                    } ?: discoverServicesCallback?.onNotConnected()
                 }
                 BluetoothConstants.EventName.NOTIFY -> {
+
                 }
                 BluetoothConstants.EventName.REQUEST_MTU -> {
                     val requestMtuEvent = event as RequestMtuEvent
                     requestMtuCallback = requestMtuEvent.callback
 
-                    if (gatt == null) {
-                        if (requestMtuCallback != null) {
-                            requestMtuCallback?.onNotConnected()
-                        }
-                    } else {
-                        gatt?.requestMtu(requestMtuEvent.mtu)
-                        try {
-                            cyclicBarrier.await(1000, TimeUnit.MILLISECONDS)
-                        } catch (e: InterruptedException) {
-                            if (requestMtuCallback != null) {
-                                requestMtuCallback?.onTimeout()
-                            }
-                        } catch (e: BrokenBarrierException) {
-                            if (requestMtuCallback != null) {
-                                requestMtuCallback?.onTimeout()
-                            }
-                        } catch (e: TimeoutException) {
-                            if (requestMtuCallback != null) {
-                                requestMtuCallback?.onTimeout()
-                            }
-                        }
-
-                    }
+                    gatt?.let {
+                        it.requestMtu(requestMtuEvent.mtu)
+                        timeout(1, TimeUnit.SECONDS)
+                    } ?: requestMtuCallback?.onNotConnected()
                 }
             }
         }
-    }
-
-    // Events
-
-    fun connect(context: Context, address: String, callback: ConnectCallback) {
-        queueEvent(ConnectEvent(context, address, callback))
-    }
-
-    fun disconnect(callback: DisconnectCallback) {
-        queueEvent(DisconnectEvent(callback))
-    }
-
-    fun discoverServices(callback: DiscoverServicesCallback) {
-        queueEvent(DiscoverServicesEvent(callback))
-    }
-
-    fun characteristicRead(
-        serviceUUID: UUID, characteristicUUID: UUID, callback: CharacteristicReadCallback
-    ) {
-        queueEvent(CharacteristicReadEvent(serviceUUID, characteristicUUID, callback))
-    }
-
-    fun readDescriptor(
-        serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID, callback: DescriptorReadCallback
-    ) {
-        queueEvent(DescriptorReadEvent(serviceUUID, characteristicUUID, descriptorUUID, callback))
-    }
-
-    fun requestMtu(mtu: Int, callback: RequestMtuCallback) {
-        queueEvent(RequestMtuEvent(mtu, callback))
-    }
-
-    fun characteristicWrite(
-        serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray, callback: CharacteristicWriteCallback
-    ) {
-        queueEvent(CharacteristicWriteEvent(serviceUUID, characteristicUUID, value, callback))
-    }
-
-    fun descriptorWrite(
-        serviceUUID: UUID, characteristicUUID: UUID, descriptorUUID: UUID, value: ByteArray, callback: DescriptorWriteCallback
-    ) {
-        queueEvent(
-            DescriptorWriteEvent(
-                serviceUUID, characteristicUUID, descriptorUUID, value, callback
-            )
-        )
     }
 
     // Device
@@ -531,37 +248,33 @@ object BluetoothClient {
     // Helpers
 
     fun notify(callback: NotifyCallback) {
+        BluetoothLog.d("notify: $callback")
         notifyCallback = callback
-        BluetoothLog.d("Notify gattCallback set to " + callback.toString())
     }
 
     fun enableNotify(serviceUUID: UUID, characteristicUUID: UUID): Boolean {
-        return if (gatt == null) {
-            false
-        } else {
-            val characteristic = getCharacteristic(gatt, serviceUUID, characteristicUUID)
-            if (characteristic == null) {
-                false
-            } else {
-                BluetoothLog.d("enableNotify: " + characteristic.uuid)
-                gatt?.setCharacteristicNotification(characteristic, true) ?: false
+        BluetoothLog.d("enableNotify: ($serviceUUID, $characteristicUUID)")
+
+        gatt?.let {
+            val characteristic = getCharacteristic(it, serviceUUID, characteristicUUID)
+            if (characteristic != null) {
+                return it.setCharacteristicNotification(characteristic, true)
             }
         }
+
+        return false
     }
 
-    fun setCharacteristicWriteType(
-        serviceUUID: UUID, characteristicUUID: UUID, writeType: Int
-    ): Boolean {
-        return if (gatt == null) {
-            false
-        } else {
-            val characteristic = getCharacteristic(gatt, serviceUUID, characteristicUUID)
-            if (characteristic == null) {
-                false
-            } else {
+    fun setCharacteristicWriteType(serviceUUID: UUID, characteristicUUID: UUID, writeType: Int): Boolean {
+        BluetoothLog.d("setCharacteristicWriteType: ($serviceUUID, $characteristicUUID)")
+        gatt?.let {
+            val characteristic = getCharacteristic(it, serviceUUID, characteristicUUID)
+            if (characteristic != null) {
                 characteristic.writeType = writeType
-                true
+                return true
             }
         }
+
+        return false
     }
 }

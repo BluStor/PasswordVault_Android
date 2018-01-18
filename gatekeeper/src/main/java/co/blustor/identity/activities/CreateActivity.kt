@@ -17,20 +17,6 @@ import java.util.*
 
 class CreateActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
 
-    private val textWatcher = object : TextWatcher {
-        override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-        }
-
-        override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-        }
-
-        override fun afterTextChanged(editable: Editable) {
-            validate()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create)
@@ -38,6 +24,20 @@ class CreateActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
         title = "New database"
 
         // Views
+
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+
+            }
+
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+
+            }
+
+            override fun afterTextChanged(editable: Editable) {
+                validate()
+            }
+        }
 
         editTextPassword.addTextChangedListener(textWatcher)
         editTextPasswordRepeat.addTextChangedListener(textWatcher)

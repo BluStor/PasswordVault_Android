@@ -1,5 +1,5 @@
 package co.blustor.identity.constants
 
 object Icons {
-    val default = 49
+    const val default = 49
 }

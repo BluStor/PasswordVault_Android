@@ -12,28 +12,28 @@ import java.util.*
 
 class SettingsActivity : LockingActivity(), SyncDialogFragment.SyncListener {
 
-    private val mTextWatcher = object : TextWatcher {
-        override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-        }
-
-        override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-        }
-
-        override fun afterTextChanged(editable: Editable) {
-            validatePassword()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
         // Views
 
-        editTextPassword.addTextChangedListener(mTextWatcher)
-        editTextPasswordRepeat.addTextChangedListener(mTextWatcher)
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+
+            }
+
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+
+            }
+
+            override fun afterTextChanged(editable: Editable) {
+                validatePassword()
+            }
+        }
+
+        editTextPassword.addTextChangedListener(textWatcher)
+        editTextPasswordRepeat.addTextChangedListener(textWatcher)
 
         buttonChangePassword.setOnClickListener { savePassword() }
     }

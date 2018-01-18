@@ -6,7 +6,8 @@ import java.io.StringWriter
 
 
 object BluetoothLog {
-    private val tag = "BluetoothLog"
+
+    private const val tag = "BluetoothLog"
 
     fun i(msg: String) {
         android.util.Log.i(tag, msg)

@@ -34,20 +34,6 @@ class GroupActivity : LockingActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group)
 
-        // Load group
-
-        val intent = intent
-        val uuid = intent.getSerializableExtra("uuid") as UUID
-
-        group = Vault.instance.getGroupByUUID(uuid)
-
-        // Start notification service if necessary
-
-        if (group?.parentUUID == null) {
-            val notificationService = Intent(this, NotificationService::class.java)
-            startService(notificationService)
-        }
-
         // Views
 
         val path = group?.path
@@ -97,6 +83,20 @@ class GroupActivity : LockingActivity() {
         fam.setClosedOnTouchOutside(true)
 
         (fragmentSearch as SearchFragment).hide()
+
+        // Load group
+
+        val intent = intent
+        val uuid = intent.getSerializableExtra("uuid") as UUID
+
+        group = Vault.instance.getGroupByUUID(uuid)
+
+        // Start notification service if necessary
+
+        if (group?.parentUUID == null) {
+            val notificationService = Intent(this, NotificationService::class.java)
+            startService(notificationService)
+        }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {

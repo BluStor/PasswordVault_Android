@@ -80,7 +80,7 @@ data class VaultGroup(val parentUUID: UUID?, val uuid: UUID, var name: String) {
     }
 
     companion object {
-        val traverser: Traverser<VaultGroup> = Traverser.forTree(SuccessorsFunction<VaultGroup> {
+        val traverser: Traverser<VaultGroup> = Traverser.forTree({
             it.groups
         })
     }

@@ -39,6 +39,8 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
 
         title = applicationTitle
 
+        // Views
+
         editTextPassword.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 submit()
@@ -52,9 +54,6 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        Log.d(tag, "onActivityResult() called")
-        Log.d(tag, "requestCode = " + requestCode)
-
         if (requestCode == AuthActivity.NEW_USER_ACTION) {
             when (resultCode) {
                 ON_SCAN_RESULT_OK -> {

@@ -65,32 +65,35 @@ class SearchFragment : Fragment() {
 
         override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
             val entry = mEntryResults[position]
+            val iconId = MyApplication.icons.get(entry.iconId)
 
-            val drawable = ContextCompat.getDrawable(activity!!, MyApplication.icons.get(entry.iconId))
-            holder.iconImageView.setImageDrawable(drawable)
+            activity?.let {
+                val drawable = ContextCompat.getDrawable(it, iconId)
+                holder.iconImageView.setImageDrawable(drawable)
 
-            val highlightColor = ContextCompat.getColor(context!!, R.color.colorPrimary)
-            val foregroundColorSpan = ForegroundColorSpan(highlightColor)
+                val highlightColor = ContextCompat.getColor(it, R.color.colorPrimary)
+                val foregroundColorSpan = ForegroundColorSpan(highlightColor)
 
-            val title = entry.title
-            val loweredTitle = title.toLowerCase(Locale.getDefault())
+                val title = entry.title
+                val loweredTitle = title.toLowerCase(Locale.getDefault())
 
-            val titleSpannable = SpannableString(title)
-            if (loweredTitle.contains(mLoweredQuery)) {
-                val start = loweredTitle.indexOf(mLoweredQuery)
-                val end = start + mLoweredQuery.length
-                titleSpannable.setSpan(
-                    foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                val titleSpannable = SpannableString(title)
+                if (loweredTitle.contains(mLoweredQuery)) {
+                    val start = loweredTitle.indexOf(mLoweredQuery)
+                    val end = start + mLoweredQuery.length
+                    titleSpannable.setSpan(
+                        foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+
+                holder.titleTextView.setText(titleSpannable, TextView.BufferType.SPANNABLE)
             }
-
-            holder.titleTextView.setText(titleSpannable, TextView.BufferType.SPANNABLE)
 
             val group = Vault.instance.getGroupByUUID(entry.groupUUID)
 
-            if (group != null) {
-                val path = group.path.toMutableList()
-                path.add(group.name)
+            group?.let {
+                val path = it.path.toMutableList()
+                path.add(it.name)
 
                 val stringBuilder = StringBuilder("in ")
 
@@ -150,10 +153,13 @@ class SearchFragment : Fragment() {
                 val editEntryActivity = Intent(activity, EditEntryActivity::class.java)
                 editEntryActivity.putExtra("uuid", entry.uuid)
 
-                val activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                    activity!!, iconImageView, "entry"
-                )
-                startActivity(editEntryActivity, activityOptions.toBundle())
+                activity?.let {
+                    val activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        it, iconImageView, "entry"
+                    )
+
+                    startActivity(editEntryActivity, activityOptions.toBundle())
+                }
             }
         }
     }

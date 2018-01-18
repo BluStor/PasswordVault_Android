@@ -24,7 +24,7 @@ class AboutActivity : AppCompatActivity() {
 
         title = "About"
 
-        // Recycler view
+        // Views
 
         recyclerViewAbout.setHasFixedSize(true)
 

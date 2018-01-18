@@ -38,9 +38,9 @@ class AddEntryActivity : LockingActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_addentry)
 
-        // Views
-
         title = "Add entry"
+
+        // Views
 
         editTextTitle.addTextChangedListener(textWatcher)
 
