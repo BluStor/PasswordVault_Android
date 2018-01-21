@@ -89,7 +89,7 @@ class AddGroupActivity : LockingActivity() {
 
             Log.d(tag, "After add, group's icon is " + this.group?.iconId)
 
-            SyncManager.setRoot(this, Vault.instance.password)
+            SyncManager.setRoot(this)
             finish()
         }
     }

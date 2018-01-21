@@ -288,7 +288,7 @@ class GroupActivity : LockingActivity() {
                                     this@GroupActivity.group?.removeGroup(group.uuid)
                                     updateData()
 
-                                    SyncManager.setRoot(this@GroupActivity, Vault.instance.password)
+                                    SyncManager.setRoot(this@GroupActivity)
                                 } else if (itemId == R.id.action_edit) {
                                     val editGroupActivity = Intent(this@GroupActivity, EditGroupActivity::class.java)
                                     editGroupActivity.putExtra("uuid", group.uuid)
@@ -317,7 +317,7 @@ class GroupActivity : LockingActivity() {
                                     group?.removeEntry(entry.uuid)
                                     updateData()
 
-                                    SyncManager.setRoot(this@GroupActivity, Vault.instance.password)
+                                    SyncManager.setRoot(this@GroupActivity)
                                 } else if (itemId == R.id.action_edit) {
                                     val editEntryActivity = Intent(this@GroupActivity, EditEntryActivity::class.java)
                                     editEntryActivity.putExtra("uuid", entry.uuid)

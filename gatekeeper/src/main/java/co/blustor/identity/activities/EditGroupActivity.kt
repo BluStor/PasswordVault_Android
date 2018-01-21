@@ -96,7 +96,7 @@ class EditGroupActivity : LockingActivity() {
                 group?.name = editTextName.text.toString()
                 group?.iconId = iconId
 
-                SyncManager.setRoot(this, Vault.instance.password)
+                SyncManager.setRoot(this)
             }
 
             finish()

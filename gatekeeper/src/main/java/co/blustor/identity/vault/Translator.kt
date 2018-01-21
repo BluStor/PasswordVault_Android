@@ -10,20 +10,23 @@ object Translator {
 
     private fun exportKeePassEntries(group: VaultGroup): List<Entry> {
         return group.entries.map {
-            EntryBuilder(it.title).uuid(it.uuid).username(it.username).password(it.password)
-                .url(it.url).notes(it.notes).iconId(it.iconId).build()
+            EntryBuilder(it.title)
+                .uuid(it.uuid)
+                .username(it.username)
+                .password(it.password)
+                .url(it.url)
+                .notes(it.notes)
+                .iconId(it.iconId)
+                .build()
         }
     }
 
     private fun importEntries(group: Group): List<VaultEntry> {
         val entries = ArrayList<VaultEntry>()
         for (entry in group.entries) {
-            val vaultEntry = VaultEntry(
-                group.uuid, entry.uuid, entry.title ?: "", entry.username ?: "", entry.password
-                        ?: ""
-            )
-            vaultEntry.url = entry.url ?: ""
-            vaultEntry.notes = entry.notes ?: ""
+            val vaultEntry = VaultEntry(group.uuid, entry.uuid, entry.title, entry.username, entry.password)
+            vaultEntry.url = entry.url
+            vaultEntry.notes = entry.notes
             vaultEntry.iconId = entry.iconId
             entries.add(vaultEntry)
         }

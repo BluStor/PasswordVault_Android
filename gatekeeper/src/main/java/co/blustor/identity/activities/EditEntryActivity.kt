@@ -129,7 +129,7 @@ class EditEntryActivity : LockingActivity() {
                 entry?.notes = editTextNotes.text.toString()
                 entry?.iconId = iconId
 
-                SyncManager.setRoot(this, Vault.instance.password)
+                SyncManager.setRoot(this)
             }
 
             finish()

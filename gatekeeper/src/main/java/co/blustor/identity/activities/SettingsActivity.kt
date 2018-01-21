@@ -48,7 +48,7 @@ class SettingsActivity : LockingActivity(), SyncDialogFragment.SyncListener {
 
             Vault.instance.password = password
 
-            SyncManager.setRoot(this, password)
+            SyncManager.setRoot(this)
 
             finish()
         }

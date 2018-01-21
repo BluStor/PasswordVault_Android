@@ -117,7 +117,7 @@ class AddEntryActivity : LockingActivity() {
                 entry.iconId = iconId
                 group?.add(entry)
 
-                SyncManager.setRoot(this, Vault.instance.password)
+                SyncManager.setRoot(this)
                 finish()
             }
         }

@@ -61,7 +61,6 @@ class SplashActivity : AppCompatActivity() {
             } catch (e: GKCard.CardException) {
                 startChoose()
             }
-
         } else {
             startUnlock()
         }

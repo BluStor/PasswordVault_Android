@@ -22,11 +22,11 @@ import java.util.concurrent.Phaser
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class GKCard(private val mAddress: String) {
+class GKCard(private val address: String) {
 
     private val mControlPointBuffer = ArrayList<Byte>()
 
-    private var mMtu = 20
+    private var mtu = 20
 
     private fun makeCommandData(command: Byte, string: String?): Promise<ByteArray, CardException, Void> {
         Log.d(tag, "makeCommandData")
@@ -44,7 +44,7 @@ class GKCard(private val mAddress: String) {
                 }
 
                 val data = byteArrayOutputStream.toByteArray()
-                if (data.size <= mMtu - 3) {
+                if (data.size <= mtu - 3) {
                     deferredObject.resolve(data)
                 } else {
                     deferredObject.reject(CardException(CardError.MAKE_COMMAND_DATA_FAILED))
@@ -96,7 +96,7 @@ class GKCard(private val mAddress: String) {
             var round = 0
             var offset = 0
 
-            val chunkMaxSize = mMtu - 3
+            val chunkMaxSize = mtu - 3
 
             val phaser = Phaser()
 
@@ -207,116 +207,106 @@ class GKCard(private val mAddress: String) {
         val deferredObject = DeferredObject<Void, CardException, Void>()
 
         val runnable = {
-            mMtu = 20
+            mtu = 20
 
             Log.d(tag, "(1/4) Connecting ...")
-            BluetoothClient.queue(ConnectEvent(context, mAddress, object : ConnectCallback {
+            BluetoothClient.queue(ConnectEvent(context, address, object : ConnectCallback {
                 override fun onConnectionStateChange(status: Int, newState: Int) {
                     if (status == GATT_SUCCESS) {
                         Log.d(tag, "(2/4) Request MTU ...")
                         BluetoothClient.queue(RequestMtuEvent(512, object : RequestMtuCallback {
                             override fun onMtuChanged(mtu: Int, status: Int) {
                                 if (status == GATT_SUCCESS) {
-                                    mMtu = mtu
+                                    this@GKCard.mtu = mtu
 
                                     Log.d(tag, "(3/4) Discover services ...")
                                     BluetoothClient.queue(DiscoverServicesEvent(object : DiscoverServicesCallback {
                                         override fun onServicesDiscovered(status: Int) {
-                                            Log.i(
-                                                tag, "(4/4) Enable control point notifications ..."
-                                            )
+                                            Log.i(tag, "(4/4) Enable control point notifications ...")
                                             BluetoothClient.queue(DescriptorWriteEvent(serviceUUID, controlPointUUID, characteristicConfigurationUUID, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE, object : DescriptorWriteCallback {
                                                 override fun onDescriptorNotFound() {
+                                                    Log.d(tag, "onDescriptorNotFound: reject")
                                                     deferredObject.reject(null)
                                                 }
 
                                                 override fun onDescriptorWrite(status: Int) {
                                                     if (status == GATT_SUCCESS) {
-                                                        if (BluetoothClient.enableNotify(
-                                                                serviceUUID, controlPointUUID
-                                                            )) {
+                                                        if (BluetoothClient.enableNotify(serviceUUID, controlPointUUID)) {
                                                             BluetoothClient.notify(object : NotifyCallback {
-                                                                override fun onNotify(
-                                                                    serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray
-                                                                ) {
+                                                                override fun onNotify(serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray) {
                                                                     if (characteristicUUID == controlPointUUID) {
-                                                                        Log.d(
-                                                                            tag, String.format(
-                                                                                "controlPointBuffer <- %d bytes", value.size
-                                                                            )
-                                                                        )
-                                                                        mControlPointBuffer.addAll(
-                                                                            Bytes.asList(*value)
-                                                                        )
+                                                                        Log.d(tag, "controlPointBuffer <- ${value.size} bytes")
+                                                                        mControlPointBuffer.addAll(value.asList())
                                                                     } else {
-                                                                        Log.d(
-                                                                            tag, "Notification callback received a value for unknown service $serviceUUID, characteristic $characteristicUUID"
-                                                                        )
+                                                                        Log.d(tag, "Notification callback received a value for unknown service $serviceUUID, characteristic $characteristicUUID")
                                                                     }
                                                                 }
                                                             })
 
+                                                            Log.d(tag, "onDescriptorWrite: resolve")
                                                             deferredObject.resolve(null)
                                                         } else {
-                                                            deferredObject.reject(
-                                                                CardException(
-                                                                    CardError.CONNECTION_FAILED
-                                                                )
-                                                            )
+                                                            Log.d(tag, "onDescriptorWrite: reject (enableNotify failed)")
+                                                            deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                                                         }
                                                     } else {
-                                                        deferredObject.reject(
-                                                            CardException(
-                                                                CardError.CONNECTION_FAILED
-                                                            )
-                                                        )
+                                                        Log.d(tag, "onDescriptorWrite: reject (not GATT_SUCCESS)")
+                                                        deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                                                     }
                                                 }
 
                                                 override fun onNotConnected() {
+                                                    Log.d(tag, "onNotConnected: reject")
                                                     deferredObject.reject(null)
                                                 }
 
                                                 override fun onTimeout() {
-                                                    deferredObject.reject(null)
+                                                    Log.d(tag, "onTimeout: reject")
+                                                    deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
                                                 }
                                             }))
                                         }
 
                                         override fun onNotConnected() {
+                                            Log.d(tag, "onNotConnected: reject")
                                             deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                                         }
 
                                         override fun onTimeout() {
-                                            deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
+                                            Log.d(tag, "onTimeout: reject")
+                                            deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
                                         }
                                     }))
                                 } else {
+                                    Log.d(tag, "onMtuChanged: reject (not GATT_SUCCESS)")
                                     deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                                 }
                             }
 
                             override fun onNotConnected() {
-                                Log.i(tag, "onNotConnected")
+                                Log.i(tag, "onNotConnected: reject")
                                 deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                             }
 
                             override fun onTimeout() {
-                                Log.i(tag, "onTimeout")
-                                deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
+                                Log.i(tag, "onTimeout: reject")
+                                deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
                             }
                         }))
                     } else {
+                        Log.d(tag, "onConnectionStateChange: reject (not GATT_SUCCESS)")
                         deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                     }
                 }
 
                 override fun onBluetoothNotSupported() {
+                    Log.d(tag, "onBluetoothNotSupported: reject")
                     deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
                 }
 
                 override fun onTimeout() {
-                    deferredObject.reject(CardException(CardError.CONNECTION_FAILED))
+                    Log.d(tag, "onTimeout: reject")
+                    deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
                 }
             }))
         }
@@ -332,21 +322,22 @@ class GKCard(private val mAddress: String) {
         val runnable = {
             BluetoothClient.queue(DisconnectEvent(object : DisconnectCallback {
                 override fun onDisconnected() {
-                    Log.d(tag, "disconnect: success")
+                    Log.d(tag, "onDisconnected: resolve")
+                    deferredObject.resolve(null)
                 }
 
                 override fun onNotConnected() {
-                    Log.d(tag, "disconnect: not connected")
+                    Log.d(tag, "onNotConnected: reject")
+                    deferredObject.reject(CardException(CardError.CARD_NOT_CONNECTED))
                 }
 
                 override fun onTimeout() {
-                    Log.d(tag, "disconnect: timeout")
+                    Log.d(tag, "onTimeout: reject")
+                    deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
                 }
             }))
         }
         Thread(runnable).start()
-
-        deferredObject.resolve(null)
 
         return deferredObject.promise()
     }
@@ -357,7 +348,7 @@ class GKCard(private val mAddress: String) {
 
         val runnable = Runnable {
             if (BluetoothAdapter.getDefaultAdapter().isEnabled) {
-                if (BluetoothClient.getBondState(mAddress) == BluetoothDevice.BOND_BONDED) {
+                if (BluetoothClient.getBondState(address) == BluetoothDevice.BOND_BONDED) {
                     deferredObject.resolve(null)
                 } else {
                     Log.i(tag, "checkBluetoothState: LE is not paired.")
@@ -608,7 +599,7 @@ class GKCard(private val mAddress: String) {
     }
 
     enum class CardError {
-        ARGUMENT_INVALID, BLUETOOTH_NOT_AVAILABLE, BLUETOOTH_ADAPTER_NOT_ENABLED, CARD_NOT_PAIRED, CONNECTION_FAILED, CHARACTERISTIC_READ_FAILURE, CHARACTERISTIC_WRITE_FAILURE, FILE_NOT_FOUND, FILE_READ_FAILED, FILE_WRITE_FAILED, MAKE_COMMAND_DATA_FAILED, INVALID_CHECKSUM, INVALID_RESPONSE
+        ARGUMENT_INVALID, BLUETOOTH_NOT_AVAILABLE, BLUETOOTH_ADAPTER_NOT_ENABLED, CARD_NOT_CONNECTED, CARD_NOT_PAIRED, CONNECTION_FAILED, CHARACTERISTIC_READ_FAILURE, CHARACTERISTIC_WRITE_FAILURE, FILE_NOT_FOUND, FILE_READ_FAILED, FILE_WRITE_FAILED, INVALID_CHECKSUM, INVALID_RESPONSE, MAKE_COMMAND_DATA_FAILED, OPERATION_TIMEOUT
     }
 
     class CardException internal constructor(val error: CardError) : Exception()
@@ -618,6 +609,6 @@ class GKCard(private val mAddress: String) {
         val controlPointUUID: UUID = UUID.fromString("423AD87A-0001-4F14-9EAA-5EB5839F2A54")
         val characteristicConfigurationUUID: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
         val fileWriteUUID: UUID = UUID.fromString("423AD87A-0002-4F14-9EAA-5EB5839F2A54")
-        val tag = "GKCard"
+        const val tag = "GKCard"
     }
 }

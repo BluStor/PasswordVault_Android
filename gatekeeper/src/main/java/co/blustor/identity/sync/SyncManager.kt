@@ -82,7 +82,7 @@ object SyncManager {
     }
 
     @Synchronized
-    fun setRoot(context: Context, password: String): Promise<VaultGroup, Exception, Void> {
+    fun setRoot(context: Context): Promise<VaultGroup, Exception, Void> {
         val deferredObject = DeferredObject<VaultGroup, Exception, Void>()
         val runnable = Runnable {
             val rootGroup = Vault.instance.root
@@ -93,7 +93,7 @@ object SyncManager {
                 val byteArrayOutputStream = ByteArrayOutputStream()
 
                 val keePassFile = KeePassFileBuilder("passwords").addTopGroups(group).build()
-                KeePassDatabase.write(keePassFile, password, byteArrayOutputStream)
+                KeePassDatabase.write(keePassFile, Vault.instance.password, byteArrayOutputStream)
 
                 val data = byteArrayOutputStream.toByteArray()
 

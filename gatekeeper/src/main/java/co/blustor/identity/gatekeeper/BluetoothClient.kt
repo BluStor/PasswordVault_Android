@@ -85,12 +85,14 @@ object BluetoothClient {
     }
 
     private fun cancelTimeout() {
-        try {
-            cyclicBarrier.await()
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-        } catch (e: BrokenBarrierException) {
-            e.printStackTrace()
+        if (!cyclicBarrier.isBroken) {
+            try {
+                cyclicBarrier.await()
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            } catch (e: BrokenBarrierException) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -132,7 +134,7 @@ object BluetoothClient {
                             characteristicReadCallback?.onCharacteristicNotFound()
                         } else {
                             it.readCharacteristic(characteristic)
-                            timeout(1, TimeUnit.SECONDS)
+                            timeout(5, TimeUnit.SECONDS)
                         }
                     } ?: characteristicReadCallback?.onDisconnected()
                 }
@@ -151,7 +153,7 @@ object BluetoothClient {
                             characteristic.value = characteristicWriteEvent.value
 
                             it.writeCharacteristic(characteristic)
-                            timeout(1, TimeUnit.SECONDS)
+                            timeout(5, TimeUnit.SECONDS)
                         }
                     } ?: characteristicWriteCallback?.onNotConnected()
                 }
@@ -169,7 +171,7 @@ object BluetoothClient {
                         } ?: run {
                             device.connectGatt(connectEvent.context, false, gattCallback)
                         }
-                        timeout(1, TimeUnit.SECONDS)
+                        timeout(5, TimeUnit.SECONDS)
                     } ?: connectCallback?.onBluetoothNotSupported()
                 }
                 BluetoothConstants.EventName.DESCRIPTOR_READ -> {
@@ -182,7 +184,7 @@ object BluetoothClient {
                             descriptorReadCallback?.onDescriptorNotFound()
                         } else {
                             it.readDescriptor(descriptor)
-                            timeout(1, TimeUnit.SECONDS)
+                            timeout(5, TimeUnit.SECONDS)
                         }
                     } ?: descriptorReadCallback?.onNotConnected()
                 }
@@ -201,7 +203,7 @@ object BluetoothClient {
 
                             descriptor.value = descriptorWriteEvent.value
                             it.writeDescriptor(descriptor)
-                            timeout(1, TimeUnit.SECONDS)
+                            timeout(5, TimeUnit.SECONDS)
                         }
                     } ?: descriptorWriteCallback?.onNotConnected()
                 }
@@ -211,7 +213,7 @@ object BluetoothClient {
 
                     gatt?.let {
                         it.disconnect()
-                        timeout(1, TimeUnit.SECONDS)
+                        timeout(5, TimeUnit.SECONDS)
                     } ?: disconnectCallback?.onNotConnected()
                 }
                 BluetoothConstants.EventName.DISCOVER_SERVICES -> {
@@ -220,7 +222,7 @@ object BluetoothClient {
 
                     gatt?.let {
                         it.discoverServices()
-                        timeout(1, TimeUnit.SECONDS)
+                        timeout(5, TimeUnit.SECONDS)
                     } ?: discoverServicesCallback?.onNotConnected()
                 }
                 BluetoothConstants.EventName.NOTIFY -> {
@@ -232,7 +234,7 @@ object BluetoothClient {
 
                     gatt?.let {
                         it.requestMtu(requestMtuEvent.mtu)
-                        timeout(1, TimeUnit.SECONDS)
+                        timeout(5, TimeUnit.SECONDS)
                     } ?: requestMtuCallback?.onNotConnected()
                 }
             }

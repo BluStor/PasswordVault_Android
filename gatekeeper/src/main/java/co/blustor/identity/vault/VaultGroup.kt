@@ -1,7 +1,6 @@
 package co.blustor.identity.vault
 
 import co.blustor.identity.constants.Icons
-import com.google.common.graph.SuccessorsFunction
 import com.google.common.graph.Traverser
 import java.util.*
 

@@ -24,9 +24,7 @@ class SyncDialogFragment : DialogFragment() {
 
     private var syncListener: SyncListener? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         isCancelable = false
 
         return if (inflater == null) {
@@ -48,7 +46,7 @@ class SyncDialogFragment : DialogFragment() {
         val promise = if (type == "read") {
             getRoot(activity, password)
         } else {
-            setRoot(activity, password)
+            setRoot(activity)
         }
 
         promise.done({
@@ -62,65 +60,39 @@ class SyncDialogFragment : DialogFragment() {
         }).always({ _, _, _ ->
             dismiss()
         }).fail({
+            Log.i(tag, it.toString())
+
             if (it is SyncManager.SyncException) {
-                Log.i(tag, it.error.toString())
+                val message = when (it.error) {
+                    SyncManager.SyncError.CARD_NOT_CHOSEN -> "Card not chosen."
+                    SyncManager.SyncError.DATABASE_UNREADABLE -> "Invalid password."
+                    SyncManager.SyncError.VAULT_EMPTY -> "Vault is empty."
+                }
+
                 activity.runOnUiThread {
-                    when (it.error) {
-                        SyncManager.SyncError.CARD_NOT_CHOSEN -> AlertUtils.showError(
-                            activity, "Card not chosen."
-                        )
-                        SyncManager.SyncError.DATABASE_UNREADABLE -> AlertUtils.showError(
-                            activity, "Invalid password."
-                        )
-                        SyncManager.SyncError.VAULT_EMPTY -> AlertUtils.showError(
-                            activity, "Vault is empty."
-                        )
-                    }
+                    AlertUtils.showError(activity, message)
                 }
             } else if (it is GKCard.CardException) {
-                Log.i(tag, it.error.toString())
+                val message = when (it.error) {
+                    GKCard.CardError.ARGUMENT_INVALID -> "Invalid argument."
+                    GKCard.CardError.BLUETOOTH_NOT_AVAILABLE -> "Bluetooth not available."
+                    GKCard.CardError.BLUETOOTH_ADAPTER_NOT_ENABLED -> "Bluetooth not enabled."
+                    GKCard.CardError.CARD_NOT_CONNECTED -> "Connection failed."
+                    GKCard.CardError.CARD_NOT_PAIRED -> "Card is not paired. Pair your card in your phone's Bluetooth settings."
+                    GKCard.CardError.CONNECTION_FAILED -> "Connection failed."
+                    GKCard.CardError.CHARACTERISTIC_READ_FAILURE -> "Card read failure."
+                    GKCard.CardError.CHARACTERISTIC_WRITE_FAILURE -> "Card write failure."
+                    GKCard.CardError.FILE_NOT_FOUND -> "File not found."
+                    GKCard.CardError.FILE_READ_FAILED -> "File read failed."
+                    GKCard.CardError.FILE_WRITE_FAILED -> "File write failed."
+                    GKCard.CardError.INVALID_CHECKSUM -> "Transfer error."
+                    GKCard.CardError.INVALID_RESPONSE -> "Invalid response."
+                    GKCard.CardError.MAKE_COMMAND_DATA_FAILED -> "Card command failure."
+                    GKCard.CardError.OPERATION_TIMEOUT -> "Operation timed out."
+                }
+
                 activity.runOnUiThread {
-                    when (it.error) {
-                        GKCard.CardError.ARGUMENT_INVALID -> AlertUtils.showError(
-                            activity, "Invalid argument."
-                        )
-                        GKCard.CardError.BLUETOOTH_NOT_AVAILABLE -> AlertUtils.showError(
-                            activity, "Bluetooth not available."
-                        )
-                        GKCard.CardError.BLUETOOTH_ADAPTER_NOT_ENABLED -> AlertUtils.showError(
-                            activity, "Bluetooth not enabled."
-                        )
-                        GKCard.CardError.CARD_NOT_PAIRED -> AlertUtils.showError(
-                            activity, "Card is not paired. Pair the device starting with 'ID-' in your phone's Bluetooth settings."
-                        )
-                        GKCard.CardError.CONNECTION_FAILED -> AlertUtils.showError(
-                            activity, "Connection failed."
-                        )
-                        GKCard.CardError.CHARACTERISTIC_READ_FAILURE -> AlertUtils.showError(
-                            activity, "Card read failure."
-                        )
-                        GKCard.CardError.CHARACTERISTIC_WRITE_FAILURE -> AlertUtils.showError(
-                            activity, "Card write failure."
-                        )
-                        GKCard.CardError.FILE_NOT_FOUND -> AlertUtils.showError(
-                            activity, "File not found."
-                        )
-                        GKCard.CardError.FILE_READ_FAILED -> AlertUtils.showError(
-                            activity, "File read failed."
-                        )
-                        GKCard.CardError.FILE_WRITE_FAILED -> AlertUtils.showError(
-                            activity, "File write failed."
-                        )
-                        GKCard.CardError.MAKE_COMMAND_DATA_FAILED -> AlertUtils.showError(
-                            activity, "Card command failure."
-                        )
-                        GKCard.CardError.INVALID_CHECKSUM -> AlertUtils.showError(
-                            activity, "Transfer error."
-                        )
-                        GKCard.CardError.INVALID_RESPONSE -> AlertUtils.showError(
-                            activity, "Invalid response."
-                        )
-                    }
+                    AlertUtils.showError(activity, message)
                 }
             }
         })
@@ -133,14 +105,16 @@ class SyncDialogFragment : DialogFragment() {
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onSyncStatus(syncStatus: SyncStatus) {
-        when (syncStatus) {
-            SyncStatus.SYNCED -> textViewStatus.setText(R.string.status_synced)
-            SyncStatus.CONNECTING -> textViewStatus.setText(R.string.status_connecting)
-            SyncStatus.DECRYPTING -> textViewStatus.setText(R.string.status_decrypting)
-            SyncStatus.ENCRYPTING -> textViewStatus.setText(R.string.status_encrypting)
-            SyncStatus.TRANSFERRING -> textViewStatus.setText(R.string.status_transferring)
-            SyncStatus.FAILED -> textViewStatus.setText(R.string.status_failed)
+        val text = when (syncStatus) {
+            SyncStatus.SYNCED -> R.string.status_synced
+            SyncStatus.CONNECTING -> R.string.status_connecting
+            SyncStatus.DECRYPTING -> R.string.status_decrypting
+            SyncStatus.ENCRYPTING -> R.string.status_encrypting
+            SyncStatus.TRANSFERRING -> R.string.status_transferring
+            SyncStatus.FAILED -> R.string.status_failed
         }
+
+        textViewStatus.setText(text)
     }
 
     fun setSyncListener(syncListener: SyncListener) {
