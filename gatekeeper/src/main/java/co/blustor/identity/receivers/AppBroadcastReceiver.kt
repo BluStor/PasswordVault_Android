@@ -10,14 +10,13 @@ import co.blustor.identity.vault.Vault
 
 class AppBroadcastReceiver : BroadcastReceiver() {
 
-    override fun onReceive(context: Context, intent: Intent) {
-        val action = intent.action
-        if (action != null) {
-            if (action == Intents.lockDatabase) {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        intent?.let {
+            if (it.action == Intents.lockDatabase) {
                 Vault.instance.close()
 
                 val ongoingNotificationService = Intent(context, NotificationService::class.java)
-                context.stopService(ongoingNotificationService)
+                context?.stopService(ongoingNotificationService)
             }
         }
     }

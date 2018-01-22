@@ -6,16 +6,10 @@ import java.util.*
 
 data class VaultGroup(val parentUUID: UUID?, val uuid: UUID, var name: String) {
 
-    private val mGroups = ArrayList<VaultGroup>()
-    private val mEntries = ArrayList<VaultEntry>()
+    val groups = mutableListOf<VaultGroup>()
+    val entries = mutableListOf<VaultEntry>()
 
-    var iconId = Icons.default
-
-    val entries: List<VaultEntry>
-        get() = mEntries
-
-    val groups: List<VaultGroup>
-        get() = mGroups
+    var iconId = Icons.folder
 
     val path: List<String>
         get() {
@@ -43,19 +37,19 @@ data class VaultGroup(val parentUUID: UUID?, val uuid: UUID, var name: String) {
     // Entries
 
     fun add(entry: VaultEntry) {
-        mEntries.add(entry)
+        entries.add(entry)
     }
 
     fun addEntries(entries: List<VaultEntry>) {
-        mEntries.addAll(entries)
+        this.entries.addAll(entries)
     }
 
     fun getEntry(uuid: UUID): VaultEntry? {
-        return mEntries.firstOrNull { it.uuid == uuid }
+        return entries.firstOrNull { it.uuid == uuid }
     }
 
     fun removeEntry(uuid: UUID) {
-        val i = mEntries.iterator()
+        val i = entries.iterator()
         while (i.hasNext()) {
             if (i.next().uuid == uuid) {
                 i.remove()
@@ -66,15 +60,12 @@ data class VaultGroup(val parentUUID: UUID?, val uuid: UUID, var name: String) {
     // Groups
 
     fun add(group: VaultGroup) {
-        mGroups.add(group)
+        groups.add(group)
     }
 
     fun removeGroup(uuid: UUID) {
-        val i = mGroups.iterator()
-        while (i.hasNext()) {
-            if (i.next().uuid == uuid) {
-                i.remove()
-            }
+        groups.removeAll {
+            it.uuid == uuid
         }
     }
 

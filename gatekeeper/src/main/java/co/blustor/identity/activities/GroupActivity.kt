@@ -6,6 +6,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
@@ -35,16 +36,6 @@ class GroupActivity : LockingActivity() {
         setContentView(R.layout.activity_group)
 
         // Views
-
-        val path = group?.path
-        if (path != null) {
-            if (path.isNotEmpty()) {
-                val pathStr = Joiner.on("/").join(path)
-                textViewPath.text = String.format(Locale.getDefault(), getString(R.string.path_in), pathStr)
-            } else {
-                textViewPath.visibility = View.GONE
-            }
-        }
 
         recyclerViewGroup.setHasFixedSize(true)
 
@@ -89,7 +80,17 @@ class GroupActivity : LockingActivity() {
         val intent = intent
         val uuid = intent.getSerializableExtra("uuid") as UUID
 
-        group = Vault.instance.getGroupByUUID(uuid)
+        Vault.instance.getGroupByUUID(uuid)?.let {
+            group = it
+
+            if (it.path.isNotEmpty()) {
+                val pathStr = Joiner.on("/").join(it.path)
+                textViewPath.text =  getString(R.string.path_in, pathStr)
+                textViewPath.visibility = View.VISIBLE
+            } else {
+                textViewPath.visibility = View.GONE
+            }
+        }
 
         // Start notification service if necessary
 
@@ -99,48 +100,52 @@ class GroupActivity : LockingActivity() {
         }
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.clear()
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.let {
+            it.clear()
 
-        menuInflater.inflate(R.menu.menu_group, menu)
+            menuInflater.inflate(R.menu.menu_group, it)
 
-        val menuItem = menu.findItem(R.id.action_search)
-        menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(menuItem: MenuItem): Boolean {
-                (fragmentSearch as SearchFragment).show()
-                return true
-            }
+            val menuItem = it.findItem(R.id.action_search)
+            menuItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+                override fun onMenuItemActionExpand(menuItem: MenuItem): Boolean {
+                    (fragmentSearch as SearchFragment).show()
+                    return true
+                }
 
-            override fun onMenuItemActionCollapse(menuItem: MenuItem): Boolean {
-                (fragmentSearch as SearchFragment).hide()
-                return true
-            }
-        })
+                override fun onMenuItemActionCollapse(menuItem: MenuItem): Boolean {
+                    (fragmentSearch as SearchFragment).hide()
+                    return true
+                }
+            })
 
-        val searchView = menuItem.actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            val searchView = menuItem.actionView as SearchView
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return false
-            }
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    return false
+                }
 
-            override fun onQueryTextChange(newText: String): Boolean {
-                (fragmentSearch as SearchFragment).search(newText)
-                return false
-            }
-        })
+                override fun onQueryTextChange(newText: String): Boolean {
+                    (fragmentSearch as SearchFragment).search(newText)
+                    return false
+                }
+            })
+        }
 
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_settings) {
-            val settingsActivity = Intent(this, SettingsActivity::class.java)
-            startActivity(settingsActivity)
-        } else if (id == R.id.action_about) {
-            val aboutActivity = Intent(this, AboutActivity::class.java)
-            startActivity(aboutActivity)
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_settings -> {
+                val settingsActivity = Intent(this, SettingsActivity::class.java)
+                startActivity(settingsActivity)
+            }
+            R.id.action_about -> {
+                val aboutActivity = Intent(this, AboutActivity::class.java)
+                startActivity(aboutActivity)
+            }
         }
 
         return super.onOptionsItemSelected(item)
@@ -162,12 +167,10 @@ class GroupActivity : LockingActivity() {
     }
 
     private inner class GroupEntryAdapter internal constructor() : RecyclerView.Adapter<GroupEntryAdapter.GroupEntryViewHolder>() {
-        private val mGroups = ArrayList<VaultGroup>()
-        private val mEntries = ArrayList<VaultEntry>()
+        private val groups = mutableListOf<VaultGroup>()
+        private val entries = mutableListOf<VaultEntry>()
 
-        override fun onCreateViewHolder(
-            parent: ViewGroup, viewType: Int
-        ): GroupEntryAdapter.GroupEntryViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupEntryAdapter.GroupEntryViewHolder {
             val view = if (viewType == 0) {
                 LayoutInflater.from(parent.context).inflate(R.layout.item_group, parent, false)
             } else {
@@ -177,26 +180,23 @@ class GroupActivity : LockingActivity() {
         }
 
         override fun getItemViewType(position: Int): Int {
-            return if (position < mGroups.size) {
+            return if (position < groups.size) {
                 0
             } else {
                 1
             }
         }
 
-        override fun onBindViewHolder(
-            holder: GroupEntryAdapter.GroupEntryViewHolder, position: Int
-        ) {
+        override fun onBindViewHolder(holder: GroupEntryAdapter.GroupEntryViewHolder, position: Int) {
             if (holder.itemViewType == 0) {
-                val group = mGroups[position]
+                val group = groups[position]
 
                 holder.iconImageView.setImageResource(MyApplication.icons.get(group.iconId))
                 holder.titleTextView.text = group.name
             } else {
-                val entry = mEntries[position - mGroups.size]
+                val entry = entries[position - groups.size]
 
-                val iconId = group?.iconId ?: 49
-                val drawable = ContextCompat.getDrawable(applicationContext, MyApplication.icons.get(iconId))
+                val drawable = ContextCompat.getDrawable(applicationContext, MyApplication.icons.get(entry.iconId))
 
                 holder.iconImageView.setImageDrawable(drawable)
                 holder.titleTextView.text = entry.title
@@ -204,74 +204,73 @@ class GroupActivity : LockingActivity() {
         }
 
         override fun getItemCount(): Int {
-            return mGroups.size + mEntries.size
+            return groups.size + entries.size
         }
 
         internal fun updateData() {
-            val groups = group?.groups ?: emptyList()
-            val entries = group?.entries ?: emptyList()
+            groups.clear()
+            entries.clear()
 
-            mGroups.clear()
-            mGroups.addAll(groups)
-            mEntries.clear()
-            mEntries.addAll(entries)
+            group?.let {
+                groups.addAll(it.groups)
+                entries.addAll(it.entries)
 
-            Collections.sort(mGroups, { leftGroup, rightGroup ->
-                leftGroup.name.compareTo(rightGroup.name)
-            })
+                groups.sortWith(Comparator { leftGroup, rightGroup ->
+                    leftGroup.name.compareTo(rightGroup.name)
+                })
 
-            Collections.sort(mEntries, { leftEntry, rightEntry ->
-                leftEntry.title.compareTo(rightEntry.title)
-            })
+                entries.sortWith(Comparator { leftEntry, rightEntry ->
+                    leftEntry.title.compareTo(rightEntry.title)
+                })
 
-            if (mGroups.size > 0 || mEntries.size > 0) {
-                textViewEmpty.visibility = View.INVISIBLE
+                title = it.name
+            }
+
+            if (itemCount > 0) {
+                textViewEmpty.visibility = View.GONE
             } else {
                 textViewEmpty.visibility = View.VISIBLE
             }
-
-            title = group?.name
 
             notifyDataSetChanged()
         }
 
         inner class GroupEntryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
 
-            val iconImageView: ImageView
-            val titleTextView: TextView
+            val iconImageView = itemView.findViewById(R.id.imageViewIcon) as ImageView
+            val titleTextView = itemView.findViewById(R.id.textview_title) as TextView
 
             init {
-
                 itemView.setOnClickListener(this)
                 itemView.setOnLongClickListener(this)
-
-                iconImageView = itemView.findViewById(R.id.imageViewIcon)
-                titleTextView = itemView.findViewById(R.id.textview_title)
             }
 
-            override fun onClick(view: View) {
-                val position = adapterPosition
-                if (position < mGroups.size) {
-                    val group = mGroups[position]
 
-                    val groupActivity = Intent(view.context, GroupActivity::class.java)
-                    groupActivity.putExtra("uuid", group.uuid)
+            override fun onClick(view: View?) {
+                view?.let {
+                    val position = adapterPosition
+                    if (position < groups.size) {
+                        val group = groups[position]
 
-                    startActivity(groupActivity)
-                } else {
-                    val entry = mEntries[position - mGroups.size]
+                        val groupActivity = Intent(it.context, GroupActivity::class.java)
+                        groupActivity.putExtra("uuid", group.uuid)
 
-                    val editEntryActivity = Intent(view.context, EditEntryActivity::class.java)
-                    editEntryActivity.putExtra("uuid", entry.uuid)
+                        startActivity(groupActivity)
+                    } else {
+                        val entry = entries[position - groups.size]
 
-                    startActivity(editEntryActivity)
+                        val editEntryActivity = Intent(it.context, EditEntryActivity::class.java)
+                        editEntryActivity.putExtra("uuid", entry.uuid)
+
+                        startActivity(editEntryActivity)
+                    }
                 }
             }
 
-            override fun onLongClick(v: View): Boolean {
+            override fun onLongClick(v: View?): Boolean {
                 val position = adapterPosition
-                if (position < mGroups.size) {
-                    val group = mGroups[position]
+                if (position < groups.size) {
+                    val group = groups[position]
                     BottomSheet.Builder(this@GroupActivity).setTitle(group.name)
                         .setSheet(R.menu.menu_bottom_group)
                         .setListener(object : BottomSheetListener {
@@ -279,20 +278,19 @@ class GroupActivity : LockingActivity() {
 
                             }
 
-                            override fun onSheetItemSelected(
-                                bottomSheet: BottomSheet, menuItem: MenuItem
-                            ) {
-                                val itemId = menuItem.itemId
+                            override fun onSheetItemSelected(bottomSheet: BottomSheet, menuItem: MenuItem?) {
+                                when (menuItem?.itemId) {
+                                    R.id.action_delete -> {
+                                        this@GroupActivity.group?.removeGroup(group.uuid)
+                                        updateData()
 
-                                if (itemId == R.id.action_delete) {
-                                    this@GroupActivity.group?.removeGroup(group.uuid)
-                                    updateData()
-
-                                    SyncManager.setRoot(this@GroupActivity)
-                                } else if (itemId == R.id.action_edit) {
-                                    val editGroupActivity = Intent(this@GroupActivity, EditGroupActivity::class.java)
-                                    editGroupActivity.putExtra("uuid", group.uuid)
-                                    startActivity(editGroupActivity)
+                                        SyncManager.setRoot(this@GroupActivity)
+                                    }
+                                    R.id.action_edit -> {
+                                        val editGroupActivity = Intent(this@GroupActivity, EditGroupActivity::class.java)
+                                        editGroupActivity.putExtra("uuid", group.uuid)
+                                        startActivity(editGroupActivity)
+                                    }
                                 }
                             }
 
@@ -301,7 +299,7 @@ class GroupActivity : LockingActivity() {
                             }
                         }).show()
                 } else {
-                    val entry = mEntries[position - mGroups.size]
+                    val entry = entries[position - groups.size]
                     BottomSheet.Builder(this@GroupActivity).setTitle(entry.title)
                         .setSheet(R.menu.menu_bottom_entry)
                         .setListener(object : BottomSheetListener {
@@ -309,19 +307,19 @@ class GroupActivity : LockingActivity() {
 
                             }
 
-                            override fun onSheetItemSelected(
-                                bottomSheet: BottomSheet, menuItem: MenuItem
-                            ) {
-                                val itemId = menuItem.itemId
-                                if (itemId == R.id.action_delete) {
-                                    group?.removeEntry(entry.uuid)
-                                    updateData()
+                            override fun onSheetItemSelected(bottomSheet: BottomSheet, menuItem: MenuItem?) {
+                                when (menuItem?.itemId) {
+                                    R.id.action_delete -> {
+                                        group?.removeEntry(entry.uuid)
+                                        updateData()
 
-                                    SyncManager.setRoot(this@GroupActivity)
-                                } else if (itemId == R.id.action_edit) {
-                                    val editEntryActivity = Intent(this@GroupActivity, EditEntryActivity::class.java)
-                                    editEntryActivity.putExtra("uuid", entry.uuid)
-                                    startActivity(editEntryActivity)
+                                        SyncManager.setRoot(this@GroupActivity)
+                                    }
+                                    R.id.action_edit -> {
+                                        val editEntryActivity = Intent(this@GroupActivity, EditEntryActivity::class.java)
+                                        editEntryActivity.putExtra("uuid", entry.uuid)
+                                        startActivity(editEntryActivity)
+                                    }
                                 }
                             }
 
@@ -334,5 +332,9 @@ class GroupActivity : LockingActivity() {
                 return true
             }
         }
+    }
+
+    companion object {
+        private const val tag = "GroupActivity"
     }
 }

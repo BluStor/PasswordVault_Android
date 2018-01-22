@@ -53,7 +53,7 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
         buttonFloatingAction.setOnClickListener { submit() }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == AuthActivity.NEW_USER_ACTION) {
             when (resultCode) {
                 ON_SCAN_RESULT_OK -> {
@@ -66,14 +66,13 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_unlock, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        when (id) {
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
             R.id.action_about -> {
                 val aboutActivity = Intent(this, AboutActivity::class.java)
                 startActivity(aboutActivity)

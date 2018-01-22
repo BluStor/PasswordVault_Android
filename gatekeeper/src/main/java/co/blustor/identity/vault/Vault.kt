@@ -23,13 +23,13 @@ class Vault {
     fun getGroupByUUID(uuid: UUID): VaultGroup? {
         val root = root
 
-        if (root != null) {
-            return VaultGroup.traverser.depthFirstPreOrder(root).firstOrNull {
+        return if (root != null) {
+            VaultGroup.traverser.depthFirstPreOrder(root).firstOrNull {
                 it?.uuid == uuid
             }
+        } else {
+            null
         }
-
-        return null
     }
 
     fun getEntryByUUID(uuid: UUID): VaultEntry? {
@@ -60,7 +60,7 @@ class Vault {
                 it.title.toLowerCase(Locale.getDefault()).contains(loweredQuery)
             }
         } else {
-            ArrayList()
+            emptyList()
         }
     }
 

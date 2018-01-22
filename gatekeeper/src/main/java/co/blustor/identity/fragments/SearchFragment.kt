@@ -54,17 +54,16 @@ class SearchFragment : Fragment() {
     }
 
     private inner class SearchResultAdapter : RecyclerView.Adapter<SearchResultAdapter.SearchResultViewHolder>() {
-        private val mEntryResults = ArrayList<VaultEntry>()
-        private var mLoweredQuery = ""
+        private val entryResults = mutableListOf<VaultEntry>()
+        private var loweredQuery = ""
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchResultViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_search, parent, false)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_search, parent, false)
             return SearchResultViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: SearchResultViewHolder, position: Int) {
-            val entry = mEntryResults[position]
+            val entry = entryResults[position]
             val iconId = MyApplication.icons.get(entry.iconId)
 
             activity?.let {
@@ -78,9 +77,9 @@ class SearchFragment : Fragment() {
                 val loweredTitle = title.toLowerCase(Locale.getDefault())
 
                 val titleSpannable = SpannableString(title)
-                if (loweredTitle.contains(mLoweredQuery)) {
-                    val start = loweredTitle.indexOf(mLoweredQuery)
-                    val end = start + mLoweredQuery.length
+                if (loweredTitle.contains(loweredQuery)) {
+                    val start = loweredTitle.indexOf(loweredQuery)
+                    val end = start + loweredQuery.length
                     titleSpannable.setSpan(
                         foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
@@ -111,17 +110,17 @@ class SearchFragment : Fragment() {
         }
 
         override fun getItemCount(): Int {
-            return mEntryResults.size
+            return entryResults.size
         }
 
         internal fun setResults(entryResults: List<VaultEntry>, loweredQuery: String) {
-            mLoweredQuery = loweredQuery
+            this.loweredQuery = loweredQuery
 
-            mEntryResults.clear()
-            mEntryResults.addAll(entryResults)
+            this.entryResults.clear()
+            this.entryResults.addAll(entryResults)
 
             if (textViewEmpty != null) {
-                if (mEntryResults.size > 0) {
+                if (this.entryResults.size > 0) {
                     textViewEmpty.visibility = View.INVISIBLE
                 } else {
                     textViewEmpty.visibility = View.VISIBLE
@@ -148,7 +147,7 @@ class SearchFragment : Fragment() {
             override fun onClick(v: View) {
                 val position = adapterPosition
 
-                val entry = mEntryResults[position]
+                val entry = entryResults[position]
 
                 val editEntryActivity = Intent(activity, EditEntryActivity::class.java)
                 editEntryActivity.putExtra("uuid", entry.uuid)

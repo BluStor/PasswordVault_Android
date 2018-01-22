@@ -24,8 +24,7 @@ import java.util.concurrent.TimeoutException
 
 class GKCard(private val address: String) {
 
-    private val mControlPointBuffer = ArrayList<Byte>()
-
+    private val controlPointBuffer = mutableListOf<Byte>()
     private var mtu = 20
 
     private fun makeCommandData(command: Byte, string: String?): Promise<ByteArray, CardException, Void> {
@@ -69,15 +68,15 @@ class GKCard(private val address: String) {
                 BluetoothLog.d("waitOnControlPointResult: waiting")
                 SystemClock.sleep(1000)
 
-                if (mControlPointBuffer.size == controlPointBufferSize) {
+                if (controlPointBuffer.size == controlPointBufferSize) {
                     break
                 } else {
-                    controlPointBufferSize = mControlPointBuffer.size
+                    controlPointBufferSize = controlPointBuffer.size
                 }
             }
 
-            val data = Bytes.toArray(mControlPointBuffer)
-            mControlPointBuffer.clear()
+            val data = Bytes.toArray(controlPointBuffer)
+            controlPointBuffer.clear()
 
             Log.i(tag, String.format("waitOnControlPointResult: %d bytes", data.size))
 
@@ -168,7 +167,7 @@ class GKCard(private val address: String) {
         val deferredObject = DeferredObject<Void, CardException, Void>()
 
         val runnable = {
-            mControlPointBuffer.clear()
+            controlPointBuffer.clear()
 
             val hexString = BaseEncoding.base16().encode(data)
             Log.d(tag, String.format("writeToControlPoint: %s", hexString))
@@ -236,7 +235,7 @@ class GKCard(private val address: String) {
                                                                 override fun onNotify(serviceUUID: UUID, characteristicUUID: UUID, value: ByteArray) {
                                                                     if (characteristicUUID == controlPointUUID) {
                                                                         Log.d(tag, "controlPointBuffer <- ${value.size} bytes")
-                                                                        mControlPointBuffer.addAll(value.asList())
+                                                                        controlPointBuffer.addAll(value.asList())
                                                                     } else {
                                                                         Log.d(tag, "Notification callback received a value for unknown service $serviceUUID, characteristic $characteristicUUID")
                                                                     }
@@ -290,7 +289,9 @@ class GKCard(private val address: String) {
 
                             override fun onTimeout() {
                                 Log.i(tag, "onTimeout: reject")
-                                deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
+                                if (deferredObject.isPending) {
+                                    deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
+                                }
                             }
                         }))
                     } else {
@@ -306,7 +307,9 @@ class GKCard(private val address: String) {
 
                 override fun onTimeout() {
                     Log.d(tag, "onTimeout: reject")
-                    deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
+                    if (deferredObject.isPending) {
+                        deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
+                    }
                 }
             }))
         }
@@ -333,7 +336,9 @@ class GKCard(private val address: String) {
 
                 override fun onTimeout() {
                     Log.d(tag, "onTimeout: reject")
-                    deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
+                    if (deferredObject.isPending) {
+                        deferredObject.reject(CardException(CardError.OPERATION_TIMEOUT))
+                    }
                 }
             }))
         }
@@ -541,7 +546,9 @@ class GKCard(private val address: String) {
                 }
 
                 override fun onTimeout() {
-                    deferredObject.reject(CardException(CardError.CHARACTERISTIC_READ_FAILURE))
+                    if (deferredObject.isPending) {
+                        deferredObject.reject(CardException(CardError.CHARACTERISTIC_READ_FAILURE))
+                    }
                 }
             }))
         }

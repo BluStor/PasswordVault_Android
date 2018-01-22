@@ -45,14 +45,13 @@ class CreateActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
         buttonFloatingAction.setOnClickListener { create() }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_create, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val itemId = item.itemId
-        when (itemId) {
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
             R.id.action_choose -> {
                 val chooseActivity = Intent(this, ChooseActivity::class.java)
                 startActivity(chooseActivity)
@@ -102,7 +101,9 @@ class CreateActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
                     syncDialogFragment.arguments = args
                     syncDialogFragment.setSyncListener(this)
                     syncDialogFragment.show(fragmentManager, "dialog")
-                }.setNegativeButton("No") { dialog, _ -> dialog.cancel() }.show()
+                }.setNegativeButton("No") { dialog, _ ->
+                    dialog.cancel()
+                }.show()
         }
     }
 

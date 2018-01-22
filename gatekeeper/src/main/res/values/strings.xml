@@ -46,7 +46,7 @@
     <string name="status_failed">Failed</string>
     <string name="status_synced">Synced</string>
     <string name="status_transferring">Transferring …</string>
-    <string name="textview_empty">Empty</string>
+    <string name="textview_empty">No entries.</string>
     <string name="textview_no_results">No results.</string>
     <string name="welcome_to">Welcome to</string>
     <string name="menu_new_database">New database</string>

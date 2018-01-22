@@ -81,7 +81,7 @@ class PasswordGeneratorActivity : LockingActivity() {
         textViewBrackets.setOnClickListener { checkBoxBrackets.toggle() }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_passwordgenerator, menu)
         return super.onCreateOptionsMenu(menu)
     }
@@ -91,14 +91,14 @@ class PasswordGeneratorActivity : LockingActivity() {
         super.onBackPressed()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-        if (id == R.id.action_save) {
-            val data = Intent()
-            data.putExtra("password", textViewPassword.text.toString())
-            setResult(RESULT_OK, data)
-            finish()
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_save -> {
+                val data = Intent()
+                data.putExtra("password", textViewPassword.text.toString())
+                setResult(RESULT_OK, data)
+                finish()
+            }
         }
 
         return super.onOptionsItemSelected(item)

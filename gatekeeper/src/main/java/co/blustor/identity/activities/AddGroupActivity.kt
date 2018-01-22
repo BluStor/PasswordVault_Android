@@ -18,7 +18,7 @@ import java.util.*
 class AddGroupActivity : LockingActivity() {
 
     private var group: VaultGroup? = null
-    private var iconId = Icons.default
+    private var iconId = Icons.folder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

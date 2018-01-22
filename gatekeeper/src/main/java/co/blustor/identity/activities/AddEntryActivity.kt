@@ -8,6 +8,7 @@ import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import co.blustor.identity.R
+import co.blustor.identity.constants.Icons
 import co.blustor.identity.sync.SyncManager
 import co.blustor.identity.utils.MyApplication
 import co.blustor.identity.vault.Vault
@@ -66,16 +67,16 @@ class AddEntryActivity : LockingActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_addentry, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_save) {
-            save()
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_save -> save()
         }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -85,16 +86,17 @@ class AddEntryActivity : LockingActivity() {
             .show()
     }
 
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == requestIcon) {
             if (resultCode == RESULT_OK) {
-                iconId = data.getIntExtra("icon", 0)
+                iconId = data?.getIntExtra("icon", Icons.folder) ?: Icons.folder
                 imageViewIcon.setImageResource(MyApplication.icons.get(iconId))
             }
         } else if (requestCode == requestPassword) {
             if (resultCode == RESULT_OK) {
-                editTextPassword.setText(data.getStringExtra("password"))
+                data?.let {
+                    editTextPassword.setText(it.getStringExtra("password"))
+                }
             }
         }
     }

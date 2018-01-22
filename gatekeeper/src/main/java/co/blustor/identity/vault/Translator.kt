@@ -22,7 +22,7 @@ object Translator {
     }
 
     private fun importEntries(group: Group): List<VaultEntry> {
-        val entries = ArrayList<VaultEntry>()
+        val entries = mutableListOf<VaultEntry>()
         for (entry in group.entries) {
             val vaultEntry = VaultEntry(group.uuid, entry.uuid, entry.title, entry.username, entry.password)
             vaultEntry.url = entry.url

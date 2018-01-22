@@ -17,7 +17,7 @@ import java.util.*
 class EditGroupActivity : LockingActivity() {
 
     private var group: VaultGroup? = null
-    private var iconId = Icons.default
+    private var iconId = Icons.folder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,10 +45,10 @@ class EditGroupActivity : LockingActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == requestIcon) {
             if (resultCode == RESULT_OK) {
-                iconId = data.getIntExtra("icon", 49)
+                iconId = data?.getIntExtra("icon", Icons.folder) ?: Icons.folder
                 imageViewIcon.setImageResource(MyApplication.icons.get(iconId))
             }
         }
@@ -59,10 +59,9 @@ class EditGroupActivity : LockingActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_save) {
-            save()
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_save -> save()
         }
 
         return super.onOptionsItemSelected(item)
