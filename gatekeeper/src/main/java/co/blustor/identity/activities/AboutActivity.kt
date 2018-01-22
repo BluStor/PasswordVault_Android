@@ -37,7 +37,7 @@ class AboutActivity : AppCompatActivity() {
     private inner class AboutAdapter : RecyclerView.Adapter<AboutAdapter.AboutViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AboutViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_about, parent)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_about, parent, false)
             return AboutViewHolder(view)
         }
 
@@ -64,14 +64,11 @@ class AboutActivity : AppCompatActivity() {
 
         internal inner class AboutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
-            val iconImageView: ImageView
-            val titleTextView: TextView
+            val iconImageView = itemView.findViewById(R.id.imageViewIcon) as ImageView
+            val titleTextView = itemView.findViewById(R.id.textview_title) as TextView
 
             init {
                 itemView.setOnClickListener(this)
-
-                iconImageView = itemView.findViewById(R.id.imageViewIcon)
-                titleTextView = itemView.findViewById(R.id.textview_title)
             }
 
             override fun onClick(v: View) {
