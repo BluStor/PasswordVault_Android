@@ -65,4 +65,7 @@
     <string name="bluetooth_not_enabled">Bluetooth is not enabled.  Open your Bluetooth settings and enable.</string>
     <string name="checkbox_palm">Palm</string>
     <string name="checkbox_fingerprint">Fingerprint</string>
+    <string name="description_fingerprint_icon">Fingerprint icon</string>
+    <string name="fingerprint_description">Confirm fingerprint to continue</string>
+    <string name="fingerprint_hint">Touch sensor</string>
 </resources>

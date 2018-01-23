@@ -28,4 +28,5 @@
             android:hint="@string/hint_name"
             android:inputType="textCapWords" />
     </android.support.design.widget.TextInputLayout>
+
 </LinearLayout>

@@ -22,12 +22,6 @@ class PasswordGeneratorActivity : LockingActivity() {
 
         // Views
 
-        checkBoxUpper.isChecked = true
-        checkBoxLower.isChecked = true
-        checkBoxDigits.isChecked = true
-
-        generateCharacters()
-
         seekBarLength.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 if (i < 10) {
@@ -62,6 +56,19 @@ class PasswordGeneratorActivity : LockingActivity() {
             textViewPassword.text = password
         }
 
+        checkBoxUpper.isChecked = true
+        checkBoxLower.isChecked = true
+        checkBoxDigits.isChecked = true
+
+        checkBoxUpper.text = getText(R.string.passwordgenerator_upper)
+        checkBoxLower.text = getText(R.string.passwordgenerator_lower)
+        checkBoxDigits.text = getText(R.string.passwordgenerator_digits)
+        checkBoxDash.text = getText(R.string.passwordgenerator_dash)
+        checkBoxUnderscore.text = getText(R.string.passwordgenerator_underscore)
+        checkBoxSpace.text = getText(R.string.passwordgenerator_space)
+        checkBoxSpecial.text = getText(R.string.passwordgenerator_special)
+        checkBoxBrackets.text = getText(R.string.passwordgenerator_brackets)
+
         checkBoxUpper.setOnCheckedChangeListener(checkedChangeListener)
         checkBoxLower.setOnCheckedChangeListener(checkedChangeListener)
         checkBoxDigits.setOnCheckedChangeListener(checkedChangeListener)
@@ -71,14 +78,9 @@ class PasswordGeneratorActivity : LockingActivity() {
         checkBoxSpecial.setOnCheckedChangeListener(checkedChangeListener)
         checkBoxBrackets.setOnCheckedChangeListener(checkedChangeListener)
 
-        textViewUpper.setOnClickListener { checkBoxUpper.toggle() }
-        textViewLower.setOnClickListener { checkBoxLower.toggle() }
-        textViewDigits.setOnClickListener { checkBoxDigits.toggle() }
-        textViewDash.setOnClickListener { checkBoxDash.toggle() }
-        textViewUnderscore.setOnClickListener { checkBoxUnderscore.toggle() }
-        textViewSpace.setOnClickListener { checkBoxSpace.toggle() }
-        textViewSpecial.setOnClickListener { checkBoxSpecial.toggle() }
-        textViewBrackets.setOnClickListener { checkBoxBrackets.toggle() }
+        // Load
+
+        generateCharacters()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

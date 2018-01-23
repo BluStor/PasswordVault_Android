@@ -7,9 +7,12 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import co.blustor.identity.R
 import co.blustor.identity.fragments.SyncDialogFragment
+import co.blustor.identity.utils.AlertUtils
+import co.blustor.identity.utils.Biometrics
 import com.zwsb.palmsdk.activities.AuthActivity
 import com.zwsb.palmsdk.activities.AuthActivity.ON_SCAN_RESULT_ERROR
 import com.zwsb.palmsdk.activities.AuthActivity.ON_SCAN_RESULT_OK
@@ -43,14 +46,98 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
 
         editTextPassword.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                submit()
+                val password = editTextPassword.text.toString()
+                openVault(password)
                 true
             } else {
                 false
             }
         }
 
-        buttonFloatingAction.setOnClickListener { submit() }
+        checkBoxFingerprint.setOnClickListener {
+            val biometrics = Biometrics(this)
+
+            if (checkBoxFingerprint.isChecked) {
+                if (biometrics.hasPalm()) {
+                    AlertUtils.showError(this, "Please disable palm before enabling fingerprint.")
+                    reloadUI()
+                } else {
+                    val password = editTextPassword.text.toString()
+                    if (password.isEmpty()) {
+                        AlertUtils.showError(this, "You must enter a password.")
+                        reloadUI()
+                    } else {
+                        biometrics.setFingerprint(password, {
+                            if (it == null) {
+                                Log.d(tag, "setFingerprint: success")
+                                editTextPassword.text.clear()
+                            } else {
+                                Log.d(tag, "setFingerprint: exception")
+                            }
+                            reloadUI()
+                        })
+                    }
+                }
+            } else {
+                biometrics.deleteFingerprint()
+                reloadUI()
+            }
+        }
+
+        checkBoxPalm.setOnClickListener {
+            val biometrics = Biometrics(this)
+
+            if (checkBoxPalm.isChecked) {
+                if (biometrics.hasFingerprint()) {
+                    AlertUtils.showError(this, "Please disable fingerprint before enabling palm.")
+                    reloadUI()
+                } else {
+                    val password = editTextPassword.text.toString()
+                    if (password.isEmpty()) {
+                        AlertUtils.showError(this, "You must enter a password.")
+                        reloadUI()
+                    } else {
+                        Biometrics(this).setPalm(password, {
+                            if (it == null) {
+                                Log.d(tag, "setPalm: success")
+                                editTextPassword.text.clear()
+                            } else {
+                                Log.d(tag, "setPalm: exception")
+                            }
+
+                            reloadUI()
+                        })
+                    }
+                }
+            } else {
+                Biometrics(this).deletePalm()
+                reloadUI()
+            }
+        }
+
+        buttonFloatingAction.setOnClickListener {
+            val biometrics = Biometrics(this)
+            when (biometrics.which) {
+                Biometrics.AuthType.NONE -> {
+                    val password = editTextPassword.text.toString()
+                    openVault(password)
+                }
+                Biometrics.AuthType.FINGERPRINT -> {
+                    biometrics.getFingerprint {
+                        openVault(it)
+                    }
+                }
+                Biometrics.AuthType.PALM -> {
+                    biometrics.getPalm {
+                        openVault(it)
+                    }
+                }
+            }
+        }
+
+        // Load
+
+        reloadUI()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -98,12 +185,6 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
         startActivity(groupActivity)
     }
 
-    private fun submit() {
-        val password = editTextPassword.text.toString()
-
-        openVault(password)
-    }
-
     private fun openVault(password: String) {
         val syncDialogFragment = SyncDialogFragment()
 
@@ -114,6 +195,27 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
         syncDialogFragment.arguments = args
         syncDialogFragment.setSyncListener(this)
         syncDialogFragment.show(fragmentManager, "dialog")
+    }
+
+    private fun reloadUI() {
+        val biometrics = Biometrics(this)
+        when (biometrics.which) {
+            Biometrics.AuthType.NONE -> {
+                textInputLayoutPassword.visibility = View.VISIBLE
+                checkBoxFingerprint.isChecked = false
+                checkBoxPalm.isChecked = false
+            }
+            Biometrics.AuthType.FINGERPRINT -> {
+                textInputLayoutPassword.visibility = View.GONE
+                checkBoxFingerprint.isChecked = true
+                checkBoxPalm.isChecked = false
+            }
+            Biometrics.AuthType.PALM -> {
+                textInputLayoutPassword.visibility = View.GONE
+                checkBoxFingerprint.isChecked = false
+                checkBoxPalm.isChecked = true
+            }
+        }
     }
 
     companion object {

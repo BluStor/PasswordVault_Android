@@ -18,6 +18,14 @@ import kotlinx.android.synthetic.main.activity_about.*
 
 class AboutActivity : AppCompatActivity() {
 
+    data class AboutItem(val iconResource: Int, val titleResource: Int, val uri: String)
+
+    val items = listOf(
+        AboutItem(R.drawable.about_phone, R.string.about_phone, "tel:+13128408250"),
+        AboutItem(R.drawable.about_email, R.string.about_email, "mailto:info@blustor.co"),
+        AboutItem(R.drawable.about_address, R.string.about_address, "geo:0,0?q=401+North+Michigan+Avenue,Chicago,IL")
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_about)
@@ -42,24 +50,13 @@ class AboutActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: AboutViewHolder, position: Int) {
-            when (position) {
-                0 -> {
-                    holder.iconImageView.setImageResource(R.drawable.phone)
-                    holder.titleTextView.setText(R.string.about_phone)
-                }
-                1 -> {
-                    holder.iconImageView.setImageResource(R.drawable.email)
-                    holder.titleTextView.setText(R.string.about_email)
-                }
-                2 -> {
-                    holder.iconImageView.setImageResource(R.drawable.location)
-                    holder.titleTextView.setText(R.string.about_address)
-                }
-            }
+            val item = items[position]
+            holder.iconImageView.setImageResource(item.iconResource)
+            holder.titleTextView.setText(item.titleResource)
         }
 
         override fun getItemCount(): Int {
-            return 3
+            return items.size
         }
 
         internal inner class AboutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
@@ -72,24 +69,11 @@ class AboutActivity : AppCompatActivity() {
             }
 
             override fun onClick(v: View) {
-                val position = adapterPosition
-                when (position) {
-                    0 -> {
-                        val uri = Uri.parse("tel:+13128408250")
-                        val phoneCall = Intent(Intent.ACTION_VIEW, uri)
-                        startActivity(phoneCall)
-                    }
-                    1 -> {
-                        val uri = Uri.parse("mailto:info@blustor.co")
-                        val sendEmail = Intent(Intent.ACTION_VIEW, uri)
-                        startActivity(sendEmail)
-                    }
-                    2 -> {
-                        val uri = Uri.parse("geo:0,0?q=401+North+Michigan+Avenue,Chicago,IL")
-                        val openMap = Intent(Intent.ACTION_VIEW, uri)
-                        startActivity(openMap)
-                    }
-                }
+                val item = items[adapterPosition]
+
+                val uri = Uri.parse(item.uri)
+                val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+                startActivity(viewIntent)
             }
         }
     }
