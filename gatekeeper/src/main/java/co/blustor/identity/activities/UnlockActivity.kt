@@ -21,9 +21,8 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.zwsb.palmsdk.activities.AuthActivity
-import com.zwsb.palmsdk.activities.AuthActivity.ON_SCAN_RESULT_ERROR
-import com.zwsb.palmsdk.activities.AuthActivity.ON_SCAN_RESULT_OK
-import com.zwsb.palmsdk.activities.PalmActivity
+import com.zwsb.palmsdk.activities.AuthActivity.*
+import com.zwsb.palmsdk.helpers.SharedPreferenceHelper
 import kotlinx.android.synthetic.main.activity_unlock.*
 import java.util.*
 
@@ -51,8 +50,14 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
         ).withListener(object: MultiplePermissionsListener {
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 if (report?.areAllPermissionsGranted() == true) {
-                    val authActivity = AuthActivity.getIntent(this@UnlockActivity, "default", true, false)
-                    startActivityForResult(authActivity, action)
+                    if (action == AuthActivity.NEW_USER_ACTION) {
+                        Biometrics(this@UnlockActivity).deletePalm()
+                        val authActivity = AuthActivity.getIntentForLeftPalm(this@UnlockActivity, Biometrics.palmUsername)
+                        startActivityForResult(authActivity, action)
+                    } else if (action == AuthActivity.READ_USER_ACTION) {
+                        val authActivity = AuthActivity.getIntent(this@UnlockActivity, Biometrics.palmUsername, false, false)
+                        startActivityForResult(authActivity, action)
+                    }
                 } else {
                     AlertUtils.showError(this@UnlockActivity, "Camera and external storage permissions are required to use palm.")
                 }
@@ -129,7 +134,7 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
                     }
                 }
             } else {
-                Biometrics(this).deletePalm()
+                biometrics.deletePalm()
                 reloadUI()
             }
         }
@@ -160,31 +165,30 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d(tag, "onActivityResult: ($requestCode, $resultCode)")
         when (requestCode) {
             AuthActivity.NEW_USER_ACTION -> {
-                when (resultCode) {
-                    ON_SCAN_RESULT_OK -> {
-                        val password = editTextPassword.text.toString()
-                        Biometrics(this).setPalm(password, {
-                            if (it) {
-                                Log.d(tag, "setPalm: success")
-                                editTextPassword.text.clear()
-                            } else {
-                                Log.d(tag, "setPalm: fail")
-                            }
+                Log.d(tag, "onActivityResult: NEW_USER_ACTION")
 
-                            reloadUI()
-                        })
-                    }
-                    ON_SCAN_RESULT_ERROR -> {
-                        Log.d(tag, "onActivityResult: NEW_USER_ACTION error")
+                if (SharedPreferenceHelper.getNumberOfRegisteredPalms(this, Biometrics.palmUsername) > 0) {
+                    val password = editTextPassword.text.toString()
+                    Biometrics(this).setPalm(password, {
+                        if (it) {
+                            Log.d(tag, "setPalm: success")
+                            editTextPassword.text.clear()
+                        } else {
+                            Log.d(tag, "setPalm: fail")
+                        }
+
                         reloadUI()
-                    }
+                    })
                 }
             }
             AuthActivity.READ_USER_ACTION -> {
+                Log.d(tag, "onActivityResult: READ_USER_ACTION")
                 when (resultCode) {
                     ON_SCAN_RESULT_OK -> {
+                        Log.d(tag, "onActivityResult: READ_USER_ACTION: ON_SCAN_RESULT_OK")
                         Biometrics(this).getPalm {
                             if (it == null) {
                                 Toast.makeText(this, "Palm authentication failed.", Toast.LENGTH_SHORT).show()
@@ -194,7 +198,7 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
                         }
                     }
                     ON_SCAN_RESULT_ERROR -> {
-                        Log.d(tag, "onActivityResult: READ_USER_ACTION error")
+                        Log.d(tag, "onActivityResult: READ_USER_ACTION: ON_SCAN_RESULT_ERROR")
                         reloadUI()
                     }
                 }

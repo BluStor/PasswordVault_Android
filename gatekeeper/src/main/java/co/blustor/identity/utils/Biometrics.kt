@@ -2,12 +2,14 @@ package co.blustor.identity.utils
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.hardware.fingerprint.FingerprintManager
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties.*
 import android.util.Base64
 import android.util.Log
 import co.blustor.identity.fragments.FingerprintDialogFragment
+import com.zwsb.palmsdk.helpers.SharedPreferenceHelper
 import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
@@ -32,6 +34,7 @@ class Biometrics(private val activity: Activity) {
         private const val preferenceAliasPalmEncoded = "palm-encoded"
         private const val preferenceAliasPalmIv = "palm-iv"
         private val keyStore: KeyStore = KeyStore.getInstance(keyStoreProvider)
+        const val palmUsername = "left"
     }
 
     enum class AuthType {
@@ -246,6 +249,13 @@ class Biometrics(private val activity: Activity) {
         keyStore.deleteEntry(keyAliasPalm)
         val removedKey = keyStore.containsAlias(keyAliasPalm)
 
+        val users = SharedPreferenceHelper.getStringArray(activity, SharedPreferenceHelper.USER_NAMES_KEY)
+        users.remove(Biometrics.palmUsername)
+
+        SharedPreferenceHelper.setStringArray(activity, SharedPreferenceHelper.USER_NAMES_KEY, users)
+        SharedPreferenceHelper.setLeftPalmEnabled(false, Biometrics.palmUsername)
+        SharedPreferenceHelper.setRightPalmEnabled(false, Biometrics.palmUsername)
+
         return removedPreference && removedKey
     }
 
@@ -267,11 +277,12 @@ class Biometrics(private val activity: Activity) {
     }
 
     fun hasPalm(): Boolean {
+        val hasEnrolled = SharedPreferenceHelper.getNumberOfRegisteredPalms(activity, palmUsername) > 0
         val hasIv = sharedPreferences.contains(preferenceAliasPalmIv)
         val hasEncoded = sharedPreferences.contains(preferenceAliasPalmEncoded)
         val hasKey = keyStore.containsAlias(keyAliasPalm)
 
-        return hasIv && hasEncoded && hasKey
+        return hasEnrolled && hasIv && hasEncoded && hasKey
     }
 
     fun setPalm(password: String, callback: (successful: Boolean) -> Unit) {
