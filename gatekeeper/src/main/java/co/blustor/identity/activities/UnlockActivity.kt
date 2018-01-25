@@ -1,5 +1,6 @@
 package co.blustor.identity.activities
 
+import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -9,13 +10,20 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import co.blustor.identity.R
 import co.blustor.identity.fragments.SyncDialogFragment
 import co.blustor.identity.utils.AlertUtils
 import co.blustor.identity.utils.Biometrics
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.zwsb.palmsdk.activities.AuthActivity
 import com.zwsb.palmsdk.activities.AuthActivity.ON_SCAN_RESULT_ERROR
 import com.zwsb.palmsdk.activities.AuthActivity.ON_SCAN_RESULT_OK
+import com.zwsb.palmsdk.activities.PalmActivity
 import kotlinx.android.synthetic.main.activity_unlock.*
 import java.util.*
 
@@ -35,6 +43,26 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
 
             return name + " " + version
         }
+
+    private fun startPalmAuth(action: Int) {
+        Dexter.withActivity(this).withPermissions(
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ).withListener(object: MultiplePermissionsListener {
+            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                if (report?.areAllPermissionsGranted() == true) {
+                    val authActivity = AuthActivity.getIntent(this@UnlockActivity, "default", true, false)
+                    startActivityForResult(authActivity, action)
+                } else {
+                    AlertUtils.showError(this@UnlockActivity, "Camera and external storage permissions are required to use palm.")
+                }
+            }
+
+            override fun onPermissionRationaleShouldBeShown(permissions: MutableList<PermissionRequest>?, token: PermissionToken?) {
+                token?.continuePermissionRequest()
+            }
+        }).check()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,16 +125,7 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
                         AlertUtils.showError(this, "You must enter a password.")
                         reloadUI()
                     } else {
-                        Biometrics(this).setPalm(password, {
-                            if (it == null) {
-                                Log.d(tag, "setPalm: success")
-                                editTextPassword.text.clear()
-                            } else {
-                                Log.d(tag, "setPalm: exception")
-                            }
-
-                            reloadUI()
-                        })
+                        startPalmAuth(AuthActivity.NEW_USER_ACTION)
                     }
                 }
             } else {
@@ -124,13 +143,13 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
                 }
                 Biometrics.AuthType.FINGERPRINT -> {
                     biometrics.getFingerprint {
-                        openVault(it)
+                        if (it != null) {
+                            openVault(it)
+                        }
                     }
                 }
                 Biometrics.AuthType.PALM -> {
-                    biometrics.getPalm {
-                        openVault(it)
-                    }
+                    startPalmAuth(AuthActivity.READ_USER_ACTION)
                 }
             }
         }
@@ -141,13 +160,43 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == AuthActivity.NEW_USER_ACTION) {
-            when (resultCode) {
-                ON_SCAN_RESULT_OK -> {
+        when (requestCode) {
+            AuthActivity.NEW_USER_ACTION -> {
+                when (resultCode) {
+                    ON_SCAN_RESULT_OK -> {
+                        val password = editTextPassword.text.toString()
+                        Biometrics(this).setPalm(password, {
+                            if (it) {
+                                Log.d(tag, "setPalm: success")
+                                editTextPassword.text.clear()
+                            } else {
+                                Log.d(tag, "setPalm: fail")
+                            }
 
+                            reloadUI()
+                        })
+                    }
+                    ON_SCAN_RESULT_ERROR -> {
+                        Log.d(tag, "onActivityResult: NEW_USER_ACTION error")
+                        reloadUI()
+                    }
                 }
-                ON_SCAN_RESULT_ERROR -> {
-                    Log.d(tag, "Error")
+            }
+            AuthActivity.READ_USER_ACTION -> {
+                when (resultCode) {
+                    ON_SCAN_RESULT_OK -> {
+                        Biometrics(this).getPalm {
+                            if (it == null) {
+                                Toast.makeText(this, "Palm authentication failed.", Toast.LENGTH_SHORT).show()
+                            } else {
+                                openVault(it)
+                            }
+                        }
+                    }
+                    ON_SCAN_RESULT_ERROR -> {
+                        Log.d(tag, "onActivityResult: READ_USER_ACTION error")
+                        reloadUI()
+                    }
                 }
             }
         }

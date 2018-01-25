@@ -2,9 +2,7 @@ package co.blustor.identity.utils
 
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.hardware.fingerprint.FingerprintManager
-import android.os.CancellationSignal
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties.*
 import android.util.Base64
@@ -113,11 +111,10 @@ class Biometrics(private val activity: Activity) {
 
     private fun encrypt(cryptoObject: FingerprintManager.CryptoObject, value: String): String {
         val encryptedBytes = cryptoObject.cipher.doFinal(value.toByteArray())
-
         return base64Encode(encryptedBytes)
     }
 
-    fun getFingerprint(callback: (password: String) -> Unit) {
+    fun getFingerprint(callback: (password: String?) -> Unit) {
         val iv = sharedPreferences.getString(preferenceAliasFingerprintIv, "")
         val encoded = sharedPreferences.getString(preferenceAliasFingerprintEncoded, "")
 
@@ -126,8 +123,7 @@ class Biometrics(private val activity: Activity) {
         val key = getKey(keyAliasFingerprint)
 
         if (key == null) {
-            // TODO: Better exception
-            throw RuntimeException("Key not found.")
+            callback(null)
         } else {
             val cryptoObject = createDecryptCryptoObject(key, ivParameterSpec)
 
@@ -165,7 +161,9 @@ class Biometrics(private val activity: Activity) {
     }
 
     fun deleteFingerprint(): Boolean {
-        val removedPreference = sharedPreferences.edit().remove(preferenceAliasFingerprintEncoded)
+        val removedPreference = sharedPreferences.edit()
+            .remove(preferenceAliasPalmIv)
+            .remove(preferenceAliasFingerprintEncoded)
             .commit()
 
         keyStore.deleteEntry(keyAliasFingerprint)
@@ -191,8 +189,7 @@ class Biometrics(private val activity: Activity) {
 
         val key = getKey(keyAliasFingerprint)
         if (key == null) {
-            // TODO: Better exception
-            throw RuntimeException("Key not found.")
+            callback(RuntimeException("Key not found."))
         } else {
             val cryptoObject = createEncryptCryptoObject(key)
 
@@ -227,7 +224,8 @@ class Biometrics(private val activity: Activity) {
 
                         sharedPreferences.edit()
                             .putString(preferenceAliasFingerprintEncoded, encrypted)
-                            .putString(preferenceAliasFingerprintIv, encodedIv).apply()
+                            .putString(preferenceAliasFingerprintIv, encodedIv)
+                            .apply()
 
                         Log.d(tag, "onAuthenticationSucceeded: stored")
                         callback(null)
@@ -240,11 +238,32 @@ class Biometrics(private val activity: Activity) {
     }
 
     fun deletePalm(): Boolean {
-        return true
+        val removedPreference = sharedPreferences.edit()
+            .remove(preferenceAliasPalmIv)
+            .remove(preferenceAliasPalmEncoded)
+            .commit()
+
+        keyStore.deleteEntry(keyAliasPalm)
+        val removedKey = keyStore.containsAlias(keyAliasPalm)
+
+        return removedPreference && removedKey
     }
 
-    fun getPalm(callback: (password: String) -> Unit) {
+    fun getPalm(callback: (password: String?) -> Unit) {
+        val iv = sharedPreferences.getString(preferenceAliasPalmIv, "")
+        val encoded = sharedPreferences.getString(preferenceAliasPalmEncoded, "")
 
+        val ivParameterSpec = IvParameterSpec(b64Decode(iv))
+
+        val key = getKey(keyAliasPalm)
+        if (key == null) {
+            callback(null)
+        } else {
+            val cryptoObject = createDecryptCryptoObject(key, ivParameterSpec)
+
+            val password = decrypt(encoded, cryptoObject)
+            callback(password)
+        }
     }
 
     fun hasPalm(): Boolean {
@@ -255,7 +274,24 @@ class Biometrics(private val activity: Activity) {
         return hasIv && hasEncoded && hasKey
     }
 
-    fun setPalm(password: String, callback: (Exception?) -> Unit) {
+    fun setPalm(password: String, callback: (successful: Boolean) -> Unit) {
+        createSecretKey(keyAliasPalm, false)
 
+        val key = getKey(keyAliasPalm)
+        if (key == null) {
+            callback(false)
+        } else {
+            val cryptoObject = createEncryptCryptoObject(key)
+            val encoded = encrypt(cryptoObject, password)
+
+            val iv = base64Encode(cryptoObject.cipher.iv)
+
+            sharedPreferences.edit()
+                .putString(preferenceAliasPalmIv, iv)
+                .putString(preferenceAliasPalmEncoded, encoded)
+                .apply()
+
+            callback(true)
+        }
     }
 }
