@@ -2,7 +2,6 @@ package co.blustor.identity.utils
 
 import android.app.Activity
 import android.content.Context
-import android.content.SharedPreferences
 import android.hardware.fingerprint.FingerprintManager
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties.*
@@ -13,12 +12,14 @@ import com.zwsb.palmsdk.helpers.SharedPreferenceHelper
 import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
+import java.security.InvalidAlgorithmParameterException
 import java.security.Key
 import java.security.KeyStore
 import java.security.KeyStoreException
 import javax.crypto.Cipher
 import javax.crypto.CipherInputStream
 import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 
 class Biometrics(private val activity: Activity) {
@@ -67,15 +68,19 @@ class Biometrics(private val activity: Activity) {
         return cipher
     }
 
-    private fun createSecretKey(keyStoreAlias: String, userAuthenticationRequired: Boolean) {
+    private fun createSecretKey(keyStoreAlias: String, userAuthenticationRequired: Boolean): SecretKey? {
         val keyPurposes = PURPOSE_DECRYPT or PURPOSE_ENCRYPT
         val keyGenParameterSpec = KeyGenParameterSpec.Builder(keyStoreAlias, keyPurposes)
             .setBlockModes(BLOCK_MODE_CBC).setEncryptionPaddings(ENCRYPTION_PADDING_PKCS7)
             .setUserAuthenticationRequired(userAuthenticationRequired).build()
 
-        val keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM_AES, keyStoreProvider)
-        keyGenerator.init(keyGenParameterSpec)
-        keyGenerator.generateKey()
+        return try {
+            val keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM_AES, keyStoreProvider)
+            keyGenerator.init(keyGenParameterSpec)
+            keyGenerator.generateKey()
+        } catch (e: InvalidAlgorithmParameterException) {
+            null
+        }
     }
 
     private fun getKey(keyStoreAlias: String): Key? {
@@ -188,11 +193,9 @@ class Biometrics(private val activity: Activity) {
     }
 
     fun setFingerprint(password: String, callback: (e: Exception?) -> Unit) {
-        createSecretKey(keyAliasFingerprint, true)
-
-        val key = getKey(keyAliasFingerprint)
+        val key = createSecretKey(keyAliasFingerprint, true)
         if (key == null) {
-            callback(RuntimeException("Key not found."))
+            callback(RuntimeException("Unable to generate secret key."))
         } else {
             val cryptoObject = createEncryptCryptoObject(key)
 
@@ -227,8 +230,7 @@ class Biometrics(private val activity: Activity) {
 
                         sharedPreferences.edit()
                             .putString(preferenceAliasFingerprintEncoded, encrypted)
-                            .putString(preferenceAliasFingerprintIv, encodedIv)
-                            .apply()
+                            .putString(preferenceAliasFingerprintIv, encodedIv).apply()
 
                         Log.d(tag, "onAuthenticationSucceeded: stored")
                         callback(null)
@@ -286,9 +288,8 @@ class Biometrics(private val activity: Activity) {
     }
 
     fun setPalm(password: String, callback: (successful: Boolean) -> Unit) {
-        createSecretKey(keyAliasPalm, false)
+        val key = createSecretKey(keyAliasPalm, false)
 
-        val key = getKey(keyAliasPalm)
         if (key == null) {
             callback(false)
         } else {
