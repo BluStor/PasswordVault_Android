@@ -88,28 +88,30 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
         }
 
         checkBoxFingerprint.setOnClickListener {
+            val password = editTextPassword.text.toString()
             val biometrics = Biometrics(this)
 
             if (checkBoxFingerprint.isChecked) {
-                if (biometrics.hasPalm()) {
-                    AlertUtils.showError(this, "Please disable palm before enabling fingerprint.")
-                    reloadUI()
-                } else {
-                    val password = editTextPassword.text.toString()
-                    if (password.isEmpty()) {
-                        AlertUtils.showError(this, "You must enter a password.")
+                val errorMessage = when {
+                    biometrics.hasPalm() -> "Please disable palm before enabling fingerprint."
+                    password.isEmpty() -> "You must enter a password."
+                    !biometrics.isFingerprintHardwareAvailable() -> "Your device does not support fingerprint authentication."
+                    !biometrics.isFingerprintUserEnrolled() -> "Your device does not have fingerprints enrolled."
+                    else -> null
+                }
+
+                if (errorMessage == null) {
+                    biometrics.setFingerprint(password, {
+                        if (it == null) {
+                            editTextPassword.text.clear()
+                        } else {
+                            it.printStackTrace()
+                        }
                         reloadUI()
-                    } else {
-                        biometrics.setFingerprint(password, {
-                            if (it == null) {
-                                Log.d(tag, "setFingerprint: success")
-                                editTextPassword.text.clear()
-                            } else {
-                                Log.d(tag, "setFingerprint: exception")
-                            }
-                            reloadUI()
-                        })
-                    }
+                    })
+                } else {
+                    AlertUtils.showError(this, errorMessage)
+                    reloadUI()
                 }
             } else {
                 biometrics.deleteFingerprint()
@@ -141,7 +143,7 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
 
         buttonFloatingAction.setOnClickListener {
             val biometrics = Biometrics(this)
-            when (biometrics.which) {
+            when (biometrics.enrolledAuthType) {
                 Biometrics.AuthType.NONE -> {
                     val password = editTextPassword.text.toString()
                     openVault(password)
@@ -252,7 +254,7 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
 
     private fun reloadUI() {
         val biometrics = Biometrics(this)
-        when (biometrics.which) {
+        when (biometrics.enrolledAuthType) {
             Biometrics.AuthType.NONE -> {
                 textInputLayoutPassword.visibility = View.VISIBLE
                 checkBoxFingerprint.isChecked = false

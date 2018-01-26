@@ -45,7 +45,7 @@ class Biometrics(private val activity: Activity) {
     private val fingerprintManager = activity.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
     private val sharedPreferences = activity.getSharedPreferences("biometrics", Context.MODE_PRIVATE)
 
-    val which: AuthType
+    val enrolledAuthType: AuthType
         get() = when {
             hasFingerprint() -> AuthType.FINGERPRINT
             hasPalm() -> AuthType.PALM
@@ -188,8 +188,12 @@ class Biometrics(private val activity: Activity) {
         return hasIv && hasEncoded && hasKey
     }
 
-    fun isFingerprintAvailable(): Boolean {
-        return fingerprintManager.isHardwareDetected && fingerprintManager.hasEnrolledFingerprints()
+    fun isFingerprintHardwareAvailable(): Boolean {
+        return fingerprintManager.isHardwareDetected
+    }
+
+    fun isFingerprintUserEnrolled(): Boolean {
+        return fingerprintManager.hasEnrolledFingerprints()
     }
 
     fun setFingerprint(password: String, callback: (e: Exception?) -> Unit) {

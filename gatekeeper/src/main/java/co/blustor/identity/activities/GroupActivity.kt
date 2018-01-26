@@ -6,7 +6,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
@@ -332,9 +331,5 @@ class GroupActivity : LockingActivity() {
                 return true
             }
         }
-    }
-
-    companion object {
-        private const val tag = "GroupActivity"
     }
 }

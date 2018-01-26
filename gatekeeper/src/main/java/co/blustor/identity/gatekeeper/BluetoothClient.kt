@@ -109,12 +109,12 @@ object BluetoothClient {
     private fun timeout(value: Long, timeUnit: TimeUnit) {
         try {
             cyclicBarrier.await(value, timeUnit)
-        } catch (e: InterruptedException) {
-            requestMtuCallback?.onTimeout()
-        } catch (e: BrokenBarrierException) {
-            requestMtuCallback?.onTimeout()
         } catch (e: TimeoutException) {
             requestMtuCallback?.onTimeout()
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        } catch (e: BrokenBarrierException) {
+            e.printStackTrace()
         }
     }
 
