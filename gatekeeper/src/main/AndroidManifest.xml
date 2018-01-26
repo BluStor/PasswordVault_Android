@@ -3,24 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="co.blustor.identity">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
-    <!-- Palm Permissions -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.REORDER_TASKS" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- PalmSDK -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature android:name="android.hardware.bluetooth_le" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
     <application
+        android:name=".utils.MyApplication"
         android:allowBackup="true"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
@@ -29,46 +31,46 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <activity android:name="co.blustor.identity.activities.AboutActivity" />
+        <activity android:name=".activities.AboutActivity" />
         <activity
-            android:name="co.blustor.identity.activities.CreateActivity"
+            android:name=".activities.CreateActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
-            android:name="co.blustor.identity.activities.AddEntryActivity"
+            android:name=".activities.AddEntryActivity"
             android:windowSoftInputMode="stateVisible" />
         <activity
-            android:name="co.blustor.identity.activities.AddGroupActivity"
+            android:name=".activities.AddGroupActivity"
             android:windowSoftInputMode="stateVisible" />
-        <activity android:name="co.blustor.identity.activities.ChooseActivity" />
-        <activity android:name="co.blustor.identity.activities.CloseActivity" />
-        <activity android:name="co.blustor.identity.activities.EditEntryActivity" />
+        <activity android:name=".activities.ChooseActivity" />
+        <activity android:name=".activities.CloseActivity" />
+        <activity android:name=".activities.EditEntryActivity" />
         <activity
-            android:name="co.blustor.identity.activities.EditGroupActivity"
+            android:name=".activities.EditGroupActivity"
             android:windowSoftInputMode="stateVisible" />
-        <activity android:name="co.blustor.identity.activities.GroupActivity" />
-        <activity android:name="co.blustor.identity.activities.IconPickerActivity" />
-        <activity android:name="co.blustor.identity.activities.MainActivity">
+        <activity android:name=".activities.GroupActivity" />
+        <activity android:name=".activities.IconPickerActivity" />
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="co.blustor.identity.activities.PasswordGeneratorActivity" />
-        <activity android:name="co.blustor.identity.activities.SettingsActivity" />
+        <activity android:name=".activities.PasswordGeneratorActivity" />
+        <activity android:name=".activities.SettingsActivity" />
         <activity
-            android:name="co.blustor.identity.activities.SplashActivity"
+            android:name=".activities.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="co.blustor.identity.activities.UnlockActivity"
+            android:name=".activities.UnlockActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <receiver
-            android:name="co.blustor.identity.receivers.AppBroadcastReceiver"
+            android:name=".receivers.AppBroadcastReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="co.blustor.pwv.lock_database" />
+                <action android:name="co.blustor.identity.lockDatabase" />
             </intent-filter>
         </receiver>
-        
+
     </application>
 </manifest>

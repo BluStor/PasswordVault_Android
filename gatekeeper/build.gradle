@@ -1,12 +1,13 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     flavorDimensions "default"
 
     compileSdkVersion 27
-    buildToolsVersion '27.0.1'
+    buildToolsVersion '27.0.3'
 
-    def buildName = "1.0.6"
     signingConfigs {
         release {
             storeFile file("gatekeeper.jks")
@@ -35,11 +36,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     defaultConfig {
         applicationId "co.blustor.identity"
         minSdkVersion 23
@@ -48,6 +44,7 @@ android {
         versionName "1.0.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     productFlavors {
         local {
             applicationId "co.blustor.identity"
@@ -58,40 +55,34 @@ android {
             testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         }
     }
-    
+
 }
 
 repositories {
     maven { url 'https://jitpack.io' }
+    mavenCentral()
 }
 
 dependencies {
-    // compile fileTree(include: ['*.jar'], dir: 'libs')
-
-    compile project(":palmsdk")
-
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.0.1'
-    compile 'org.greenrobot:eventbus:3.0.0'
-    compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile 'com.google.code.gson:gson:2.6.1'
-    implementation 'com.android.support:appcompat-v7:27.0.0'
-    implementation 'com.android.support:design:27.0.0'
-    implementation 'com.android.support:support-v4:27.0.0'
+    implementation project(":palmsdk")
+    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support:design:27.0.2'
+    implementation 'com.android.support:support-v4:27.0.2'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.github.clans:fab:1.6.4'
     implementation 'com.github.Kennyc1012:BottomSheet:2.3.4'
-    implementation 'com.google.guava:guava:23.0-android'
+    implementation 'com.google.guava:guava:23.6-android'
     implementation 'com.karumi:dexter:4.2.0'
-    implementation('de.slackspace:openkeepass:0.6.1') {
+    implementation('de.slackspace:openkeepass:0.7.0') {
         exclude module: 'stax'
         exclude module: 'stax-api'
         exclude module: 'xpp3'
     }
-    implementation 'org.greenrobot:eventbus:3.0.0'
+    implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'org.jdeferred:jdeferred-core:1.2.6'
     testImplementation 'com.android.support.test:runner:1.0.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'junit:junit:4.12'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

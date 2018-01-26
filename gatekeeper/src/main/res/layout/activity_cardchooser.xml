@@ -20,7 +20,7 @@
         android:src="@drawable/card" />
 
     <ToggleButton
-        android:id="@+id/button_scan_toggle"
+        android:id="@+id/buttonScanToggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -28,16 +28,16 @@
         android:textOn="@string/togglebutton_scanning" />
 
     <ProgressBar
-        android:id="@+id/progressbar_results"
+        android:id="@+id/progressBarResults"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:layout_marginBottom="10dp"
-        android:visibility="gone"
-        android:indeterminateBehavior="cycle" />
+        android:indeterminateBehavior="cycle"
+        android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_results"
+        android:id="@+id/recyclerViewResults"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/item_scanresult" />

@@ -7,7 +7,7 @@
     android:padding="10dp">
 
     <ImageView
-        android:id="@+id/imageview_icon"
+        android:id="@+id/imageViewIcon"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:adjustViewBounds="true"
@@ -21,10 +21,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@id/imageview_icon"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewIcon"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/imageview_icon"
-        app:layout_constraintTop_toTopOf="@+id/imageview_icon"
+        app:layout_constraintStart_toEndOf="@id/imageViewIcon"
+        app:layout_constraintTop_toTopOf="@id/imageViewIcon"
         tools:layout_editor_absoluteX="8dp">
 
         <TextView

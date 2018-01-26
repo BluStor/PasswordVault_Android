@@ -1,7 +1,7 @@
 <resources>
     <string name="about_address">965 W. Chicago Avenue, Chicago, IL 60642</string>
     <string name="about_email">info@blustor.co</string>
-    <string name="about_phone">+1 312-265-3058</string>
+    <string name="about_phone">+1 312–265–3058</string>
     <string name="app_name">GateKeeper</string>
     <string name="button_change_password">Change password</string>
     <string name="button_generate">Generate</string>
@@ -46,7 +46,7 @@
     <string name="status_failed">Failed</string>
     <string name="status_synced">Synced</string>
     <string name="status_transferring">Transferring …</string>
-    <string name="textview_empty">Empty</string>
+    <string name="textview_empty">No entries.</string>
     <string name="textview_no_results">No results.</string>
     <string name="welcome_to">Welcome to</string>
     <string name="menu_new_database">New database</string>
@@ -63,4 +63,9 @@
     <string name="menu_choose_card">Choose card</string>
     <string name="bluetooth_not_paired">Card is not paired with your phone.  Open Bluetooth settings to pair card.  Make sure the card has a rapidly flashing yellow light.</string>
     <string name="bluetooth_not_enabled">Bluetooth is not enabled.  Open your Bluetooth settings and enable.</string>
+    <string name="checkbox_palm">Palm</string>
+    <string name="checkbox_fingerprint">Fingerprint</string>
+    <string name="description_fingerprint_icon">Fingerprint icon</string>
+    <string name="fingerprint_description">Confirm fingerprint to continue</string>
+    <string name="fingerprint_hint">Touch sensor</string>
 </resources>
