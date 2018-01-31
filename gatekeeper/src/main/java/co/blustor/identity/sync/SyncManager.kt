@@ -22,7 +22,7 @@ object SyncManager {
     private val eventBus = EventBus.getDefault()
 
     @Synchronized
-    fun getRoot(context: Context, password: String): Promise<VaultGroup, Exception, Void> {
+    fun getRoot(context: Context): Promise<VaultGroup, Exception, Void> {
         val deferredObject = DeferredObject<VaultGroup, Exception, Void>()
         val runnable = Runnable {
             eventBus.postSticky(SyncStatus.CONNECTING)
@@ -44,13 +44,12 @@ object SyncManager {
                         try {
                             val byteArrayInputStream = ByteArrayInputStream(it)
                             val keePassFile = KeePassDatabase.getInstance(byteArrayInputStream)
-                                .openDatabase(password)
+                                .openDatabase(Vault.instance.password)
 
                             val keePassRoot = keePassFile.root.groups[0]
                             val group = Translator.importKeePass(keePassRoot)
 
                             Vault.instance.root = group
-                            Vault.instance.password = password
 
                             eventBus.postSticky(SyncStatus.SYNCED)
                             deferredObject.resolve(group)

@@ -91,12 +91,14 @@ class CreateActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
                     dialog.cancel()
 
                     Vault.instance.create()
+                    Vault.instance.password = editTextPassword.text.toString()
+
+                    Log.d(tag, "Password is ${Vault.instance.password}")
 
                     val syncDialogFragment = SyncDialogFragment()
 
                     val args = Bundle()
                     args.putSerializable("type", "write")
-                    args.putSerializable("password", editTextPassword.text.toString())
 
                     syncDialogFragment.arguments = args
                     syncDialogFragment.setSyncListener(this)

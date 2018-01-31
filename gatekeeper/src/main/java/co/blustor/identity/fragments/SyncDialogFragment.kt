@@ -13,7 +13,6 @@ import co.blustor.identity.sync.SyncManager.getRoot
 import co.blustor.identity.sync.SyncManager.setRoot
 import co.blustor.identity.sync.SyncStatus
 import co.blustor.identity.utils.AlertUtils
-import com.google.common.base.MoreObjects
 import kotlinx.android.synthetic.main.dialogfragment_sync.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -40,11 +39,10 @@ class SyncDialogFragment : DialogFragment() {
 
         val args = arguments
 
-        val type = MoreObjects.firstNonNull(args.getString("type"), "read")
-        val password = MoreObjects.firstNonNull(args.getString("password"), "")
+        val type = args.getString("type", "read")
 
         val promise = if (type == "read") {
-            getRoot(activity, password)
+            getRoot(activity)
         } else {
             setRoot(activity)
         }

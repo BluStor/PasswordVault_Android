@@ -15,6 +15,7 @@ import co.blustor.identity.R
 import co.blustor.identity.fragments.SyncDialogFragment
 import co.blustor.identity.utils.AlertUtils
 import co.blustor.identity.utils.Biometrics
+import co.blustor.identity.vault.Vault
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -243,9 +244,10 @@ class UnlockActivity : AppCompatActivity(), SyncDialogFragment.SyncListener {
     private fun openVault(password: String) {
         val syncDialogFragment = SyncDialogFragment()
 
+        Vault.instance.password = password
+
         val args = Bundle()
         args.putSerializable("type", "read")
-        args.putSerializable("password", password)
 
         syncDialogFragment.arguments = args
         syncDialogFragment.setSyncListener(this)

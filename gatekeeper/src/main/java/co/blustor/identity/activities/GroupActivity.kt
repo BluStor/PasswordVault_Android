@@ -1,5 +1,6 @@
 package co.blustor.identity.activities
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
